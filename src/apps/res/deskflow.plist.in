@@ -30,6 +30,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>@BUNDLE_COPYRIGHT@</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>@BUNDLE_MINIMUM_SYSTEM_VERSION@</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 

@@ -18,7 +18,24 @@ runs:
           dmg=$(ls build/deskflow-*.dmg | head -1)
           echo "Y" | hdiutil attach "$dmg" -nobrowse -mountpoint /tmp/deskflow-dmg
           /tmp/deskflow-dmg/Deskflow.app/Contents/MacOS/deskflow-core --version
+          # Every Mach-O in the bundle must load on the oldest macOS we target;
+          # one newer than that makes Finder refuse to open the app.
+          app=/tmp/deskflow-dmg/Deskflow.app
+          plutil -p "$app/Contents/Info.plist" | grep -E "LSMinimumSystemVersion|CFBundleExecutable" || true
+          min=$(plutil -extract LSMinimumSystemVersion raw "$app/Contents/Info.plist")
+          too_new=0
+          while IFS= read -r -d '' f; do
+            file -b "$f" | grep -q Mach-O || continue
+            for v in $(vtool -show-build "$f" 2>/dev/null | awk '$1=="minos"{print $2} $1=="version"{print $2}'); do
+              echo "$v  ${f#$app/}"
+              if [ "$(printf '%s\n%s\n' "$min" "$v" | sort -V | tail -1)" != "$min" ]; then
+                echo "::error::${f#$app/} needs macOS $v, newer than LSMinimumSystemVersion $min"
+                too_new=1
+              fi
+            done
+          done < <(find "$app" -type f -print0)
           hdiutil detach /tmp/deskflow-dmg
+          exit $too_new
 
         elif [ "$RUNNER_OS" == "Windows" ]; then
           7z x build/deskflow-*-portable.zip -otmp/deskflow-pkg
