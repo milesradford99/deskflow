@@ -21,7 +21,14 @@
 
 namespace {
 const CFStringRef kFileUrlFlavor = CFSTR("public.file-url");
+
+// Item ids are opaque pointers that only have to differ from each other. The text
+// and image flavors have always used id 0, so the first file joins them there.
+PasteboardItemID itemId(size_t index)
+{
+  return reinterpret_cast<PasteboardItemID>(index);
 }
+} // namespace
 
 //
 // OSXClipboard
@@ -314,7 +321,7 @@ void OSXClipboard::addFiles(const std::string &paths)
       continue;
 
     // the first file shares item 0 with the other flavors; each further file is an item of its own
-    const auto item = reinterpret_cast<PasteboardItemID>(index == 0 ? 0 : index + 1);
+    const auto item = itemId(index == 0 ? 0 : index + 1);
     if (CFDataRef data = CFURLCreateData(kCFAllocatorDefault, url, kCFStringEncodingUTF8, true); data != nullptr) {
       PasteboardPutItemFlavor(m_pboard, item, kFileUrlFlavor, data, kPasteboardFlavorNoFlags);
       CFRelease(data);
@@ -332,7 +339,7 @@ void OSXClipboard::addFiles(const std::string &paths)
   if (index > 0) {
     CFDataRef list = CFPropertyListCreateData(kCFAllocatorDefault, names, kCFPropertyListXMLFormat_v1_0, 0, nullptr);
     if (list != nullptr) {
-      PasteboardPutItemFlavor(m_pboard, 0, CFSTR("NSFilenamesPboardType"), list, kPasteboardFlavorNoFlags);
+      PasteboardPutItemFlavor(m_pboard, itemId(0), CFSTR("NSFilenamesPboardType"), list, kPasteboardFlavorNoFlags);
       CFRelease(list);
     }
   }
