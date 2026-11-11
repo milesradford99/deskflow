@@ -84,13 +84,19 @@ bool postCommand(const QString &command, const QString &args)
   return true;
 }
 
-void configure(FileTransferManager &manager)
+QString downloadDir()
 {
   auto downloads = Settings::value(Settings::Core::DownloadDir).toString();
   if (downloads.isEmpty())
     downloads = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
   if (downloads.isEmpty())
     downloads = QDir::homePath();
+  return downloads;
+}
+
+void configure(FileTransferManager &manager)
+{
+  const auto downloads = downloadDir();
   manager.setDownloadDir(downloads);
 
   // one cache per computer name, so a server and client on one machine don't share it

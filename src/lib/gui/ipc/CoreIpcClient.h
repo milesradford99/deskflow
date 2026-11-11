@@ -20,6 +20,8 @@ public:
   explicit CoreIpcClient(QObject *parent = nullptr);
 
   void sendStop();
+  //! Send `command=args`; args must not contain newlines or `=` (see IpcPayload.h).
+  void sendCommand(const QString &command, const QString &args);
 
 Q_SIGNALS:
   void commandReceived(const QString &command, const QString &args);

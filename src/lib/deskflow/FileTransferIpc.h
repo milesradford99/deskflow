@@ -53,6 +53,9 @@ bool postCommand(const QString &command, const QString &args);
 //! Create a manager's folders from the settings and empty the clipboard file cache.
 void configure(FileTransferManager &manager);
 
+//! Where received files go: the folder from the settings, else the user's download folder.
+QString downloadDir();
+
 //! Largest clipboard file set, in bytes, that is fetched without asking; 0 disables it.
 quint64 clipboardFilesLimit();
 

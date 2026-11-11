@@ -30,6 +30,7 @@
 #include "gui/ipc/DaemonIpcClient.h"
 #include "gui/widgets/LogDock.h"
 #include "net/FingerprintDatabase.h"
+#include "widgets/FileTransferWidget.h"
 #include "widgets/StatusBar.h"
 
 #include <QCheckBox>
@@ -84,6 +85,22 @@ MainWindow::MainWindow()
       m_networkMonitor{new NetworkMonitor(this)}
 {
   ui->setupUi(this);
+
+  // roles the theme styles, see Theme.h
+  ui->rbModeServer->setProperty("segment", true);
+  ui->rbModeServer->setProperty("segmentPosition", "first");
+  ui->rbModeClient->setProperty("segment", true);
+  ui->rbModeClient->setProperty("segmentPosition", "last");
+  ui->btnToggleCore->setProperty("primary", true);
+  ui->lblIpAddresses->setProperty("secondary", true);
+  ui->lblComputerName->setProperty("heading", true);
+
+  m_fileTransfer = new FileTransferWidget(this);
+  if (auto *mainLayout = qobject_cast<QBoxLayout *>(ui->topLevelWidget->layout())) {
+    mainLayout->insertWidget(mainLayout->indexOf(ui->groupBox) + 1, m_fileTransfer);
+    mainLayout->setSpacing(12);
+    mainLayout->setContentsMargins(16, 12, 16, 8);
+  }
 
   setWindowIcon(QIcon::fromTheme(kRevFqdnName));
 
@@ -275,6 +292,14 @@ void MainWindow::connectSlots()
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::trayIconActivated);
 
   connect(&m_coreProcess, &CoreProcess::connectedClientsChanged, this, &MainWindow::serverClientsChanged);
+  connect(&m_coreProcess, &CoreProcess::filePeersChanged, m_fileTransfer, &FileTransferWidget::setPeers);
+  connect(&m_coreProcess, &CoreProcess::fileTransferProgress, m_fileTransfer, &FileTransferWidget::updateTransfer);
+  connect(&m_coreProcess, &CoreProcess::processStateChanged, m_fileTransfer, [this](ProcessState state) {
+    if (state == ProcessState::Stopped)
+      m_fileTransfer->reset();
+  });
+  connect(m_fileTransfer, &FileTransferWidget::sendRequested, &m_coreProcess, &CoreProcess::sendFiles);
+  connect(m_fileTransfer, &FileTransferWidget::cancelRequested, &m_coreProcess, &CoreProcess::cancelFileTransfer);
   connect(&m_coreProcess, &CoreProcess::unrecognisedClient, this, &MainWindow::handleUnrecognisedClient);
   connect(&m_coreProcess, &CoreProcess::connectionRefused, this, &MainWindow::handleConnectionRefused);
   connect(&m_coreProcess, &CoreProcess::retryIn, this, &MainWindow::updateTimeoutDelay);

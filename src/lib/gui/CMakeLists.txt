@@ -29,6 +29,8 @@ add_library(${target} STATIC
   Messages.cpp
   Messages.h
   StyleUtils.h
+  Theme.cpp
+  Theme.h
   TlsUtility.cpp
   TlsUtility.h
   VersionChecker.cpp
@@ -97,6 +99,8 @@ add_library(${target} STATIC
   validators/IpAddressValidator.h
   widgets/ComputerSetupView.cpp
   widgets/ComputerSetupView.h
+  widgets/FileTransferWidget.cpp
+  widgets/FileTransferWidget.h
   widgets/FingerprintPreview.cpp
   widgets/FingerprintPreview.h
   widgets/KeySequenceWidget.cpp

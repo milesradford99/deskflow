@@ -437,6 +437,9 @@ void Client::sendClipboard(ClipboardID id)
 
 void Client::handleFileTransferMessage(const deskflow::FileTransferMessage &message)
 {
+  // the user may have picked another folder in the GUI since the last transfer
+  if (message.type == deskflow::FileTransferMessage::Type::Start)
+    m_fileTransfer->setDownloadDir(deskflow::fileTransferIpc::downloadDir());
   m_fileTransfer->handleMessage({}, message);
 }
 

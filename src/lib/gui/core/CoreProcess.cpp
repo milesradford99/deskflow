@@ -8,6 +8,7 @@
 #include "CoreProcess.h"
 
 #include "common/ExitCodes.h"
+#include "common/IpcPayload.h"
 #include "gui/ipc/CoreIpcClient.h"
 #include "gui/ipc/DaemonIpcClient.h"
 
@@ -23,6 +24,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QJsonArray>
 #include <QMetaEnum>
 #include <QMutexLocker>
 #include <QRegularExpression>
@@ -624,6 +626,27 @@ void CoreProcess::setProcessState(ProcessState state)
   Q_EMIT processStateChanged(state);
 }
 
+void CoreProcess::sendFiles(const QString &target, const QStringList &paths)
+{
+  if (!m_coreIpcClient || !m_coreIpcClient->isConnected()) {
+    qWarning("cannot send files, core is not connected");
+    return;
+  }
+  QJsonObject payload;
+  payload["target"] = target;
+  payload["paths"] = QJsonArray::fromStringList(paths);
+  m_coreIpcClient->sendCommand(deskflow::ipc::kSendFiles, deskflow::ipc::encodePayload(payload));
+}
+
+void CoreProcess::cancelFileTransfer(quint32 id)
+{
+  if (!m_coreIpcClient || !m_coreIpcClient->isConnected())
+    return;
+  QJsonObject payload;
+  payload["id"] = static_cast<qint64>(id);
+  m_coreIpcClient->sendCommand(deskflow::ipc::kCancelTransfer, deskflow::ipc::encodePayload(payload));
+}
+
 void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString &args)
 {
   if (command == "connectionState") {
@@ -635,6 +658,10 @@ void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString
       return;
     }
     setConnectionState(state);
+  } else if (command == deskflow::ipc::kFilePeers) {
+    Q_EMIT filePeersChanged(deskflow::ipc::decodePayload(args)["peers"].toVariant().toStringList());
+  } else if (command == deskflow::ipc::kFileTransfer) {
+    Q_EMIT fileTransferProgress(deskflow::ipc::decodePayload(args));
   } else if (command == "connectedClients") {
     const auto clients = args.isEmpty() ? QStringList() : args.split(",");
     Q_EMIT connectedClientsChanged(clients);

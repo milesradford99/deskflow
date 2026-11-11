@@ -355,6 +355,9 @@ void Server::sendConnectedClientsIpc() const
 void Server::handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message)
 {
   // only a client that is part of the layout may send, receive or relay
+  // the user may have picked another folder in the GUI since the last transfer
+  if (message.type == deskflow::FileTransferMessage::Type::Start)
+    m_fileTransfer->setDownloadDir(deskflow::fileTransferIpc::downloadDir());
   if (m_clientSet.contains(const_cast<BaseClientProxy *>(client)))
     m_fileTransfer->handleMessage(getName(client), message);
 }

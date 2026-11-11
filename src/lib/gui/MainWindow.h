@@ -33,6 +33,10 @@ class DeskflowApplication;
 class LogDock;
 class StatusBar;
 
+namespace deskflow::gui {
+class FileTransferWidget;
+}
+
 namespace Ui {
 class MainWindow;
 }
@@ -172,6 +176,7 @@ private:
   bool m_clientErrorVisible = false;
   ServerConfig m_serverConfig;
   deskflow::gui::CoreProcess m_coreProcess;
+  deskflow::gui::FileTransferWidget *m_fileTransfer = nullptr;
   QSet<QString> m_ignoredClients;
   bool m_newClientPromptShowing = false;
   bool m_serverConfigDialogVisible = false;

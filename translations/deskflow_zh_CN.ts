@@ -1398,6 +1398,109 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::FileTransferWidget</name>
+    <message>
+        <source>Send files</source>
+        <translation>发送文件</translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation>更改…</translation>
+    </message>
+    <message>
+        <source>Received files are saved to %1</source>
+        <translation>收到的文件保存在 %1</translation>
+    </message>
+    <message>
+        <source>Save received files to</source>
+        <translation>选择接收文件的保存位置</translation>
+    </message>
+    <message>
+        <source>Connect another computer to send files to it. Files you copy are also pasted across.</source>
+        <translation>连接另一台电脑后即可向它发送文件；复制的文件也可以直接在另一台电脑上粘贴。</translation>
+    </message>
+    <message>
+        <source>Drop files or folders on a computer, or click it to choose them.</source>
+        <translation>把文件或文件夹拖到某台电脑上，或点击它来选择文件。</translation>
+    </message>
+    <message>
+        <source>Send files to %1</source>
+        <translation>发送文件到 %1</translation>
+    </message>
+    <message>
+        <source>Choose files…</source>
+        <translation>选择文件…</translation>
+    </message>
+    <message>
+        <source>Choose a folder…</source>
+        <translation>选择文件夹…</translation>
+    </message>
+    <message>
+        <source>Send a folder to %1</source>
+        <translation>发送文件夹到 %1</translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation>发送到 %1</translation>
+    </message>
+    <message>
+        <source>Copied files from %1: %2</source>
+        <translation>来自 %1 的复制文件：%2</translation>
+    </message>
+    <message>
+        <source>Copied files to %1: %2</source>
+        <translation>复制到 %1 的文件：%2</translation>
+    </message>
+    <message>
+        <source>%1 from %2</source>
+        <translation>%1（来自 %2）</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1（发往 %2）</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 / %2</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Ready to paste · %1</source>
+        <translation>可以粘贴 · %1</translation>
+    </message>
+    <message>
+        <source>Received · %1</source>
+        <translation>已接收 · %1</translation>
+    </message>
+    <message>
+        <source>Sent · %1</source>
+        <translation>已发送 · %1</translation>
+    </message>
+    <message>
+        <source>Dismiss</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Show in folder</source>
+        <translation>在文件夹中显示</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>已取消</translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation>失败：%1</translation>
+    </message>
+    <message>
+        <source>unknown error</source>
+        <translation>未知错误</translation>
+    </message>
+</context>
+<context>
     <name>i18n</name>
     <message>
         <source>LocalizedName</source>

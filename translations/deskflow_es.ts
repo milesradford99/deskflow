@@ -1397,6 +1397,109 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     </message>
 </context>
 <context>
+    <name>deskflow::gui::FileTransferWidget</name>
+    <message>
+        <source>Send files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received files are saved to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save received files to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect another computer to send files to it. Files you copy are also pasted across.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drop files or folders on a computer, or click it to choose them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send files to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a folder…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send a folder to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied files from %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied files to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 from %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to paste · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sent · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dismiss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show in folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>i18n</name>
     <message>
         <source>LocalizedName</source>
