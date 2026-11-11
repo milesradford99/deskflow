@@ -199,6 +199,9 @@ add_library(platform STATIC ${PLATFORM_SOURCES})
 
 target_link_libraries(platform PUBLIC client ${libs})
 
+# the clipboard converters use the shared image helpers that live next to IClipboard
+target_link_libraries(platform PRIVATE app Qt6::Gui)
+
 if(UNIX)
   target_link_libraries(platform PRIVATE net app)
 

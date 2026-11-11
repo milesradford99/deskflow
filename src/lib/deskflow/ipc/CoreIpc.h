@@ -10,5 +10,7 @@
 
 #include <QString>
 
-void ipcSendToClient(const QString &command, const QString &args = "");
+//! Broadcast to the connected GUIs. Messages sent while none is connected are replayed
+//! to the first one that does, unless \c queueIfNoClients is false.
+void ipcSendToClient(const QString &command, const QString &args = "", bool queueIfNoClients = true);
 void ipcSendConnectionState(deskflow::core::ConnectionState state);

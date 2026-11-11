@@ -45,7 +45,7 @@ static const int16_t kProtocolMajorVersion = 1;
  * @note When incrementing the minor version, the Deskflow application version should also increment
  * @since Protocol version 1.0
  */
-static const int16_t kProtocolMinorVersion = 8;
+static const int16_t kProtocolMinorVersion = 9;
 
 /**
  * @brief Default TCP port for Deskflow connections
@@ -1161,6 +1161,33 @@ extern const char *const kMsgDSecureInputNotification;
  * @since Protocol version 1.8
  */
 extern const char *const kMsgDLanguageSynchronisation;
+
+/**
+ * @brief File transfer messages
+ *
+ * A transfer is opened by its sender with a start message, streamed as data
+ * messages that the receiver acknowledges, and closed by an end message in
+ * each direction. Clients address any computer by name; the server relays
+ * transfers that are not for itself. See FileTransferManager for the stream
+ * format and flow control.
+ *
+ * - `DFTS%4i%s`: start; transfer id, JSON header (kind, source, target, token, total, count, label)
+ * - `DFTD%4i%s`: data; transfer id, a slice of the record stream
+ * - `DFTA%4i%4i`: acknowledge; transfer id, data messages consumed so far
+ * - `DFTE%4i%1i%s`: end; transfer id, status (0 ok, 1 cancelled, 2 error), reason
+ * - `DFTQ%4i%s`: request the files behind a clipboard offer; offer token, JSON (origin, requester)
+ * - `DFTN%4i%s`: the requested clipboard offer is no longer available; offer token, JSON
+ * - `DFTP%s`: server to client; newline separated computer names, the server's first
+ *
+ * @since Protocol version 1.9
+ */
+extern const char *const kMsgDFileStart;
+extern const char *const kMsgDFileData;    ///< @see kMsgDFileStart
+extern const char *const kMsgDFileAck;     ///< @see kMsgDFileStart
+extern const char *const kMsgDFileEnd;     ///< @see kMsgDFileStart
+extern const char *const kMsgDFileRequest; ///< @see kMsgDFileStart
+extern const char *const kMsgDFileDecline; ///< @see kMsgDFileStart
+extern const char *const kMsgDFilePeers;   ///< @see kMsgDFileStart
 
 /** @} */ // end of protocol_system group
 

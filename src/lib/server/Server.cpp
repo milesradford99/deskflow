@@ -13,6 +13,8 @@
 #include "deskflow/AppUtil.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
+#include "deskflow/FileTransfer.h"
+#include "deskflow/FileTransferIpc.h"
 #include "deskflow/IPlatformComputer.h"
 #include "deskflow/OptionTypes.h"
 #include "deskflow/PacketStreamFilter.h"
@@ -65,6 +67,21 @@ Server::Server(ServerConfig &config, PrimaryClient *primaryClient, deskflow::Com
     }
     clipboard.m_clipboardData = clipboard.m_clipboard.marshall();
   }
+
+  // file transfers: this server receives, sends, and relays between clients
+  m_fileTransfer = std::make_unique<deskflow::FileTransferManager>(
+      primaryName, true,
+      [this](const std::string &peer, const deskflow::FileTransferMessage &message) {
+        const auto it = m_clients.find(peer);
+        return it != m_clients.end() && it->second->sendFileTransferMessage(message);
+      }
+  );
+  deskflow::fileTransferIpc::configure(*m_fileTransfer);
+  deskflow::fileTransferIpc::attach(m_events);
+  m_events->addHandler(
+      EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
+      [this](const auto &e) { handleFileTransferCommand(e); }
+  );
 
   // install event handlers
   m_events->addHandler(EventTypes::Timer, this, [this](const auto &) { handleSwitchWaitTimeout(); });
@@ -167,6 +184,8 @@ Server::~Server()
   m_events->removeHandler(PrimaryComputerFakeInputBegin, m_inputFilter);
   m_events->removeHandler(PrimaryComputerFakeInputEnd, m_inputFilter);
   m_events->removeHandler(Timer, this);
+  m_events->removeHandler(FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
+  deskflow::fileTransferIpc::attach(nullptr);
   stopSwitch();
 
   try {
@@ -324,6 +343,42 @@ void Server::sendConnectedClientsIpc() const
     }
   }
   ipcSendToClient("connectedClients", clientList.join(","));
+}
+
+void Server::handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message)
+{
+  // only a client that is part of the layout may send, receive or relay
+  if (m_clientSet.contains(const_cast<BaseClientProxy *>(client)))
+    m_fileTransfer->handleMessage(getName(client), message);
+}
+
+void Server::handleFileTransferCommand(const Event &event)
+{
+  const auto *command = static_cast<const deskflow::fileTransferIpc::Command *>(event.getDataObject());
+  if (command->action == deskflow::fileTransferIpc::Command::Action::Cancel) {
+    m_fileTransfer->cancel(command->id);
+  } else {
+    m_fileTransfer->sendFiles(command->target, command->paths);
+  }
+}
+
+void Server::sendFilePeers() const
+{
+  const auto self = getName(m_primaryClient);
+  QStringList everyone{QString::fromStdString(self)};
+  QStringList others;
+  for (const auto &[name, client] : m_clients) {
+    if (name != self) {
+      everyone.append(QString::fromStdString(name));
+      others.append(QString::fromStdString(name));
+    }
+  }
+
+  for (const auto &[name, client] : m_clients) {
+    if (name != self)
+      client->sendFilePeers(everyone);
+  }
+  deskflow::fileTransferIpc::sendPeers(self, others);
 }
 
 std::string Server::getName(const BaseClientProxy *client) const
@@ -1917,6 +1972,7 @@ bool Server::addClient(BaseClientProxy *client)
   // tell primary client about the active sides
   m_primaryClient->reconfigure(getActivePrimarySides());
 
+  sendFilePeers();
   return true;
 }
 
@@ -1935,9 +1991,12 @@ bool Server::removeClient(BaseClientProxy *client)
   m_events->removeHandler(ClipboardChanged, client->getEventTarget());
 
   // remove from list
-  m_clients.erase(getName(client));
+  const auto name = getName(client);
+  m_clients.erase(name);
   m_clientSet.erase(i);
 
+  m_fileTransfer->peerDisconnected(name);
+  sendFilePeers();
   return true;
 }
 

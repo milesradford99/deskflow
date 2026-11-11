@@ -16,7 +16,10 @@
 #include "deskflow/IClipboard.h"
 #include "net/NetworkAddress.h"
 
+#include <QStringList>
+
 #include <climits>
+#include <memory>
 #include <string>
 
 class Event;
@@ -25,6 +28,10 @@ namespace deskflow {
 class Computer;
 }
 class ServerProxy;
+namespace deskflow {
+class FileTransferManager;
+struct FileTransferMessage;
+} // namespace deskflow
 class IDataSocket;
 class ISocketFactory;
 namespace deskflow {
@@ -156,6 +163,12 @@ public:
   */
   NetworkAddress getServerAddress() const;
 
+  //! Feed a file transfer message that arrived from the server.
+  void handleFileTransferMessage(const deskflow::FileTransferMessage &message);
+
+  //! Called with the computers files can be sent to; the server's name comes first.
+  void setFilePeers(const QStringList &names);
+
   //! Return last resolved adresses count
   size_t getLastResolvedAddressesCount() const
   {
@@ -244,4 +257,7 @@ private:
   int32_t m_relativeRestoreY = 0;
   size_t m_maximumClipboardSize = INT_MAX;
   size_t m_resolvedAddressesCount = 0;
+
+  std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
+  void handleFileTransferCommand(const Event &event);
 };

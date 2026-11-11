@@ -14,6 +14,8 @@
 
 namespace deskflow::core::ipc {
 
+static constexpr qsizetype kMaxMessageSize = 16 * 1024 * 1024;
+
 IpcServer::IpcServer(QObject *parent, const QString &serverName, const QString &typeName)
     : QObject(parent),
       m_server{new QLocalServer(this)}, // NOSONAR - Qt memory
@@ -63,17 +65,10 @@ void IpcServer::handleReadyRead()
   const auto clientSocket = qobject_cast<QLocalSocket *>(sender());
   LOG_VERBOSE("%s ipc server ready to read data", m_typeName.constData());
 
-  QByteArray data = clientSocket->readAll();
-  if (data.isEmpty()) {
-    LOG_WARN("%s ipc server got empty message", m_typeName.constData());
-    return;
-  }
-
-  // we don't handle incomplete messages yet; each socket read must have delimiters.
-  if (!data.contains('\n')) {
-    LOG_WARN("%s ipc server got incomplete message: %s", m_typeName.constData(), data.constData());
-    return;
-  }
+  // a long message (e.g. many file paths) can arrive in pieces, so keep the tail for the next read
+  // (taken out of the map while processing: a handler may drop the socket and its buffer)
+  auto data = m_readBuffers.take(clientSocket);
+  data += clientSocket->readAll();
 
   // each message is delimited by a newline to keep the protocol super simple.
   while (data.contains('\n')) {
@@ -83,6 +78,12 @@ void IpcServer::handleReadyRead()
     QString message = QString::fromUtf8(messageData);
     processMessage(clientSocket, message);
   }
+
+  if (data.size() > kMaxMessageSize) {
+    LOG_WARN("%s ipc server dropping oversized message", m_typeName.constData());
+  } else if (!data.isEmpty() && m_clients.contains(clientSocket)) {
+    m_readBuffers.insert(clientSocket, data);
+  }
 }
 
 void IpcServer::handleDisconnected()
@@ -90,6 +91,7 @@ void IpcServer::handleDisconnected()
   const auto clientSocket = qobject_cast<QLocalSocket *>(sender());
   LOG_DEBUG("%s ipc server client disconnected", m_typeName.constData());
   m_clients.remove(clientSocket);
+  m_readBuffers.remove(clientSocket);
   clientSocket->deleteLater();
 }
 
@@ -103,6 +105,7 @@ void IpcServer::handleErrorOccurred()
   }
 
   m_clients.remove(clientSocket);
+  m_readBuffers.remove(clientSocket);
   clientSocket->deleteLater();
 }
 
@@ -159,11 +162,13 @@ void IpcServer::processMessage(QLocalSocket *clientSocket, const QString &messag
   clientSocket->flush();
 }
 
-void IpcServer::broadcastCommand(const QString &command, const QString &args)
+void IpcServer::broadcastCommand(const QString &command, const QString &args, bool queueIfNoClients)
 {
   const auto message = args.isEmpty() ? command : QStringLiteral("%1=%2").arg(command, args);
 
   if (m_clients.isEmpty()) {
+    if (!queueIfNoClients)
+      return;
     LOG_VERBOSE(
         "%s ipc server has no clients, message queued: %s", m_typeName.constData(), message.toUtf8().constData()
     );

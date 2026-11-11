@@ -238,5 +238,8 @@ enum class EventTypes : uint32_t
 
   /// Stop libei
   EISessionClosed,
+
+  /// The GUI asked for a file transfer to start or stop. The data object is a fileTransferIpc::Command.
+  FileTransferCommand,
 };
 } // namespace deskflow

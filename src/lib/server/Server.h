@@ -19,10 +19,15 @@
 
 #include <climits>
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 
 class BaseClientProxy;
+namespace deskflow {
+class FileTransferManager;
+struct FileTransferMessage;
+} // namespace deskflow
 class EventQueueTimer;
 class PrimaryClient;
 class InputFilter;
@@ -198,6 +203,15 @@ public:
   */
   void getClients(std::vector<std::string> &list) const;
   void sendConnectedClientsIpc() const;
+
+  //! Feed a file transfer message that arrived from a client.
+  void handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message);
+
+  //! The manager that sends, receives and relays files for this server.
+  deskflow::FileTransferManager &fileTransfer() const
+  {
+    return *m_fileTransfer;
+  }
   size_t getMaximumClipboardSizeBytes() const;
 
   //@}
@@ -410,6 +424,11 @@ private:
   using ClientList = std::map<std::string, BaseClientProxy *>;
   using ClientSet = std::set<BaseClientProxy *>;
   ClientList m_clients;
+
+  std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
+  void handleFileTransferCommand(const Event &event);
+  //! Tell every client and the GUI which computers files can be sent to.
+  void sendFilePeers() const;
   ClientSet m_clientSet;
 
   // all old connections that we're waiting to hangup

@@ -22,6 +22,10 @@ class IStream;
 }
 class IEventQueue;
 
+namespace deskflow {
+struct FileTransferMessage;
+}
+
 //! Proxy for server implementing protocol version 1.6
 /*!
 This class acts a proxy for the server, converting calls into messages
@@ -50,6 +54,12 @@ public:
   void onInfoChanged();
   bool onGrabClipboard(ClipboardID);
   void onClipboardChanged(ClipboardID, const IClipboard *);
+
+  //! Queue a file transfer message for the server; false if it can't take one (protocol < 1.9).
+  virtual bool sendFileTransferMessage(const deskflow::FileTransferMessage &)
+  {
+    return false;
+  }
 
   //@}
 

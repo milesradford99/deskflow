@@ -14,11 +14,14 @@
 #include "client/ServerProxy.h"
 #include "client/ServerProxy1_7.h"
 #include "client/ServerProxy1_8.h"
+#include "client/ServerProxy1_9.h"
 #include "common/NetworkProtocol.h"
 #include "common/Settings.h"
 #include "deskflow/Clipboard.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
+#include "deskflow/FileTransfer.h"
+#include "deskflow/FileTransferIpc.h"
 #include "deskflow/IPlatformComputer.h"
 #include "deskflow/PacketStreamFilter.h"
 #include "deskflow/ProtocolTypes.h"
@@ -69,12 +72,28 @@ Client::Client(
   // register suspend/resume event handlers
   m_events->addHandler(EventTypes::ComputerSuspend, getEventTarget(), [this](const auto &) { handleSuspend(); });
   m_events->addHandler(EventTypes::ComputerResume, getEventTarget(), [this](const auto &) { handleResume(); });
+
+  // file transfers: everything goes through the server, which relays to other clients
+  m_fileTransfer = std::make_unique<deskflow::FileTransferManager>(
+      m_name, false,
+      [this](const std::string &, const deskflow::FileTransferMessage &message) {
+        return m_server != nullptr && m_server->sendFileTransferMessage(message);
+      }
+  );
+  deskflow::fileTransferIpc::configure(*m_fileTransfer);
+  deskflow::fileTransferIpc::attach(m_events);
+  m_events->addHandler(
+      EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
+      [this](const auto &e) { handleFileTransferCommand(e); }
+  );
 }
 
 Client::~Client()
 {
   m_events->removeHandler(EventTypes::ComputerSuspend, getEventTarget());
   m_events->removeHandler(EventTypes::ComputerResume, getEventTarget());
+  m_events->removeHandler(EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
+  deskflow::fileTransferIpc::attach(nullptr);
 
   cleanupTimer();
   cleanupComputer();
@@ -409,6 +428,28 @@ void Client::sendClipboard(ClipboardID id)
   }
 }
 
+void Client::handleFileTransferMessage(const deskflow::FileTransferMessage &message)
+{
+  m_fileTransfer->handleMessage({}, message);
+}
+
+void Client::setFilePeers(const QStringList &names)
+{
+  auto peers = names;
+  peers.removeAll(QString::fromStdString(m_name));
+  deskflow::fileTransferIpc::sendPeers(m_name, peers);
+}
+
+void Client::handleFileTransferCommand(const Event &event)
+{
+  const auto *command = static_cast<const deskflow::fileTransferIpc::Command *>(event.getDataObject());
+  if (command->action == deskflow::fileTransferIpc::Command::Action::Cancel) {
+    m_fileTransfer->cancel(command->id);
+  } else {
+    m_fileTransfer->sendFiles(command->target, command->paths);
+  }
+}
+
 void Client::sendEvent(EventTypes type)
 {
   m_events->addEvent(Event(type, getEventTarget()));
@@ -483,6 +524,9 @@ bool Client::setupComputer(int16_t protocolMinor)
   case 8:
     m_server = new ServerProxy1_8(this, m_stream, m_events);
     break;
+  case 9:
+    m_server = new ServerProxy1_9(this, m_stream, m_events);
+    break;
   default:
     break;
   }
@@ -548,6 +592,10 @@ void Client::cleanupComputer()
     m_events->removeHandler(EventTypes::ClipboardGrabbed, getEventTarget());
     delete m_server;
     m_server = nullptr;
+
+    // nothing can be sent or finished without the server
+    m_fileTransfer->abortAll(QStringLiteral("disconnected from the server"));
+    deskflow::fileTransferIpc::sendPeers(m_name, {});
   }
 }
 

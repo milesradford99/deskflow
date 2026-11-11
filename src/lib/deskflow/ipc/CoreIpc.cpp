@@ -10,13 +10,16 @@
 
 #include <QMetaEnum>
 
-void ipcSendToClient(const QString &command, const QString &args)
+void ipcSendToClient(const QString &command, const QString &args, bool queueIfNoClients)
 {
   // Queued because callers may not be on the main thread,
   // and QLocalSocket can only be written to from its owning thread.
   auto &server = deskflow::core::ipc::CoreIpcServer::instance();
   QMetaObject::invokeMethod(
-      &server, [command, args] { deskflow::core::ipc::CoreIpcServer::instance().broadcastCommand(command, args); },
+      &server,
+      [command, args, queueIfNoClients] {
+        deskflow::core::ipc::CoreIpcServer::instance().broadcastCommand(command, args, queueIfNoClients);
+      },
       Qt::QueuedConnection
   );
 }

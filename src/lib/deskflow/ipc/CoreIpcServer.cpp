@@ -8,6 +8,7 @@
 
 #include "base/Log.h"
 #include "common/Constants.h"
+#include "deskflow/FileTransferIpc.h"
 
 #include <QLocalSocket>
 
@@ -29,7 +30,9 @@ CoreIpcServer &CoreIpcServer::instance()
 
 void CoreIpcServer::processCommand(QLocalSocket *clientSocket, const QString &command, const QStringList &parts)
 {
-  Q_UNUSED(parts)
+  if (deskflow::fileTransferIpc::postCommand(command, parts.size() >= 2 ? parts.at(1) : QString()))
+    return;
+
   if (command == QStringLiteral("stop")) {
     LOG_DEBUG("core ipc server got stop message");
     writeToClientSocket(clientSocket, QStringLiteral("ok"));

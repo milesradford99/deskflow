@@ -392,6 +392,10 @@ QVariant Settings::defaultValue(const QString &key)
   if (key == Server::ClipboardSize)
     return 256; // MiB
 
+  // copied files up to this size are fetched as soon as the clipboard arrives
+  if (key == Core::ClipboardFilesLimit)
+    return 500; // MiB
+
   return QVariant();
 }
 

@@ -63,6 +63,8 @@ public:
     inline static const auto ComputerEnterCommand = QStringLiteral("core/enterCommand");
     inline static const auto EnableExitCommand = QStringLiteral("core/enableExitCommand");
     inline static const auto ComputerExitCommand = QStringLiteral("core/exitCommand");
+    inline static const auto DownloadDir = QStringLiteral("core/downloadDir");
+    inline static const auto ClipboardFilesLimit = QStringLiteral("core/clipboardFilesLimit");
   };
   struct Daemon
   {
@@ -292,6 +294,8 @@ private:
     , Core::EnableExitCommand
     , Core::ComputerEnterCommand
     , Core::ComputerExitCommand
+    , Core::DownloadDir
+    , Core::ClipboardFilesLimit
     , Core::ComputerName
     , Core::Display
     , Core::UseHooks
