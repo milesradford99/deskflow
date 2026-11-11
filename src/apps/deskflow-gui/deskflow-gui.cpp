@@ -24,6 +24,7 @@
 #include <QLocalSocket>
 #include <QMessageBox>
 #include <QProcess>
+#include <QPushButton>
 #include <QSharedMemory>
 #include <QTimer>
 #include <QUrl>
