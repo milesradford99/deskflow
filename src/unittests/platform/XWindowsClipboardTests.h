@@ -6,11 +6,12 @@
 
 #include "base/Log.h"
 
+// Qt must come first: Xlib defines macros (Status, Bool, None) that break Qt headers.
+#include <QTest>
+
 #if !WINAPI_LIBEI && !WINAPI_PORTAL
 #include "platform/XWindowsClipboard.h"
 #endif
-
-#include <QTest>
 
 class XWindowsClipboardTests : public QObject
 {

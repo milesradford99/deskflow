@@ -14,7 +14,6 @@ path = [
  , ".gitattributes"
  , ".gitignore"
  , "cspell.json"
- , "sonar-project.properties"
  , "cmake/vcpkg.json.in"
  , "**/*.md"
  , "docs/**"

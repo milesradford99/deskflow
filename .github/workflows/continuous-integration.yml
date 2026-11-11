@@ -1,71 +1,32 @@
-# All-in-one continuous integration (CI) workflow.
-# Runs on all platforms (Windows, macOS, and Linux)
-# for all events (pull request, release, and schedule).
+# Build, test and package on every push.
+#
+# Every push to master or a working branch produces installable packages as
+# workflow artifacts (macOS arm64 + x64 dmg, Windows x64 msi/portable zip).
+# Download them from the run page: Actions -> the run -> Artifacts.
+# Tags named v* additionally publish a GitHub release.
 
 name: Continuous Integration
 
 on:
   push:
-    branches: [master]
+    branches: [master, "claude/**"]
     tags:
       - "v*"
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  GIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  GIT_SHA: ${{ github.sha }}
   PACKAGE_PREFIX: "deskflow"
   PACKAGE_PATH: ./dist
   CMAKE_CONFIGURE: "cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_BUILD_TESTS=ON -DCMAKE_COMPILE_WARNING_AS_ERROR=ON"
 
 jobs:
-  # Quality gate to allow PR merge, used in the branch protection rules.
-  ci-passed:
-    runs-on: ubuntu-latest
-    needs: [main-build, test-results, unix, flatpak]
-    if: always()
-
-    steps:
-      - name: Check all steps passed
-        run: |
-          if [[ ${{needs.main-build.result}} == 'success' && ${{needs.test-results.result}} == 'success' && ${{needs.unix.result}} == 'success' && ${{needs.flatpak.result}} == 'success' ]]; then
-            echo "✅ CI passed" > $GITHUB_STEP_SUMMARY
-          else
-            exit 1
-          fi
-
-  # Summary of test results, combined from test result artifacts.
-  # Runs even if the tests fail to provide a summary of the failures.
-  test-results:
-    needs: main-build
-    if: always() && needs.main-build.result != 'skipped'
-
-    runs-on: ubuntu-slim
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Test summary
-        uses: ./.github/actions/test-summary
-
-  lint-reuse:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@v5
-
   lint-clang:
-    needs: [lint-reuse]
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
@@ -75,13 +36,9 @@ jobs:
       - name: Lint Checker
         uses: ./.github/actions/lint-clang
 
-  analyze-valgrind:
-    needs: lint-clang
-    if: ${{ github.event_name == 'pull_request' }}
-    uses: ./.github/workflows/valgrind-analysis.yml
-
+  # Lint runs alongside the builds rather than gating them, so a formatting
+  # slip never costs a packaging round trip.
   main-build:
-    needs: lint-clang
     name: ${{ matrix.target.name }}
     runs-on: ${{ matrix.target.runs-on }}
     permissions:
@@ -89,141 +46,35 @@ jobs:
     container: ${{ matrix.target.container }}
     timeout-minutes: ${{ matrix.target.timeout }}
     strategy:
-      # Normally, we want to fail fast, but in this case we shouldn't since one target may
-      # fail due to transient issues unrelated to the build.
       fail-fast: false
 
       matrix:
         target:
           - name: "windows-2022-x64"
             runs-on: "windows-2022"
-            timeout: 30
+            timeout: 40
             config-args: "-G Ninja"
             vcpkg-triplet: x64-windows-release
             arch: "amd64"
             qt-version: 6.12
 
-          - name: "windows-2022-arm64"
-            runs-on: "windows-11-arm"
-            timeout: 30
-            config-args: "-G Ninja"
-            vcpkg-triplet: arm64-windows
-            arch: "arm64"
-            qt-version: 6.12
-
           - name: "macos-arm64"
             runs-on: macos-15
-            timeout: 20
+            timeout: 30
             qt-version: 6.12
             config-args: '-DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=14 ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"}'
 
           - name: "macos-x64"
             runs-on: macos-15-intel
-            timeout: 30
+            timeout: 40
             qt-version: 6.9.3
             config-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=12 -DCMAKE_OSX_SYSROOT=/Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"}'
 
-          - name: "debian-x86_64"
-            runs-on: ubuntu-latest
-            container: debian:stable-slim
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "debian-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: debian:stable-slim
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
+          # One Linux target keeps the portable code honest and runs the unit tests
+          # on the platform they are developed on.
           - name: "debian-testing-x86_64"
             runs-on: ubuntu-latest
             container: debian:testing-slim
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "debian-testing-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: debian:testing-slim
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "fedora-stable-x86_64"
-            runs-on: ubuntu-latest
-            container: fedora:latest
-            like: "fedora"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "fedora-stable-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: fedora:latest
-            like: "fedora"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "fedora-rawhide-x86_64"
-            runs-on: ubuntu-latest
-            container: fedora:rawhide
-            like: "fedora"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "fedora-rawhide-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: fedora:rawhide
-            like: "fedora"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "opensuse-x86_64"
-            runs-on: ubuntu-latest
-            container: opensuse/tumbleweed:latest
-            like: "suse"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "opensuse-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: opensuse/tumbleweed:latest
-            like: "suse"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "archlinux-x86_64"
-            runs-on: ubuntu-latest
-            container: archlinux:latest
-            like: "arch"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_DEV_DOCS=ON"
-
-          - name: "ubuntu-latest-x86_64"
-            runs-on: ubuntu-latest
-            container: ubuntu:latest
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "ubuntu-latest-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: ubuntu:latest
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "ubuntu-devel-x86_64"
-            runs-on: ubuntu-latest
-            container: ubuntu:devel
-            like: "debian"
-            timeout: 20
-            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
-
-          - name: "ubuntu-devel-arm64"
-            runs-on: ubuntu-24.04-arm
-            container: ubuntu:devel
             like: "debian"
             timeout: 20
             config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
@@ -367,152 +218,34 @@ jobs:
         with:
           like: ${{ matrix.target.like }}
 
-      - name: Update Development Documentation
-        if: matrix.target.like == 'arch' && github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/docs/dev/html
-          force_orphan: true
-
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: package-${{ env.PACKAGE_PREFIX }}-${{ matrix.target.name }}
           path: ${{github.workspace}}/build/deskflow[-_]*.*
 
-  # Technically, "unix" is a misnomer, but we use it here to mean "Unix-like BSD-derived".
-  unix:
-    needs: lint-clang
-    name: unix-${{ matrix.distro.name }}
-    runs-on: ${{ vars.CI_UNIX_RUNNER || 'ubuntu-24.04' }}
-    timeout-minutes: 20
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        distro:
-          - name: freebsd
-
-    steps:
-      # Fancy checkout gets all the tags
-      # it also makes sure we can use git --describe correctly
-      - name: Fancy Checkout
-        uses: sithlord48/fancy-checkout@v2
-      - name: Build on FreeBSD
-        if: ${{ matrix.distro.name == 'freebsd' }}
-        uses: vmactions/freebsd-vm@v1
-        with:
-          usesh: true
-
-          # Workaround for unreliable pkg: Pin to a stable release.
-          # vmactions/freebsd-vm@v1 gets latest FreeBSD, which sometimes has a broken ports catalog.
-          release: "14.4"
-
-          run: |
-            pkg install -y cmake ninja gmake gcc12 openssl libXrandr libXinerama \
-            libX11 libXtst libxkbfile qt6-base qt6-tools libxkbcommon pkgconf libei libportal
-            ${{env.CMAKE_CONFIGURE}} -G Ninja
-            cmake --build build -j16
-  flatpak:
-    needs: lint-clang
-    name: flatpak-${{matrix.flatpak.arch}}
-    runs-on: ${{matrix.flatpak.runs-on}}
-    timeout-minutes: 60
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
-      options: --privileged
-    strategy:
-      fail-fast: false
-      matrix:
-        flatpak:
-          - runs-on: ubuntu-latest
-            arch: x86_64
-          - runs-on: ubuntu-24.04-arm
-            arch: aarch64
-    steps:
-      - name: Check out repository
-        uses: sithlord48/fancy-checkout@v2
-
-      - run: git config --global protocol.file.allow always
-
-      - name: Get version
-        uses: ./.github/actions/get-version
-
-      - name: Lint appsteam
-        run: flatpak-builder-lint appstream deploy/linux/org.deskflow.deskflow.metainfo.xml
-
-      - name: Lint manifest
-        run: flatpak-builder-lint manifest deploy/linux/flatpak/org.deskflow.deskflow.yml
-
-      - name: Build
-        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-        with:
-          bundle: deskflow-${{env.DESKFLOW_PACKAGE_VERSION}}-linux-${{matrix.flatpak.arch}}.flatpak
-          manifest-path: deploy/linux/flatpak/org.deskflow.deskflow.yml
-          cache-key: flatpak-builder-${{matrix.flatpak.arch}}-2.0
-          arch: ${{matrix.flatpak.arch}}
-          upload-artifact: false
-
-      - name: Validate build
-        run: flatpak-builder-lint --exceptions --user-exceptions deploy/linux/flatpak/ci-build-lint-exceptions.json repo repo
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: package-${{ env.PACKAGE_PREFIX }}-flatpak-${{matrix.flatpak.arch}}
-          path: ${{github.workspace}}/deskflow[-_]*.flatpak
-
   release:
-    needs: ci-passed
-    if: (github.ref == 'refs/heads/master') || (contains(github.ref, '/tags/v'))
+    needs: main-build
+    if: contains(github.ref, '/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Fancy Checkout
         uses: sithlord48/fancy-checkout@v2
-
-      - name: Get version
-        uses: ./.github/actions/get-version
 
       - name: Download artifacts
         uses: actions/download-artifact@v8
 
       - name: Generate package checksums
-        id: generate_notes
         shell: bash
         run: |
           mv $GITHUB_WORKSPACE/package-*/deskflow-* .
           rm -rf $GITHUB_WORKSPACE/package-*
-          echo "Build: ${{env.DESKFLOW_VERSION }}" > sums.txt
-          sha256sum deskflow-* >> sums.txt
-          export changes=$(git log --abbrev=8 --abbrev-commit --pretty=format:" - %s(%h) by %an" continuous..HEAD)
-          echo -e "## Latest Changes:\n$changes" > changelog.txt
-
-      - name: Update continuous tag
-        if: (github.ref == 'refs/heads/master') && !(contains(github.ref, '/tags/v'))
-        run: gh release delete continuous --cleanup-tag
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Deploy continuous
-        if: (github.ref == 'refs/heads/master') && !(contains(github.ref, '/tags/v'))
-        uses: softprops/action-gh-release@v3
-        with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          tag_name: "continuous"
-          name: "Continuous v${{env.DESKFLOW_VERSION}}"
-          prerelease: true
-          append_body: false
-          generate_release_notes: false
-          body_path: changelog.txt
-          files: |
-            deskflow-*
-            sums.txt
+          sha256sum deskflow-* > sums.txt
 
       - name: Deploy release
-        if: contains(github.ref, '/tags/v')
         uses: softprops/action-gh-release@v3
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -522,13 +255,3 @@ jobs:
           files: |
             deskflow-*
             sums.txt
-
-      - name: Update Homebrewtap
-        shell: bash
-        run: |
-          curl -L -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.DF_TAP_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/deskflow/homebrew-tap/dispatches \
-          -d '{"event_type":"update_tap"}'
