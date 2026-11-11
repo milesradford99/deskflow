@@ -20,9 +20,13 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDesktopServices>
 #include <QLocalSocket>
 #include <QMessageBox>
+#include <QProcess>
 #include <QSharedMemory>
+#include <QTimer>
+#include <QUrl>
 
 #if defined(Q_OS_MACOS)
 #include <Carbon/Carbon.h>
@@ -156,22 +160,73 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_MACOS)
 bool checkMacAssistiveDevices()
 {
-  // new in mavericks, applications are trusted individually
-  // with use of the accessibility api. this call will show a
-  // prompt which can show the security/privacy/accessibility
-  // tab, with a list of allowed applications. deskflow should
-  // show up there automatically, but will be unchecked.
-
+  // Applications are trusted individually through the Accessibility list in
+  // Privacy & Security; the core needs it to read and send input.
   if (AXIsProcessTrusted()) {
     return true;
+  }
+
+  // macOS ties the entry to the app's code signature. Each new ad-hoc signed build
+  // leaves the old entry switched on but no longer matching, and the switch then
+  // does nothing. Clearing our own entry makes the prompt add a fresh one.
+  if (CFStringRef bundleId = CFBundleGetIdentifier(CFBundleGetMainBundle()); bundleId != nullptr) {
+    const auto id = QString::fromCFString(bundleId);
+    qInfo().noquote() << "not trusted for accessibility, clearing any stale entry for" << id;
+    const QStringList args = {QStringLiteral("reset"), QStringLiteral("Accessibility"), id};
+    if (QProcess::execute(QStringLiteral("/usr/bin/tccutil"), args) != 0) {
+      qWarning("unable to clear the accessibility entry");
+    }
   }
 
   const void *keys[] = {kAXTrustedCheckOptionPrompt};
   const void *trueValue[] = {kCFBooleanTrue};
   CFDictionaryRef options = CFDictionaryCreate(nullptr, keys, trueValue, 1, nullptr, nullptr);
-
-  bool result = AXIsProcessTrustedWithOptions(options);
+  const bool trusted = AXIsProcessTrustedWithOptions(options);
   CFRelease(options);
-  return result;
+  if (trusted) {
+    return true;
+  }
+
+  // Wait for the permission instead of quitting, so the first launch carries on by
+  // itself once the switch is turned on.
+  QMessageBox box;
+  box.setIcon(QMessageBox::Information);
+  box.setWindowTitle(kAppName);
+  box.setText(QObject::tr("%1 needs Accessibility permission to share your keyboard and mouse.").arg(kAppName));
+  box.setInformativeText(
+      QObject::tr(
+          "In System Settings, open Privacy & Security > Accessibility and switch on %1. "
+          "This window closes by itself once the permission is granted.\n\n"
+          "If %1 is already switched on, remove it with the minus button and open %1 again."
+      )
+          .arg(kAppName)
+  );
+  const auto openSettings = box.addButton(QObject::tr("Open System Settings"), QMessageBox::ActionRole);
+  const auto quit = box.addButton(QObject::tr("Quit"), QMessageBox::RejectRole);
+
+  QTimer poll;
+  QObject::connect(&poll, &QTimer::timeout, &box, [&box] {
+    if (AXIsProcessTrusted()) {
+      box.done(QMessageBox::Ok);
+    }
+  });
+  poll.start(500);
+
+  // any button closes the box, so show it again until the permission arrives or the user quits
+  while (!AXIsProcessTrusted()) {
+    box.exec();
+    if (AXIsProcessTrusted()) {
+      break;
+    }
+    if (box.clickedButton() == quit) {
+      return false;
+    }
+    if (box.clickedButton() == openSettings) {
+      QDesktopServices::openUrl(
+          QUrl(QStringLiteral("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"))
+      );
+    }
+  }
+  return true;
 }
 #endif

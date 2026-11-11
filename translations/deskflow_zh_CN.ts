@@ -927,6 +927,26 @@ Additionally, check you are able to %1 the server config file: %2</source>
         <source>Super</source>
         <translation type="unfinished">Super</translation>
     </message>
+    <message>
+        <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
+        <translation>%1 需要“辅助功能”权限才能共享键盘和鼠标。</translation>
+    </message>
+    <message>
+        <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
+
+If %1 is already switched on, remove it with the minus button and open %1 again.</source>
+        <translation>请在“系统设置”中打开“隐私与安全性 &gt; 辅助功能”，并开启 %1。获得权限后此窗口会自动关闭。
+
+如果 %1 已经开启，请用减号按钮将其移除，然后重新打开 %1。</translation>
+    </message>
+    <message>
+        <source>Open System Settings</source>
+        <translation>打开系统设置</translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
 </context>
 <context>
     <name>SearchWidget</name>

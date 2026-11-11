@@ -41,6 +41,14 @@ scripts/dev/e2e-clipboard-files.sh  # real server + client on two virtual displa
 scripts/dev/screenshot.sh out.png dark   # look at the GUI without a desktop
 ```
 
+- `scripts/dev` is referenced above but is **not in the tree** on this branch; restore or
+  rewrite it before relying on those commands. Without it, the two tools CI insists on
+  can be had quickly:
+  `python3 -m venv /tmp/cf && /tmp/cf/bin/pip install clang-format==20.1.0`, and
+  `apt-get install qt6-l10n-tools` for `/usr/lib/qt6/bin/lupdate`, run the way
+  `translations/CMakeLists.txt` does:
+  `lupdate -no-ui-lines -locations none -silent src -ts translations/deskflow_<lang>.ts`
+  (`-pluralonly` for `deskflow_en.ts`). The system clang-format is 18 and reformats code.
 - Set `DESKFLOW_BUILD_DIR` if the build is somewhere other than `./build-dev`.
 - In a sandbox, `ArchNetworkTests` (no IPv6 sockets) and `XWindowsClipboardTests`
   (no X display) fail for environmental reasons; everything else must pass.
@@ -84,6 +92,15 @@ show this, so `test-package` checks the signature flags and each binary's minimu
 against `LSMinimumSystemVersion` instead of trusting a successful launch.
 
 ## Feature notes
+
+**macOS permissions**: the GUI must hold Accessibility (the core it launches inherits
+it). `checkMacAssistiveDevices()` clears a stale entry with `tccutil reset` (each ad-hoc
+build has a new signature, so an old switched-on entry silently stops counting), shows
+Apple's prompt, then waits in a dialog until `AXIsProcessTrusted()` turns true.
+
+**macOS pasteboard ownership**: `OSXClipboard::synchronize()` reports a change only when
+another app owns the pasteboard. Treating our own writes as a local copy cancels copied
+files that are still being fetched, leaving only their names to paste.
 
 **Clipboard formats** (`IClipboard::Format`): `Text`, `HTML`, `Bitmap` (legacy DIB),
 `Png`, `Files`. Images travel as PNG; `marshall()` converts a lone `Bitmap` and never

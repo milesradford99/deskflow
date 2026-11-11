@@ -925,6 +925,24 @@ Inoltre, verifica di poter %1 il file di configurazione del server: %2</translat
         <source>Super</source>
         <translation type="unfinished">Super</translation>
     </message>
+    <message>
+        <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
+
+If %1 is already switched on, remove it with the minus button and open %1 again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open System Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SearchWidget</name>

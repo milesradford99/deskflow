@@ -89,10 +89,9 @@ bool OSXClipboard::synchronize()
   PasteboardSyncFlags flags = PasteboardSynchronize(m_pboard);
   LOG_VERBOSE("flags: %x", flags);
 
-  if (flags & kPasteboardModified) {
-    return true;
-  }
-  return false;
+  // While we own the pasteboard the change is one we made (a clipboard from another
+  // computer). Reporting it as a local copy would cancel copied files still on their way.
+  return (flags & kPasteboardModified) && !(flags & kPasteboardClientIsOwner);
 }
 
 void OSXClipboard::add(Format format, const std::string &data)
