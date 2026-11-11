@@ -5,6 +5,7 @@
 
 # temp dirs created during build
 /build
+/build-dev
 /dist
 /deps
 /tmp
@@ -43,8 +44,9 @@ CMakeFiles/*
 # vscode folder
 /.vscode
 
-# scripts folder
-/scripts
+# scripts folder (local helpers), except the dev tools AGENTS.md relies on
+/scripts/*
+!/scripts/dev/
 
 # Ai helperfilers
 **/[cC]laude.[mM][dD]

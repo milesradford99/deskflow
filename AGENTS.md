@@ -25,7 +25,7 @@ session would otherwise have to rediscover.
 | `src/lib/platform` | Per-OS screens and clipboards (`OSX*`, `MSWindows*`, `XWindows*`, `Ei*`/`Portal*`) |
 | `src/lib/gui` | Qt Widgets GUI; talks to the core process over a local socket |
 | `src/unittests` | Qt Test suites, mirrored by library |
-| `scripts/dev` | Dev box setup, end-to-end tests and GUI screenshots |
+| `scripts/dev` | Dev box setup, end-to-end test and GUI screenshots |
 
 The GUI (`deskflow`) and the core (`deskflow-core`) are separate processes. The core runs
 its own event queue on a worker thread and serves IPC on the Qt main thread; IPC messages
@@ -34,21 +34,25 @@ are `command=args` lines, with structured arguments as base64 JSON (`common/IpcP
 ## Build and test locally (Linux)
 
 ```bash
-scripts/dev/setup-linux.sh          # once: apt packages, Qt from conda-forge, configures ./build-dev
+scripts/dev/setup-linux.sh          # once, ~20 s: apt packages, Qt + clang-format 20.1.0, configures ./build-dev
 ninja -C build-dev                  # build everything; also runs the unit tests
 QT_QPA_PLATFORM=offscreen ctest --test-dir build-dev/src/unittests
-scripts/dev/e2e-clipboard-files.sh  # real server + client on two virtual displays
-scripts/dev/screenshot.sh out.png dark   # look at the GUI without a desktop
+scripts/dev/e2e-multi-server.sh     # two real servers + one client on three virtual displays
+scripts/dev/screenshot.sh out.png dark [seed.conf]   # look at the GUI without a desktop
 ```
 
-- `scripts/dev` is referenced above but is **not in the tree** on this branch; restore or
-  rewrite it before relying on those commands. Without it, the two tools CI insists on
-  can be had quickly:
-  `python3 -m venv /tmp/cf && /tmp/cf/bin/pip install clang-format==20.1.0`, and
-  `apt-get install qt6-l10n-tools` for `/usr/lib/qt6/bin/lupdate`, run the way
-  `translations/CMakeLists.txt` does:
-  `lupdate -no-ui-lines -locations none -silent src -ts translations/deskflow_<lang>.ts`
-  (`-pluralonly` for `deskflow_en.ts`). The system clang-format is 18 and reformats code.
+- The setup script gets Qt from conda-forge with micromamba (also from conda-forge:
+  download.qt.io and micro.mamba.pm are blocked in the sandbox). It puts it and
+  clang-format 20.1.0 under `~/.cache/deskflow-dev`; add `~/.cache/deskflow-dev/venv/bin`
+  to `PATH` first, because the system clang-format is 18 and reformats code differently.
+- `/scripts` is git-ignored except `scripts/dev`; the earlier dev scripts never reached
+  the repo for that reason, and `e2e-clipboard-files.sh` was lost. `e2e-multi-server.sh`
+  shows how to drive real cores: `--new-instance -s file.conf`, computers declared as
+  `[computer_N] name=...`, `log/level=Debug` (names, not numbers), TLS off. Xvfb only
+  reports raw motion (what an X11 server watches) for **relative** `xdotool` moves. The
+  core started last owns the IPC socket `/tmp/deskflow-core`.
+- `screenshot.sh` takes an optional settings file to seed; `SHOT_KEYS="alt+c"
+  SHOT_DIALOG="Client Configuration"` opens and captures a dialog.
 - Set `DESKFLOW_BUILD_DIR` if the build is somewhere other than `./build-dev`.
 - In a sandbox, `ArchNetworkTests` (no IPv6 sockets) and `XWindowsClipboardTests`
   (no X display) fail for environmental reasons; everything else must pass.
@@ -101,6 +105,21 @@ Apple's prompt, then waits in a dialog until `AXIsProcessTrusted()` turns true.
 **macOS pasteboard ownership**: `OSXClipboard::synchronize()` reports a change only when
 another app owns the pasteboard. Treating our own writes as a local copy cancels copied
 files that are still being fetched, leaving only their names to paste.
+
+**Several servers** (`client/ClientHub`, `client/InputArbiter`, protocol 1.10): a client
+can stay connected to `client/remoteHost` plus every `client/extraServers` entry at once.
+`ClientApp` keeps one session (retries, failover list) per server; each `Client` talks
+to one shared `ClientHub`, which owns what belongs to the computer: enabling it, its
+events (fanned out to the clients), one non-router `FileTransferManager` routed by peer
+name, and one `ClipboardFileSync`. `InputArbiter` decides who is in control: an enter
+claims, a leave or disconnect releases, and another server takes over once the owner
+has been idle for `client/takeoverDelay` ms (0: at once, -1: never). A server that is
+turned away or taken over gets `CDNY` and its `Server::handleControlDenied` brings the
+cursor back just inside the edge it left by. Clipboards from a server not in control
+are held until it takes over; `client/shareClipboardBetweenServers` forwards one
+server's clipboard to the others (copied files only travel within the network they
+came from). The GUI shows each server's state from the core's `servers` IPC message.
+`Client::getEventTarget()` is the client itself, not the computer.
 
 **Clipboard formats** (`IClipboard::Format`): `Text`, `HTML`, `Bitmap` (legacy DIB),
 `Png`, `Files`. Images travel as PNG; `marshall()` converts a lone `Bitmap` and never
