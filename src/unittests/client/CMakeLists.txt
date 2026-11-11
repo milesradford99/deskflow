@@ -16,7 +16,7 @@ create_test(
 create_test(
   NAME InputArbiterTests
   DEPENDS client
-  LIBS base arch
+  LIBS base arch ${extra_libs}
   SOURCE InputArbiterTests.cpp
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/client"
 )
