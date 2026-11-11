@@ -11,6 +11,7 @@
 #include "base/Log.h"
 #include "platform/MSWindowsClipboardBitmapConverter.h"
 #include "platform/MSWindowsClipboardFacade.h"
+#include "platform/MSWindowsClipboardFilesConverter.h"
 #include "platform/MSWindowsClipboardHTMLConverter.h"
 #include "platform/MSWindowsClipboardPngConverter.h"
 #include "platform/MSWindowsClipboardUTF16Converter.h"
@@ -33,6 +34,8 @@ MSWindowsClipboard::MSWindowsClipboard(HWND window)
   m_converters.push_back(new MSWindowsClipboardDibPngConverter);
   m_converters.push_back(new MSWindowsClipboardBitmapConverter);
   m_converters.push_back(new MSWindowsClipboardHTMLConverter);
+  m_converters.push_back(new MSWindowsClipboardFilesConverter);
+  m_converters.push_back(new MSWindowsClipboardDropEffectConverter);
 }
 
 MSWindowsClipboard::~MSWindowsClipboard()

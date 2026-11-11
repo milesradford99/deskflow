@@ -25,7 +25,7 @@ bool ServerProxy1_9::sendFileTransferMessage(const deskflow::FileTransferMessage
   return true;
 }
 
-ServerProxy::ConnectionResult ServerProxy1_9::parseMessage(const uint8_t *code)
+bool ServerProxy1_9::parseFileMessage(const uint8_t *code)
 {
   if (protocol::isMessage(code)) {
     deskflow::FileTransferMessage message;
@@ -34,15 +34,27 @@ ServerProxy::ConnectionResult ServerProxy1_9::parseMessage(const uint8_t *code)
     } else {
       LOG_ERR("malformed file transfer message from server");
     }
-    return ConnectionResult::Okay;
+    return true;
   }
 
   if (protocol::isPeerList(code)) {
     if (QStringList names; protocol::readPeerList(getStream(), names)) {
       m_client->setFilePeers(names);
     }
-    return ConnectionResult::Okay;
+    return true;
   }
 
-  return ServerProxy1_8::parseMessage(code);
+  return false;
+}
+
+// The server announces the computers as soon as it adopts this client,
+// which can be before the handshake is over on our side.
+ServerProxy::ConnectionResult ServerProxy1_9::parseHandshakeMessage(const uint8_t *code)
+{
+  return parseFileMessage(code) ? ConnectionResult::Okay : ServerProxy1_8::parseHandshakeMessage(code);
+}
+
+ServerProxy::ConnectionResult ServerProxy1_9::parseMessage(const uint8_t *code)
+{
+  return parseFileMessage(code) ? ConnectionResult::Okay : ServerProxy1_8::parseMessage(code);
 }

@@ -461,10 +461,11 @@ void FileTransferManager::handleStart(const std::string &from, const FileTransfe
   if (transfer->kind == Kind::Clipboard) {
     // only accept clipboard files we asked for
     const auto requested = m_requested.find(transfer->token);
-    if (requested == m_requested.end() || requested->second != transfer->source) {
+    if (requested == m_requested.end() || requested->second.origin != transfer->source) {
       sendEnd(from, id, FileTransferStatus::Error, QStringLiteral("clipboard files were not requested"));
       return;
     }
+    transfer->offerJson = requested->second.json;
     m_requested.erase(requested);
     baseDir = m_cacheDir;
     transfer->stageDir = cacheDirFor(transfer->source, transfer->token);
@@ -758,7 +759,7 @@ void FileTransferManager::handleEnd(const std::string &from, const FileTransferM
   report(*transfer, State::Completed, detail);
 
   if (transfer->kind == Kind::Clipboard) {
-    m_fetched[fetchedKey(transfer->source, transfer->token)] = paths;
+    m_fetched[fetchedKey(transfer->source, transfer->token)] = Fetched{paths, transfer->offerJson};
     if (m_clipboardFiles)
       m_clipboardFiles(transfer->source, transfer->token, paths);
   }
@@ -858,7 +859,7 @@ void FileTransferManager::peerDisconnected(const std::string &peer)
     }
   }
 
-  std::erase_if(m_requested, [&peer](const auto &item) { return item.second == peer; });
+  std::erase_if(m_requested, [&peer](const auto &item) { return item.second.origin == peer; });
 }
 
 void FileTransferManager::abortAll(const QString &reason)
@@ -924,6 +925,7 @@ FileTransferManager::Offer FileTransferManager::parseOffer(const std::string &js
   offer.count = object["count"].toInt();
   offer.label = object["label"].toString();
   offer.valid = !offer.origin.empty() && offer.token != 0 && offer.count > 0;
+  offer.json = json;
   return offer;
 }
 
@@ -940,11 +942,20 @@ QStringList FileTransferManager::localPathsForOffer(const Offer &offer) const
     return {};
 
   // the cache may have been cleaned behind our back
-  for (const auto &path : it->second) {
+  for (const auto &path : it->second.paths) {
     if (!QFileInfo::exists(path))
       return {};
   }
-  return it->second;
+  return it->second.paths;
+}
+
+std::string FileTransferManager::offerForLocalPaths(const QStringList &paths)
+{
+  for (const auto &[key, fetched] : m_fetched) {
+    if (fetched.paths == paths)
+      return fetched.json;
+  }
+  return createOffer(paths);
 }
 
 bool FileTransferManager::requestOffer(const Offer &offer)
@@ -952,7 +963,7 @@ bool FileTransferManager::requestOffer(const Offer &offer)
   if (!offer.valid || offer.origin == m_localName || m_cacheDir.isEmpty())
     return false;
 
-  if (const auto it = m_requested.find(offer.token); it != m_requested.end() && it->second == offer.origin)
+  if (const auto it = m_requested.find(offer.token); it != m_requested.end() && it->second.origin == offer.origin)
     return true; // already on its way
 
   QJsonObject request;
@@ -961,7 +972,7 @@ bool FileTransferManager::requestOffer(const Offer &offer)
   if (!send(offer.origin, Type::Request, offer.token, 0, toJson(request).toStdString()))
     return false;
 
-  m_requested[offer.token] = offer.origin;
+  m_requested[offer.token] = offer;
   return true;
 }
 

@@ -12,6 +12,7 @@
 
 #include "base/Stopwatch.h"
 #include "platform/XWindowsClipboardBMPConverter.h"
+#include "platform/XWindowsClipboardFilesConverter.h"
 #include "platform/XWindowsClipboardHTMLConverter.h"
 #include "platform/XWindowsClipboardPNGConverter.h"
 #include "platform/XWindowsClipboardTextConverter.h"
@@ -63,6 +64,9 @@ XWindowsClipboard::XWindowsClipboard(Display *display, Window window, ClipboardI
   // add converters, most desired first
   m_converters.push_back(new XWindowsClipboardHTMLConverter(m_display, "text/html"));
   m_converters.push_back(new XWindowsClipboardHTMLConverter(m_display, "application/x-moz-nativehtml"));
+  using FilesFlavor = XWindowsClipboardFilesConverter::Flavor;
+  m_converters.push_back(new XWindowsClipboardFilesConverter(m_display, FilesFlavor::UriList));
+  m_converters.push_back(new XWindowsClipboardFilesConverter(m_display, FilesFlavor::GnomeCopied));
   m_converters.push_back(new XWindowsClipboardPNGConverter(m_display));
   m_converters.push_back(new XWindowsClipboardBMPConverter(m_display));
   m_converters.push_back(new XWindowsClipboardUTF8Converter(m_display, "text/plain;charset=UTF-8", true));

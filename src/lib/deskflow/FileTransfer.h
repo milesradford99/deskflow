@@ -157,8 +157,16 @@ public:
     quint64 total = 0;
     int count = 0;
     QString label;
+    std::string json; //!< the offer as it travels in the clipboard
   };
   static Offer parseOffer(const std::string &json);
+
+  //! The offer to put on the wire for local clipboard \c paths.
+  /*!
+  Files we fetched for the clipboard keep the offer of the computer they came
+  from, so a clipboard that bounces back doesn't turn into a new, second-hand copy.
+  */
+  std::string offerForLocalPaths(const QStringList &paths);
 
   //! Local paths for an offer if it is ours or was already fetched; empty otherwise.
   QStringList localPathsForOffer(const Offer &offer) const;
@@ -211,6 +219,7 @@ private:
     std::string source; // who the files come from
     Kind kind = Kind::Send;
     uint32_t token = 0;
+    std::string offerJson;
     QString label;
     QString stageDir;
     QStringList topLevel;
@@ -283,9 +292,14 @@ private:
   QStringList m_offerPaths;
   std::string m_offerJson;
   // clipboard files already fetched: "origin/token" -> local paths
-  std::map<std::string, QStringList> m_fetched;
-  // offers we asked for and have not received yet: token -> origin
-  std::map<uint32_t, std::string> m_requested;
+  struct Fetched
+  {
+    QStringList paths;
+    std::string json;
+  };
+  std::map<std::string, Fetched> m_fetched;
+  // offers we asked for and have not received yet, by token
+  std::map<uint32_t, Offer> m_requested;
 };
 
 } // namespace deskflow

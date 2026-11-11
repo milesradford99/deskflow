@@ -18,6 +18,7 @@
 #include "common/NetworkProtocol.h"
 #include "common/Settings.h"
 #include "deskflow/Clipboard.h"
+#include "deskflow/ClipboardFileSync.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
 #include "deskflow/FileTransfer.h"
@@ -82,6 +83,10 @@ Client::Client(
   );
   deskflow::fileTransferIpc::configure(*m_fileTransfer);
   deskflow::fileTransferIpc::attach(m_events);
+  m_clipboardFiles = std::make_unique<deskflow::ClipboardFileSync>(
+      *m_fileTransfer, deskflow::fileTransferIpc::clipboardFilesLimit(),
+      [this](ClipboardID id, const IClipboard *clipboard) { m_computer->setClipboard(id, clipboard); }
+  );
   m_events->addHandler(
       EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
       [this](const auto &e) { handleFileTransferCommand(e); }
@@ -270,7 +275,7 @@ bool Client::leave()
 
 void Client::setClipboard(ClipboardID id, const IClipboard *clipboard)
 {
-  m_computer->setClipboard(id, clipboard);
+  m_clipboardFiles->incoming(id, clipboard);
   m_ownClipboard[id] = false;
   m_sentClipboard[id] = false;
 }
@@ -278,6 +283,7 @@ void Client::setClipboard(ClipboardID id, const IClipboard *clipboard)
 void Client::grabClipboard(ClipboardID id)
 {
   m_computer->grabClipboard(id);
+  m_clipboardFiles->localChanged(id);
   m_ownClipboard[id] = false;
   m_sentClipboard[id] = false;
 }
@@ -407,6 +413,7 @@ void Client::sendClipboard(ClipboardID id)
     clipboard.close();
   }
   m_computer->getClipboard(id, &clipboard);
+  m_clipboardFiles->outgoing(&clipboard);
 
   // check time
   if (m_timeClipboard[id] == 0 || clipboard.getTime() != m_timeClipboard[id]) {
@@ -696,6 +703,9 @@ void Client::handleClipboardGrabbed(const Event &event)
   }
 
   const auto *info = static_cast<const IComputer::ClipboardInfo *>(event.getData());
+
+  // whatever was being fetched for the old clipboard no longer belongs on it
+  m_clipboardFiles->localChanged(info->m_id);
 
   // grab ownership
   m_server->onGrabClipboard(info->m_id);

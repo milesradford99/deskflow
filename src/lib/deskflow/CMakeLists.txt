@@ -37,6 +37,8 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   Clipboard.cpp
   Clipboard.h
   ClipboardChunk.cpp
+  ClipboardFileSync.cpp
+  ClipboardFileSync.h
   ClipboardImage.cpp
   ClipboardImage.h
   ClipboardChunk.h

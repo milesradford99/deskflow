@@ -25,6 +25,7 @@
 
 class BaseClientProxy;
 namespace deskflow {
+class ClipboardFileSync;
 class FileTransferManager;
 struct FileTransferMessage;
 } // namespace deskflow
@@ -426,6 +427,7 @@ private:
   ClientList m_clients;
 
   std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
+  std::unique_ptr<deskflow::ClipboardFileSync> m_clipboardFiles;
   void handleFileTransferCommand(const Event &event);
   //! Tell every client and the GUI which computers files can be sent to.
   void sendFilePeers() const;

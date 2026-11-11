@@ -11,6 +11,7 @@
 #include "base/IEventQueue.h"
 #include "base/Log.h"
 #include "deskflow/AppUtil.h"
+#include "deskflow/ClipboardFileSync.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
 #include "deskflow/FileTransfer.h"
@@ -78,6 +79,11 @@ Server::Server(ServerConfig &config, PrimaryClient *primaryClient, deskflow::Com
   );
   deskflow::fileTransferIpc::configure(*m_fileTransfer);
   deskflow::fileTransferIpc::attach(m_events);
+  m_clipboardFiles = std::make_unique<deskflow::ClipboardFileSync>(
+      *m_fileTransfer, deskflow::fileTransferIpc::clipboardFilesLimit(),
+      [this](ClipboardID id, const IClipboard *clipboard) { m_computer->setClipboard(id, clipboard); }
+  );
+  m_primaryClient->setClipboardFileSync(m_clipboardFiles.get());
   m_events->addHandler(
       EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
       [this](const auto &e) { handleFileTransferCommand(e); }
@@ -186,6 +192,7 @@ Server::~Server()
   m_events->removeHandler(Timer, this);
   m_events->removeHandler(FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
   deskflow::fileTransferIpc::attach(nullptr);
+  m_primaryClient->setClipboardFileSync(nullptr);
   stopSwitch();
 
   try {
@@ -1242,6 +1249,11 @@ void Server::handleClipboardGrabbed(const Event &event, BaseClientProxy *grabber
       clipboard.m_clipboardOwner.c_str()
   );
   clipboard.m_clipboardOwner = getName(grabber);
+
+  // a local app took the server's clipboard: stop waiting for files meant for the old one
+  if (grabber == m_primaryClient) {
+    m_clipboardFiles->localChanged(info->m_id);
+  }
   clipboard.m_clipboardSeqNum = info->m_sequenceNumber;
 
   // clear the clipboard data (since it's not known at this point)

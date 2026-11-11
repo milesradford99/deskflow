@@ -29,6 +29,7 @@ class Computer;
 }
 class ServerProxy;
 namespace deskflow {
+class ClipboardFileSync;
 class FileTransferManager;
 struct FileTransferMessage;
 } // namespace deskflow
@@ -259,5 +260,6 @@ private:
   size_t m_resolvedAddressesCount = 0;
 
   std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
+  std::unique_ptr<deskflow::ClipboardFileSync> m_clipboardFiles;
   void handleFileTransferCommand(const Event &event);
 };

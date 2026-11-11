@@ -8,6 +8,7 @@
 #include "server/PrimaryClient.h"
 
 #include "base/Log.h"
+#include "deskflow/ClipboardFileSync.h"
 #include "deskflow/Computer.h"
 //
 // PrimaryClient
@@ -76,7 +77,11 @@ void *PrimaryClient::getEventTarget() const
 
 bool PrimaryClient::getClipboard(ClipboardID id, IClipboard *clipboard) const
 {
-  return m_computer->getClipboard(id, clipboard);
+  const bool result = m_computer->getClipboard(id, clipboard);
+  if (result && m_clipboardFiles != nullptr) {
+    m_clipboardFiles->outgoing(clipboard);
+  }
+  return result;
 }
 
 void PrimaryClient::getShape(int32_t &x, int32_t &y, int32_t &width, int32_t &height) const
@@ -121,7 +126,11 @@ void PrimaryClient::setClipboard(ClipboardID id, const IClipboard *clipboard)
     m_clipboardDirty[id] = false;
 
     // set clipboard
-    m_computer->setClipboard(id, clipboard);
+    if (m_clipboardFiles != nullptr) {
+      m_clipboardFiles->incoming(id, clipboard);
+    } else {
+      m_computer->setClipboard(id, clipboard);
+    }
   }
 }
 
@@ -129,6 +138,9 @@ void PrimaryClient::grabClipboard(ClipboardID id)
 {
   // grab clipboard
   m_computer->grabClipboard(id);
+  if (m_clipboardFiles != nullptr) {
+    m_clipboardFiles->localChanged(id);
+  }
 
   // clipboard is dirty (because someone else owns it now)
   m_clipboardDirty[id] = true;

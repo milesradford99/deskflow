@@ -39,6 +39,12 @@ public:
 private:
   void clearConverters();
 
+  // Copied files are one pasteboard item per file, so they can't go through the
+  // per-flavor converters, which only ever look at the first item.
+  bool hasFiles() const;
+  std::string getFiles() const;
+  void addFiles(const std::string &paths);
+
 private:
   using ConverterList = std::vector<IOSXClipboardConverter *>;
 

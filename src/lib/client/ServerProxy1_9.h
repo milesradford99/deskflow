@@ -18,8 +18,12 @@ public:
   bool sendFileTransferMessage(const deskflow::FileTransferMessage &message) override;
 
 protected:
+  ConnectionResult parseHandshakeMessage(const uint8_t *code) override;
   ConnectionResult parseMessage(const uint8_t *code) override;
 
 private:
+  //! Handles a file transfer family message; returns false if \c code isn't one.
+  bool parseFileMessage(const uint8_t *code);
+
   Client *m_client;
 };

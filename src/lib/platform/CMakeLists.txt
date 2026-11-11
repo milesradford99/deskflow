@@ -44,6 +44,8 @@ if(WIN32)
     MSWindowsClipboardBitmapConverter.h
     MSWindowsClipboardFacade.cpp
     MSWindowsClipboardFacade.h
+    MSWindowsClipboardFilesConverter.cpp
+    MSWindowsClipboardFilesConverter.h
     MSWindowsClipboardHTMLConverter.cpp
     MSWindowsClipboardHTMLConverter.h
     MSWindowsClipboardPngConverter.cpp
@@ -135,6 +137,8 @@ elseif(UNIX)
       XWindowsClipboardAnyBitmapConverter.h
       XWindowsClipboardBMPConverter.cpp
       XWindowsClipboardBMPConverter.h
+      XWindowsClipboardFilesConverter.cpp
+      XWindowsClipboardFilesConverter.h
       XWindowsClipboardHTMLConverter.cpp
       XWindowsClipboardPNGConverter.cpp
       XWindowsClipboardPNGConverter.h

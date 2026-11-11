@@ -50,6 +50,12 @@ public:
   clipboards offer it whenever any image is available and marshall()
   converts a lone \c Bitmap to it, so \c Bitmap never crosses the wire
   unless that conversion fails.
+
+  \c Files means two things depending on where the clipboard is. Read from
+  or written to a platform clipboard it is a list of absolute local paths,
+  UTF-8, one per line. On the wire it is a small JSON offer naming the
+  computer that has the files; ClipboardFileSync converts between the two
+  and fetches the files when an offer arrives.
   */
   enum class Format
   {
@@ -57,6 +63,7 @@ public:
     HTML,        //!< HTML format, HTML fragment, UTF-8, newline is LF
     Bitmap,      //!< Bitmap format, BMP 24/32bpp, BI_RGB
     Png,         //!< Image format, a complete PNG file
+    Files,       //!< Copied files and folders, see below
     TotalFormats //!< The number of clipboard formats supported
   };
 

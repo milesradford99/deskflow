@@ -10,8 +10,9 @@
 #include "server/BaseClientProxy.h"
 
 namespace deskflow {
+class ClipboardFileSync;
 class Computer;
-}
+} // namespace deskflow
 
 //! Primary computer as pseudo-client
 /*!
@@ -27,6 +28,12 @@ public:
   */
   PrimaryClient(const std::string &name, deskflow::Computer *computer);
   ~PrimaryClient() override = default;
+
+  //! Route clipboards through \c sync so copied files travel with them; nullptr to stop.
+  void setClipboardFileSync(deskflow::ClipboardFileSync *sync)
+  {
+    m_clipboardFiles = sync;
+  }
 
   //! @name manipulators
   //@{
@@ -141,6 +148,7 @@ public:
 
 private:
   deskflow::Computer *m_computer;
+  deskflow::ClipboardFileSync *m_clipboardFiles = nullptr;
   bool m_clipboardDirty[kClipboardEnd] = {false, false};
   int32_t m_fakeInputCount = 0;
 };
