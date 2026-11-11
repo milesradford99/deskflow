@@ -23,12 +23,14 @@ runs:
           app=/tmp/deskflow-dmg/Deskflow.app
           plutil -p "$app/Contents/Info.plist" | grep -E "LSMinimumSystemVersion|CFBundleExecutable" || true
           min=$(plutil -extract LSMinimumSystemVersion raw "$app/Contents/Info.plist")
+          # 12 and 12.0 are the same system; compare as three numeric fields.
+          ver3() { echo "$1.0.0" | awk -F. '{printf "%05d%05d%05d", $1, $2, $3}'; }
           too_new=0
           while IFS= read -r -d '' f; do
             file -b "$f" | grep -q Mach-O || continue
             for v in $(vtool -show-build "$f" 2>/dev/null | awk '$1=="minos"{print $2} /LC_VERSION_MIN_MACOSX/{vm=1} vm&&$1=="version"{print $2;vm=0}'); do
               echo "$v  ${f#$app/}"
-              if [ "$(printf '%s\n%s\n' "$min" "$v" | sort -V | tail -1)" != "$min" ]; then
+              if [[ "$(ver3 "$v")" > "$(ver3 "$min")" ]]; then
                 echo "::error::${f#$app/} needs macOS $v, newer than LSMinimumSystemVersion $min"
                 too_new=1
               fi
