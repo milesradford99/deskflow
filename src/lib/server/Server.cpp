@@ -352,6 +352,36 @@ void Server::sendConnectedClientsIpc() const
   ipcSendToClient("connectedClients", clientList.join(","));
 }
 
+void Server::handleControlDenied(const BaseClientProxy *client)
+{
+  // only matters while our cursor is on that client (and not for the screen saver)
+  if (client != m_active || m_activeSaver != nullptr || client == m_primaryClient) {
+    return;
+  }
+
+  LOG_INFO("\"%s\" is controlled by another server, taking the cursor back", getName(client).c_str());
+
+  // back where it left, a little way in from the edge so it doesn't cross straight over again
+  int32_t dx;
+  int32_t dy;
+  int32_t dw;
+  int32_t dh;
+  m_primaryClient->getShape(dx, dy, dw, dh);
+  const double centerX = dx + dw / 2.0;
+  const double centerY = dy + dh / 2.0;
+  double x = m_returnX;
+  double y = m_returnY;
+  if (const auto distance = std::hypot(centerX - x, centerY - y); distance > 0) {
+    const auto step = std::min(48.0, distance);
+    x += (centerX - x) / distance * step;
+    y += (centerY - y) / distance * step;
+  }
+  const auto backX = std::clamp(static_cast<int32_t>(std::lround(x)), dx, dx + dw - 1);
+  const auto backY = std::clamp(static_cast<int32_t>(std::lround(y)), dy, dy + dh - 1);
+
+  switchComputer(m_primaryClient, backX, backY, false);
+}
+
 void Server::handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message)
 {
   // only a client that is part of the layout may send, receive or relay
@@ -505,6 +535,12 @@ void Server::switchComputer(BaseClientProxy *dst, int32_t x, int32_t y, bool for
 
   // stop waiting to switch
   stopSwitch();
+
+  // remember where we left our own computer
+  if (m_active == m_primaryClient && dst != m_primaryClient) {
+    m_returnX = m_x;
+    m_returnY = m_y;
+  }
 
   // record new position
   m_x = x;

@@ -374,6 +374,10 @@ QVariant Settings::defaultValue(const QString &key)
   if (key == Client::YScrollScale || key == Client::XScrollScale)
     return 1.0;
 
+  // another server takes over once the one in control has been idle this long
+  if (key == Client::TakeoverDelay)
+    return 2000; // ms
+
   if (key == Server::Protocol)
     return networkProtocolToOption(NetworkProtocol::Barrier);
 

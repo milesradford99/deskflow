@@ -177,6 +177,50 @@ p, li { white-space: pre-wrap; }
         <source>Clear Server History</source>
         <translation type="unfinished">서버 기록 지우기</translation>
     </message>
+    <message>
+        <source>Other servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also stay connected to these servers, one per line. Each can control this computer, one at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.20 or office-pc:24800</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When another server&apos;s cursor arrives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying on one server makes it pasteable on the others too. Leave this off if the servers belong to different people.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pass a clipboard from one server on to the others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch once the server in control is idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch at once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wait until the server in control leaves</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComputerSettingsDialog</name>
@@ -577,6 +621,26 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;서버 &apos;%1&apos;에 연결하지 못했습니다.&lt;/p&gt;&lt;p&gt;같은 이름의 클라이언트가 이미 서버에 연결되어 있습니다.&lt;/p&gt;&lt;p&gt;고유한 이름을 사용하고, 클라이언트 프로세스가 하나만 실행 중인지 확인하세요.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>%1: in control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connects to %1 at the same time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>

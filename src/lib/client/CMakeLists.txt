@@ -6,6 +6,10 @@
 add_library(client STATIC
   Client.cpp
   Client.h
+  ClientHub.cpp
+  ClientHub.h
+  InputArbiter.cpp
+  InputArbiter.h
   ServerProxy.cpp
   ServerProxy.h
   ServerProxy1_7.cpp
@@ -14,6 +18,8 @@ add_library(client STATIC
   ServerProxy1_8.h
   ServerProxy1_9.cpp
   ServerProxy1_9.h
+  ServerProxy1_10.cpp
+  ServerProxy1_10.h
 )
 
 target_link_libraries(client PUBLIC common)

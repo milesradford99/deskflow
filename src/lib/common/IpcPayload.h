@@ -37,5 +37,7 @@ inline const auto kCancelTransfer = QStringLiteral("cancelTransfer"); //!< {id}
 // commands, core -> GUI
 inline const auto kFileTransfer = QStringLiteral("fileTransfer"); //!< progress, see FileTransferIpc
 inline const auto kFilePeers = QStringLiteral("filePeers");       //!< {self, peers[]}
+//! client mode: {servers: [{host, state, control}]}, state as in deskflow::core::ConnectionState
+inline const auto kServers = QStringLiteral("servers");
 
 } // namespace deskflow::ipc

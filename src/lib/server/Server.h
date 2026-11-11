@@ -208,6 +208,9 @@ public:
   //! Feed a file transfer message that arrived from a client.
   void handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message);
 
+  //! The client is controlled by another server: take the cursor back from it.
+  void handleControlDenied(const BaseClientProxy *client);
+
   //! The manager that sends, receives and relays files for this server.
   deskflow::FileTransferManager &fileTransfer() const
   {
@@ -450,6 +453,10 @@ private:
   // whichever computer is active
   int32_t m_x;
   int32_t m_y;
+
+  // where the cursor left the primary computer, to put it back if a client turns us down
+  int32_t m_returnX = 0;
+  int32_t m_returnY = 0;
 
   // last mouse deltas.  this is needed to smooth out double tap
   // on win32 which reports bogus mouse motion at the edge of

@@ -12,3 +12,11 @@ create_test(
   SOURCE ServerProxyTests.cpp
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/client"
 )
+
+create_test(
+  NAME InputArbiterTests
+  DEPENDS client
+  LIBS base arch
+  SOURCE InputArbiterTests.cpp
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/client"
+)

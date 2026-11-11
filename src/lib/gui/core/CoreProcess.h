@@ -12,6 +12,7 @@
 #include "gui/FileTail.h"
 #include "gui/config/ServerConfig.h"
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QMutex>
 #include <QObject>
@@ -102,6 +103,8 @@ Q_SIGNALS:
   void unrecognisedClient(const QString &clientName);
   void connectionRefused(deskflow::core::ConnectionRefusal reason);
   void retryIn(int seconds);
+  //! Client mode: how each server is doing, see deskflow::ipc::kServers.
+  void serversChanged(const QJsonArray &servers);
   void peerFingerprint(const QString &fingerprint);
   void missingKeyboardLayouts(const QString &layouts);
 

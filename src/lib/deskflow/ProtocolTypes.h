@@ -45,7 +45,7 @@ static const int16_t kProtocolMajorVersion = 1;
  * @note When incrementing the minor version, the Deskflow application version should also increment
  * @since Protocol version 1.0
  */
-static const int16_t kProtocolMinorVersion = 9;
+static const int16_t kProtocolMinorVersion = 10;
 
 /**
  * @brief Default TCP port for Deskflow connections
@@ -489,6 +489,21 @@ extern const char *const kMsgCInfoAck;
  * @since Protocol version 1.3
  */
 extern const char *const kMsgCKeepAlive;
+
+/**
+ * @brief Control denied: the client won't take input from this server right now
+ *
+ * **Direction**: Client → Server
+ * **Format**: No parameters
+ *
+ * A client can be connected to several servers. Only one of them controls it at a
+ * time; when another server's cursor enters, or the one in control is taken over,
+ * the client sends this so that server takes its cursor back to its own computer.
+ * A server that isn't on the client any more ignores it.
+ *
+ * @since Protocol version 1.10
+ */
+extern const char *const kMsgCControlDenied;
 
 /** @} */ // end of protocol_commands group
 

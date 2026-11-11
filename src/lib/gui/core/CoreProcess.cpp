@@ -660,6 +660,8 @@ void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString
     setConnectionState(state);
   } else if (command == deskflow::ipc::kFilePeers) {
     Q_EMIT filePeersChanged(deskflow::ipc::decodePayload(args)["peers"].toVariant().toStringList());
+  } else if (command == deskflow::ipc::kServers) {
+    Q_EMIT serversChanged(deskflow::ipc::decodePayload(args)["servers"].toArray());
   } else if (command == deskflow::ipc::kFileTransfer) {
     Q_EMIT fileTransferProgress(deskflow::ipc::decodePayload(args));
   } else if (command == "connectedClients") {

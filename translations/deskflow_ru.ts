@@ -177,6 +177,50 @@ p, li { white-space: pre-wrap; }
         <source>Clear Server History</source>
         <translation type="unfinished">Очистить историю серверов</translation>
     </message>
+    <message>
+        <source>Other servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also stay connected to these servers, one per line. Each can control this computer, one at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.20 or office-pc:24800</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When another server&apos;s cursor arrives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying on one server makes it pasteable on the others too. Leave this off if the servers belong to different people.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pass a clipboard from one server on to the others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch once the server in control is idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch at once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wait until the server in control leaves</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComputerSettingsDialog</name>
@@ -577,6 +621,26 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Не удалось подключиться к серверу &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;Клиент с таким именем уже подключен к серверу.&lt;/p&gt;Убедитесь, что вы используете уникальное имя и запущен только один процесс клиента.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>%1: in control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connects to %1 at the same time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>

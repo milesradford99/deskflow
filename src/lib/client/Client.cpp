@@ -11,7 +11,9 @@
 #include "arch/Arch.h"
 #include "base/IEventQueue.h"
 #include "base/Log.h"
+#include "client/ClientHub.h"
 #include "client/ServerProxy.h"
+#include "client/ServerProxy1_10.h"
 #include "client/ServerProxy1_7.h"
 #include "client/ServerProxy1_8.h"
 #include "client/ServerProxy1_9.h"
@@ -22,7 +24,6 @@
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
 #include "deskflow/FileTransfer.h"
-#include "deskflow/FileTransferIpc.h"
 #include "deskflow/IPlatformComputer.h"
 #include "deskflow/PacketStreamFilter.h"
 #include "deskflow/ProtocolTypes.h"
@@ -58,52 +59,30 @@ Client::DisconnectRequest::DisconnectRequest(deskflow::core::ConnectionRefusal r
 
 Client::Client(
     IEventQueue *events, const std::string &name, const NetworkAddress &address, ISocketFactory *socketFactory,
-    deskflow::Computer *computer
+    deskflow::client::ClientHub *hub
 )
     : m_name(name),
       m_serverAddress(address),
       m_socketFactory(socketFactory),
-      m_computer(computer),
+      m_hub(hub),
+      m_computer(hub->computer()),
       m_events(events),
       m_useSecureNetwork(Settings::value(Settings::Security::TlsEnabled).toBool())
 {
   assert(m_socketFactory != nullptr);
   assert(m_computer != nullptr);
 
-  // register suspend/resume event handlers
-  m_events->addHandler(EventTypes::ComputerSuspend, getEventTarget(), [this](const auto &) { handleSuspend(); });
-  m_events->addHandler(EventTypes::ComputerResume, getEventTarget(), [this](const auto &) { handleResume(); });
-
-  // file transfers: everything goes through the server, which relays to other clients
-  m_fileTransfer = std::make_unique<deskflow::FileTransferManager>(
-      m_name, false,
-      [this](const std::string &, const deskflow::FileTransferMessage &message) {
-        return m_server != nullptr && m_server->sendFileTransferMessage(message);
-      }
-  );
-  deskflow::fileTransferIpc::configure(*m_fileTransfer);
-  deskflow::fileTransferIpc::attach(m_events);
-  m_clipboardFiles = std::make_unique<deskflow::ClipboardFileSync>(
-      *m_fileTransfer, deskflow::fileTransferIpc::clipboardFilesLimit(),
-      [this](ClipboardID id, const IClipboard *clipboard) { m_computer->setClipboard(id, clipboard); }
-  );
-  m_events->addHandler(
-      EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
-      [this](const auto &e) { handleFileTransferCommand(e); }
-  );
+  // the hub hands us the computer's events (suspend, resume, shape, clipboard)
+  m_hub->addClient(this);
 }
 
 Client::~Client()
 {
-  m_events->removeHandler(EventTypes::ComputerSuspend, getEventTarget());
-  m_events->removeHandler(EventTypes::ComputerResume, getEventTarget());
-  m_events->removeHandler(EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
-  deskflow::fileTransferIpc::attach(nullptr);
-
   cleanupTimer();
   cleanupComputer();
   cleanupConnecting();
   cleanupConnection();
+  m_hub->removeClient(this);
   delete m_socketFactory;
 }
 
@@ -139,7 +118,6 @@ void Client::connect(size_t addressIndex)
           "connecting to '%s': %s:%i", m_serverAddress.getHostname().c_str(),
           ARCH->addrToString(m_serverAddress.getAddress()).c_str(), m_serverAddress.getPort()
       );
-      ipcSendConnectionState(deskflow::core::ConnectionState::Connecting);
     }
 
     // create the socket
@@ -193,7 +171,7 @@ void Client::refuseConnection(deskflow::core::ConnectionRefusal reason, const ch
 void Client::handshakeComplete()
 {
   m_ready = true;
-  m_computer->enable();
+  m_hub->sessionReady(this);
   if (m_relativeMouseMoves && !m_hasRelativeRestorePosition) {
     saveRelativeRestorePosition();
   }
@@ -222,7 +200,8 @@ size_t Client::getMaximumClipboardReceiveSizeBytes() const
 
 void *Client::getEventTarget() const
 {
-  return m_computer->getEventTarget();
+  // our own target: several clients may share one computer
+  return const_cast<Client *>(this);
 }
 
 bool Client::getClipboard(ClipboardID id, IClipboard *clipboard) const
@@ -248,8 +227,7 @@ void Client::enter(int32_t xAbs, int32_t yAbs, uint32_t, KeyModifierMask mask, b
     yAbs = m_relativeRestoreY;
     LOG_VERBOSE("using relative restore position: %d,%d", xAbs, yAbs);
   }
-  m_computer->mouseMove(xAbs, yAbs);
-  m_computer->enter(mask);
+  m_hub->enter(this, xAbs, yAbs, mask);
 }
 
 bool Client::leave()
@@ -259,7 +237,7 @@ bool Client::leave()
   }
   m_active = false;
 
-  m_computer->leave();
+  m_hub->leave(this);
 
   if (m_enableClipboard) {
     // send clipboards that we own and that have changed
@@ -275,15 +253,14 @@ bool Client::leave()
 
 void Client::setClipboard(ClipboardID id, const IClipboard *clipboard)
 {
-  m_clipboardFiles->incoming(id, clipboard);
+  m_hub->setClipboard(this, id, clipboard);
   m_ownClipboard[id] = false;
   m_sentClipboard[id] = false;
 }
 
 void Client::grabClipboard(ClipboardID id)
 {
-  m_computer->grabClipboard(id);
-  m_clipboardFiles->localChanged(id);
+  m_hub->grabClipboard(this, id);
   m_ownClipboard[id] = false;
   m_sentClipboard[id] = false;
 }
@@ -295,54 +272,54 @@ void Client::setClipboardDirty(ClipboardID, bool)
 
 void Client::keyDown(KeyID id, KeyModifierMask mask, KeyButton button, const std::string &lang)
 {
-  m_computer->keyDown(id, mask, button, lang);
+  m_hub->keyDown(this, id, mask, button, lang);
 }
 
 void Client::keyRepeat(KeyID id, KeyModifierMask mask, int32_t count, KeyButton button, const std::string &lang)
 {
-  m_computer->keyRepeat(id, mask, count, button, lang);
+  m_hub->keyRepeat(this, id, mask, count, button, lang);
 }
 
 void Client::keyUp(KeyID id, KeyModifierMask mask, KeyButton button)
 {
-  m_computer->keyUp(id, mask, button);
+  m_hub->keyUp(this, id, mask, button);
 }
 
 void Client::mouseDown(ButtonID id)
 {
-  m_computer->mouseDown(id);
+  m_hub->mouseDown(this, id);
 }
 
 void Client::mouseUp(ButtonID id)
 {
-  m_computer->mouseUp(id);
+  m_hub->mouseUp(this, id);
 }
 
 void Client::mouseMove(int32_t x, int32_t y)
 {
-  m_computer->mouseMove(x, y);
+  m_hub->mouseMove(this, x, y);
 }
 
 void Client::mouseRelativeMove(int32_t dx, int32_t dy)
 {
-  m_computer->mouseRelativeMove(dx, dy);
+  m_hub->mouseRelativeMove(this, dx, dy);
 }
 
 void Client::mouseWheel(int32_t xDelta, int32_t yDelta)
 {
-  m_computer->mouseWheel(xDelta, yDelta);
+  m_hub->mouseWheel(this, xDelta, yDelta);
 }
 
 void Client::screensaver(bool activate)
 {
-  m_computer->screensaver(activate);
+  m_hub->screensaver(this, activate);
 }
 
 void Client::resetOptions()
 {
   m_relativeMouseMoves = false;
   m_hasRelativeRestorePosition = false;
-  m_computer->resetOptions();
+  m_hub->resetOptions(this);
 }
 
 void Client::setOptions(const OptionsList &options)
@@ -383,7 +360,7 @@ void Client::setOptions(const OptionsList &options)
     LOG_INFO("clipboard sharing is disabled because the server set the maximum clipboard size to 0");
   }
 
-  m_computer->setOptions(options);
+  m_hub->setOptions(this, options);
 }
 
 void Client::saveRelativeRestorePosition()
@@ -413,7 +390,7 @@ void Client::sendClipboard(ClipboardID id)
     clipboard.close();
   }
   m_computer->getClipboard(id, &clipboard);
-  m_clipboardFiles->outgoing(&clipboard);
+  m_hub->clipboardFiles().outgoing(&clipboard);
 
   // check time
   if (m_timeClipboard[id] == 0 || clipboard.getTime() != m_timeClipboard[id]) {
@@ -437,26 +414,42 @@ void Client::sendClipboard(ClipboardID id)
 
 void Client::handleFileTransferMessage(const deskflow::FileTransferMessage &message)
 {
-  // the user may have picked another folder in the GUI since the last transfer
-  if (message.type == deskflow::FileTransferMessage::Type::Start)
-    m_fileTransfer->setDownloadDir(deskflow::fileTransferIpc::downloadDir());
-  m_fileTransfer->handleMessage({}, message);
+  m_hub->handleFileTransferMessage(this, message);
 }
 
 void Client::setFilePeers(const QStringList &names)
 {
-  auto peers = names;
-  peers.removeAll(QString::fromStdString(m_name));
-  deskflow::fileTransferIpc::sendPeers(m_name, peers);
+  m_hub->setFilePeers(this, names);
 }
 
-void Client::handleFileTransferCommand(const Event &event)
+bool Client::sendFileTransferMessage(const deskflow::FileTransferMessage &message)
 {
-  const auto *command = static_cast<const deskflow::fileTransferIpc::Command *>(event.getDataObject());
-  if (command->action == deskflow::fileTransferIpc::Command::Action::Cancel) {
-    m_fileTransfer->cancel(command->id);
-  } else {
-    m_fileTransfer->sendFiles(command->target, command->paths);
+  return m_server != nullptr && m_server->sendFileTransferMessage(message);
+}
+
+std::string Client::getServerName() const
+{
+  return m_serverAddress.getHostname() + ":" + std::to_string(m_serverAddress.getPort());
+}
+
+void Client::controlLost()
+{
+  if (m_server != nullptr) {
+    m_server->sendControlDenied();
+  }
+}
+
+void Client::shareClipboard(ClipboardID id)
+{
+  if (!m_enableClipboard || m_maximumClipboardSize == 0 || m_server == nullptr) {
+    return;
+  }
+  m_server->onGrabClipboard(id);
+  m_ownClipboard[id] = true;
+  m_sentClipboard[id] = false;
+  m_timeClipboard[id] = 0;
+  if (!m_active) {
+    sendClipboard(id);
   }
 }
 
@@ -537,18 +530,13 @@ bool Client::setupComputer(int16_t protocolMinor)
   case 9:
     m_server = new ServerProxy1_9(this, m_stream, m_events);
     break;
+  case 10:
+    m_server = new ServerProxy1_10(this, m_stream, m_events);
+    break;
   default:
     break;
   }
 
-  if (m_server != nullptr) {
-    m_events->addHandler(EventTypes::ComputerShapeChanged, getEventTarget(), [this](const auto &) {
-      handleShapeChanged();
-    });
-    m_events->addHandler(EventTypes::ClipboardGrabbed, getEventTarget(), [this](const auto &e) {
-      handleClipboardGrabbed(e);
-    });
-  }
   return m_server != nullptr;
 }
 
@@ -595,17 +583,12 @@ void Client::cleanupComputer()
 {
   if (m_server != nullptr) {
     if (m_ready) {
-      m_computer->disable();
       m_ready = false;
+      // the hub also drops the transfers that needed this server
+      m_hub->sessionEnded(this);
     }
-    m_events->removeHandler(EventTypes::ComputerShapeChanged, getEventTarget());
-    m_events->removeHandler(EventTypes::ClipboardGrabbed, getEventTarget());
     delete m_server;
     m_server = nullptr;
-
-    // nothing can be sent or finished without the server
-    m_fileTransfer->abortAll(QStringLiteral("disconnected from the server"));
-    deskflow::fileTransferIpc::sendPeers(m_name, {});
   }
 }
 
@@ -695,33 +678,31 @@ void Client::handleDisconnectRequested(const Event &event)
 
 void Client::handleShapeChanged()
 {
+  if (m_server == nullptr) {
+    return;
+  }
   LOG_DEBUG("resolution changed");
   m_server->onInfoChanged();
 }
 
-void Client::handleClipboardGrabbed(const Event &event)
+void Client::handleClipboardGrabbed(ClipboardID id)
 {
-  if (!m_enableClipboard || (m_maximumClipboardSize == 0)) {
+  if (!m_enableClipboard || (m_maximumClipboardSize == 0) || m_server == nullptr) {
     return;
   }
 
-  const auto *info = static_cast<const IComputer::ClipboardInfo *>(event.getData());
-
-  // whatever was being fetched for the old clipboard no longer belongs on it
-  m_clipboardFiles->localChanged(info->m_id);
-
   // grab ownership
-  m_server->onGrabClipboard(info->m_id);
+  m_server->onGrabClipboard(id);
 
   // we now own the clipboard and it has not been sent to the server
-  m_ownClipboard[info->m_id] = true;
-  m_sentClipboard[info->m_id] = false;
-  m_timeClipboard[info->m_id] = 0;
+  m_ownClipboard[id] = true;
+  m_sentClipboard[id] = false;
+  m_timeClipboard[id] = 0;
 
   // if we're not the active computer then send the clipboard now,
   // otherwise we'll wait until we leave.
   if (!m_active) {
-    sendClipboard(info->m_id);
+    sendClipboard(id);
   }
 }
 

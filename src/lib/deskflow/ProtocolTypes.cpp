@@ -23,6 +23,7 @@ const char *const kMsgCScreenSaver = "CSEC%1i";
 const char *const kMsgCResetOptions = "CROP";
 const char *const kMsgCInfoAck = "CIAK";
 const char *const kMsgCKeepAlive = "CALV";
+const char *const kMsgCControlDenied = "CDNY";
 
 // This is weird, it goes from DKDN to DKDL. Someone misunderstood the pattern (keep the
 // code, pick the form by negotiated version). Do not copy this.

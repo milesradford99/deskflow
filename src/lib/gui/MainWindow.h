@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <QJsonArray>
+#include <QLabel>
 #include <QMainWindow>
 #include <QProcess>
 #include <QRegularExpression>
@@ -177,6 +179,10 @@ private:
   ServerConfig m_serverConfig;
   deskflow::gui::CoreProcess m_coreProcess;
   deskflow::gui::FileTransferWidget *m_fileTransfer = nullptr;
+  //! Client mode with several servers: which are connected and which is in control
+  QLabel *m_serverStatus = nullptr;
+  QJsonArray m_serverStates;
+  void updateServerStatus();
   QSet<QString> m_ignoredClients;
   bool m_newClientPromptShowing = false;
   bool m_serverConfigDialogVisible = false;

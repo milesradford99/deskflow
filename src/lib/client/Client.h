@@ -29,10 +29,11 @@ class Computer;
 }
 class ServerProxy;
 namespace deskflow {
-class ClipboardFileSync;
-class FileTransferManager;
 struct FileTransferMessage;
 } // namespace deskflow
+namespace deskflow::client {
+class ClientHub;
+} // namespace deskflow::client
 class IDataSocket;
 class ISocketFactory;
 namespace deskflow {
@@ -97,11 +98,12 @@ public:
   /*!
   This client will attempt to connect to the server using \p name
   as its name and \p address as the server's address and \p factory
-  to create the socket.  \p computer is    the local computer.
+  to create the socket.  \p hub owns the local computer, which other
+  clients (connected to other servers) may share.
   */
   Client(
       IEventQueue *events, const std::string &name, const NetworkAddress &address, ISocketFactory *socketFactory,
-      deskflow::Computer *computer
+      deskflow::client::ClientHub *hub
   );
   Client(Client const &) = delete;
   Client(Client &&) = delete;
@@ -170,6 +172,25 @@ public:
   //! Called with the computers files can be sent to; the server's name comes first.
   void setFilePeers(const QStringList &names);
 
+  //! Send a file transfer message to the server. False if not connected.
+  bool sendFileTransferMessage(const deskflow::FileTransferMessage &message);
+
+  //! The host name this client connects to, for logs.
+  std::string getServerName() const;
+
+  //! @name Called by the hub
+  //@{
+  //! Another server is in control although our server's cursor is here.
+  void controlLost();
+  //! Something on the computer was copied.
+  void handleClipboardGrabbed(ClipboardID id);
+  //! Another server's clipboard was applied; send it to ours as if copied here.
+  void shareClipboard(ClipboardID id);
+  void handleShapeChanged();
+  void handleSuspend();
+  void handleResume();
+  //@}
+
   //! Return last resolved adresses count
   size_t getLastResolvedAddressesCount() const
   {
@@ -225,11 +246,7 @@ private:
   void handleOutputError();
   void handleDisconnected();
   void handleDisconnectRequested(const Event &event);
-  void handleShapeChanged();
-  void handleClipboardGrabbed(const Event &event);
   void handleHello();
-  void handleSuspend();
-  void handleResume();
   void sendClipboardThread(void *);
   void bindNetworkInterface(IDataSocket *socket) const;
 
@@ -237,6 +254,7 @@ private:
   std::string m_name;
   NetworkAddress m_serverAddress;
   ISocketFactory *m_socketFactory = nullptr;
+  deskflow::client::ClientHub *m_hub = nullptr;
   deskflow::Computer *m_computer = nullptr;
   deskflow::IStream *m_stream = nullptr;
   EventQueueTimer *m_timer = nullptr;
@@ -258,8 +276,4 @@ private:
   int32_t m_relativeRestoreY = 0;
   size_t m_maximumClipboardSize = INT_MAX;
   size_t m_resolvedAddressesCount = 0;
-
-  std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
-  std::unique_ptr<deskflow::ClipboardFileSync> m_clipboardFiles;
-  void handleFileTransferCommand(const Event &event);
 };

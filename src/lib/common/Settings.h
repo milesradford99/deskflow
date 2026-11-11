@@ -43,6 +43,13 @@ public:
     inline static const auto XScrollScale = QStringLiteral("client/xScrollScale");
     inline static const auto LanguageSync = QStringLiteral("client/languageSync");
     inline static const auto RemoteHost = QStringLiteral("client/remoteHost");
+    //! More servers to stay connected to at the same time; each entry is a remoteHost value.
+    inline static const auto ExtraServers = QStringLiteral("client/extraServers");
+    //! With several servers: how long (ms) the one in control must be idle before another
+    //! takes over. 0 means the latest server always wins, -1 that the first one keeps it.
+    inline static const auto TakeoverDelay = QStringLiteral("client/takeoverDelay");
+    //! With several servers: pass a clipboard received from one on to the others.
+    inline static const auto ShareClipboardBetweenServers = QStringLiteral("client/shareClipboardBetweenServers");
     inline static const auto RecentRemoteHosts = QStringLiteral("client/recentRemoteHosts");
     inline static const auto XdpClipboardRetried = QStringLiteral("client/xdpClipboardRetried");
     inline static const auto XdpRestoreToken = QStringLiteral("client/xdpRestoreToken");
@@ -281,6 +288,9 @@ private:
     , Client::InvertXScroll
     , Client::LanguageSync
     , Client::RemoteHost
+    , Client::ExtraServers
+    , Client::TakeoverDelay
+    , Client::ShareClipboardBetweenServers
     , Client::RecentRemoteHosts
     , Client::YScrollScale
     , Client::XScrollScale
@@ -358,6 +368,7 @@ private:
     , Client::InvertYScroll
     , Client::InvertXScroll
     , Client::LanguageSync
+    , Client::ShareClipboardBetweenServers
     , Client::XdpClipboardRetried
     , Log::ToFile
     , Log::GuiDebug

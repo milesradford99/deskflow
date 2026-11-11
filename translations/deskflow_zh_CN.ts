@@ -177,6 +177,50 @@ p, li { white-space: pre-wrap; }
         <source>Clear Server History</source>
         <translation type="unfinished">清除服务器历史记录</translation>
     </message>
+    <message>
+        <source>Other servers</source>
+        <translation>其他服务器</translation>
+    </message>
+    <message>
+        <source>Also stay connected to these servers, one per line. Each can control this computer, one at a time.</source>
+        <translation>同时保持与这些服务器的连接，每行一个。它们都可以控制这台电脑，但同一时间只有一个。</translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.20 or office-pc:24800</source>
+        <translation>例如 192.168.1.20 或 office-pc:24800</translation>
+    </message>
+    <message>
+        <source>When another server&apos;s cursor arrives</source>
+        <translation>另一台服务器的光标移过来时</translation>
+    </message>
+    <message>
+        <source>Idle time</source>
+        <translation>空闲时间</translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation> 秒</translation>
+    </message>
+    <message>
+        <source>Copying on one server makes it pasteable on the others too. Leave this off if the servers belong to different people.</source>
+        <translation>在一台服务器上复制的内容也可以在其他服务器上粘贴。如果这些服务器属于不同的人，请保持关闭。</translation>
+    </message>
+    <message>
+        <source>Pass a clipboard from one server on to the others</source>
+        <translation>把一台服务器的剪贴板转给其他服务器</translation>
+    </message>
+    <message>
+        <source>Switch once the server in control is idle</source>
+        <translation>等正在控制的服务器空闲后切换</translation>
+    </message>
+    <message>
+        <source>Switch at once</source>
+        <translation>立即切换</translation>
+    </message>
+    <message>
+        <source>Wait until the server in control leaves</source>
+        <translation>等正在控制的服务器离开后再切换</translation>
+    </message>
 </context>
 <context>
     <name>ComputerSettingsDialog</name>
@@ -577,6 +621,26 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;连接到服务器“%1”失败。&lt;/p&gt;&lt;p&gt;一个同名的客户端已连接到服务器。&lt;/p&gt;请确保您使用的名称唯一，且只有一个客户端进程实例在运行。&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>%1: in control</source>
+        <translation>%1：正在控制</translation>
+    </message>
+    <message>
+        <source>%1: connected</source>
+        <translation>%1：已连接</translation>
+    </message>
+    <message>
+        <source>%1: connecting</source>
+        <translation>%1：正在连接</translation>
+    </message>
+    <message>
+        <source>%1: not connected</source>
+        <translation>%1：未连接</translation>
+    </message>
+    <message>
+        <source>Connects to %1 at the same time</source>
+        <translation>同时连接到 %1</translation>
     </message>
     <message>
         <source>View &amp;Help</source>

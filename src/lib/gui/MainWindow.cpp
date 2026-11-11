@@ -95,6 +95,15 @@ MainWindow::MainWindow()
   ui->lblIpAddresses->setProperty("secondary", true);
   ui->lblComputerName->setProperty("heading", true);
 
+  // with several servers, one line under the address says how each is doing
+  m_serverStatus = new QLabel(this);
+  m_serverStatus->setProperty("secondary", true);
+  m_serverStatus->setWordWrap(true);
+  m_serverStatus->setVisible(false);
+  if (auto *groupLayout = qobject_cast<QBoxLayout *>(ui->groupBox->layout())) {
+    groupLayout->insertWidget(groupLayout->indexOf(ui->widgetModeOptions) + 1, m_serverStatus);
+  }
+
   m_fileTransfer = new FileTransferWidget(this);
   if (auto *mainLayout = qobject_cast<QBoxLayout *>(ui->topLevelWidget->layout())) {
     mainLayout->insertWidget(mainLayout->indexOf(ui->groupBox) + 1, m_fileTransfer);
@@ -297,6 +306,16 @@ void MainWindow::connectSlots()
   connect(&m_coreProcess, &CoreProcess::processStateChanged, m_fileTransfer, [this](ProcessState state) {
     if (state == ProcessState::Stopped)
       m_fileTransfer->reset();
+  });
+  connect(&m_coreProcess, &CoreProcess::serversChanged, this, [this](const QJsonArray &servers) {
+    m_serverStates = servers;
+    updateServerStatus();
+  });
+  connect(&m_coreProcess, &CoreProcess::processStateChanged, this, [this](ProcessState state) {
+    if (state == ProcessState::Stopped) {
+      m_serverStates = {};
+      updateServerStatus();
+    }
   });
   connect(m_fileTransfer, &FileTransferWidget::sendRequested, &m_coreProcess, &CoreProcess::sendFiles);
   connect(m_fileTransfer, &FileTransferWidget::cancelRequested, &m_coreProcess, &CoreProcess::cancelFileTransfer);
@@ -564,6 +583,7 @@ void MainWindow::updateModeControls()
 
   ui->serverOptions->setVisible(isServer);
   ui->clientOptions->setVisible(isClient);
+  updateServerStatus();
   ui->lblNoMode->setVisible(!isServer && !isClient);
   toggleCanRunCore(canRunCore());
 
@@ -1020,6 +1040,45 @@ void MainWindow::coreProcessStateChanged(ProcessState state)
     m_actionStopCore->setEnabled(false);
   }
   updateModeControlLabels();
+}
+
+void MainWindow::updateServerStatus()
+{
+  const auto extra = Settings::value(Settings::Client::ExtraServers).toStringList();
+  const bool show = ui->rbModeClient->isChecked() && !extra.isEmpty();
+  m_serverStatus->setVisible(show);
+  if (!show)
+    return;
+
+  // the core's report, or just the configured servers while it isn't running
+  QStringList parts;
+  if (!m_serverStates.isEmpty()) {
+    for (const auto &value : std::as_const(m_serverStates)) {
+      const auto server = value.toObject();
+      const auto host = server["host"].toString();
+      if (server["control"].toBool()) {
+        parts.append(tr("%1: in control").arg(host));
+        continue;
+      }
+      switch (static_cast<ConnectionState>(server["state"].toInt())) {
+      case ConnectionState::Connected:
+        parts.append(tr("%1: connected").arg(host));
+        break;
+      case ConnectionState::Connecting:
+        parts.append(tr("%1: connecting").arg(host));
+        break;
+      default:
+        parts.append(tr("%1: not connected").arg(host));
+        break;
+      }
+    }
+  } else {
+    QStringList hosts{ui->cbHostname->currentText()};
+    hosts.append(extra);
+    hosts.removeAll(QString());
+    parts.append(tr("Connects to %1 at the same time").arg(hosts.join(QStringLiteral(", "))));
+  }
+  m_serverStatus->setText(parts.join(QStringLiteral("  ·  ")));
 }
 
 void MainWindow::coreConnectionStateChanged(ConnectionState state)

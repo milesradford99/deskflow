@@ -19,6 +19,10 @@ ClientConfigDialog::ClientConfigDialog(QWidget *parent)
 {
   ui->setupUi(this);
   layout()->addWidget(m_buttonBox);
+  // values are the takeover delay: < 0 never, 0 at once, > 0 after the idle time
+  ui->cbTakeover->addItem(tr("Switch once the server in control is idle"), kTakeoverIdle);
+  ui->cbTakeover->addItem(tr("Switch at once"), 0);
+  ui->cbTakeover->addItem(tr("Wait until the server in control leaves"), -1);
   ui->btnClearServerHistory->setIcon(QIcon::fromTheme(QStringLiteral("edit-clear-all")));
   initConnections();
   load();
@@ -47,6 +51,10 @@ void ClientConfigDialog::updateControls() const
   ui->sbXScrollScale->setEnabled(writable);
   ui->cbYScrollInvert->setEnabled(writable);
   ui->sbYScrollScale->setEnabled(writable);
+  ui->teExtraServers->setEnabled(writable);
+  ui->cbTakeover->setEnabled(writable);
+  ui->sbTakeoverDelay->setEnabled(writable && ui->cbTakeover->currentData().toInt() == kTakeoverIdle);
+  ui->cbShareClipboard->setEnabled(writable);
   ui->btnClearServerHistory->setEnabled(
       writable && !Settings::value(Settings::Client::RecentRemoteHosts).toStringList().isEmpty()
   );
@@ -68,6 +76,13 @@ void ClientConfigDialog::initConnections() const
   connect(ui->sbYScrollScale, &QDoubleSpinBox::valueChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
   connect(ui->cbXScrollInvert, &QCheckBox::checkStateChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
   connect(ui->sbXScrollScale, &QDoubleSpinBox::valueChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
+  connect(ui->teExtraServers, &QPlainTextEdit::textChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbTakeover, &QComboBox::currentIndexChanged, this, [this] {
+    updateControls();
+    setButtonBoxEnabledButtons();
+  });
+  connect(ui->sbTakeoverDelay, &QDoubleSpinBox::valueChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbShareClipboard, &QCheckBox::checkStateChanged, this, &ClientConfigDialog::setButtonBoxEnabledButtons);
   connect(Settings::instance(), &Settings::settingsWritableChanged, this, &ClientConfigDialog::updateControls);
 }
 
@@ -79,7 +94,11 @@ bool ClientConfigDialog::isModified() const
          (ui->cbYScrollInvert->isChecked() != Settings::value(Settings::Client::InvertYScroll).toBool()) ||
          (ui->sbYScrollScale->value() != Settings::value(Settings::Client::YScrollScale).toDouble()) ||
          (ui->cbXScrollInvert->isChecked() != Settings::value(Settings::Client::InvertXScroll).toBool()) ||
-         (ui->sbXScrollScale->value() != Settings::value(Settings::Client::XScrollScale).toDouble());
+         (ui->sbXScrollScale->value() != Settings::value(Settings::Client::XScrollScale).toDouble()) ||
+         (extraServers() != Settings::value(Settings::Client::ExtraServers).toStringList()) ||
+         (takeoverDelay() != Settings::value(Settings::Client::TakeoverDelay).toInt()) ||
+         (ui->cbShareClipboard->isChecked() != Settings::value(Settings::Client::ShareClipboardBetweenServers).toBool()
+         );
 }
 
 bool ClientConfigDialog::isDefault() const
@@ -90,7 +109,38 @@ bool ClientConfigDialog::isDefault() const
          (ui->cbYScrollInvert->isChecked() == Settings::defaultValue(Settings::Client::InvertYScroll).toBool()) &&
          (ui->sbYScrollScale->value() == Settings::defaultValue(Settings::Client::YScrollScale).toDouble()) &&
          (ui->cbXScrollInvert->isChecked() == Settings::defaultValue(Settings::Client::InvertXScroll).toBool()) &&
-         (ui->sbXScrollScale->value() == Settings::defaultValue(Settings::Client::XScrollScale).toDouble());
+         (ui->sbXScrollScale->value() == Settings::defaultValue(Settings::Client::XScrollScale).toDouble()) &&
+         extraServers().isEmpty() &&
+         (takeoverDelay() == Settings::defaultValue(Settings::Client::TakeoverDelay).toInt()) &&
+         (ui->cbShareClipboard->isChecked() ==
+          Settings::defaultValue(Settings::Client::ShareClipboardBetweenServers).toBool());
+}
+
+QStringList ClientConfigDialog::extraServers() const
+{
+  QStringList servers;
+  for (const auto &line : ui->teExtraServers->toPlainText().split('\n')) {
+    if (const auto server = line.trimmed(); !server.isEmpty() && !servers.contains(server))
+      servers.append(server);
+  }
+  return servers;
+}
+
+int ClientConfigDialog::takeoverDelay() const
+{
+  const auto choice = ui->cbTakeover->currentData().toInt();
+  if (choice != kTakeoverIdle)
+    return choice;
+  return static_cast<int>(ui->sbTakeoverDelay->value() * 1000);
+}
+
+void ClientConfigDialog::showTakeoverDelay(int delay)
+{
+  ui->cbTakeover->setCurrentIndex(ui->cbTakeover->findData(delay <= 0 ? delay : kTakeoverIdle));
+  if (delay > 0)
+    ui->sbTakeoverDelay->setValue(delay / 1000.0);
+  else
+    ui->sbTakeoverDelay->setValue(Settings::defaultValue(Settings::Client::TakeoverDelay).toInt() / 1000.0);
 }
 
 void ClientConfigDialog::setButtonBoxEnabledButtons() const
@@ -109,6 +159,10 @@ void ClientConfigDialog::load()
   ui->sbYScrollScale->setValue(Settings::value(Settings::Client::YScrollScale).toDouble());
   ui->cbXScrollInvert->setChecked(Settings::value(Settings::Client::InvertXScroll).toBool());
   ui->sbXScrollScale->setValue(Settings::value(Settings::Client::XScrollScale).toDouble());
+  ui->teExtraServers->setPlainText(Settings::value(Settings::Client::ExtraServers).toStringList().join('\n'));
+  showTakeoverDelay(Settings::value(Settings::Client::TakeoverDelay).toInt());
+  ui->cbShareClipboard->setChecked(Settings::value(Settings::Client::ShareClipboardBetweenServers).toBool());
+  updateControls();
   setButtonBoxEnabledButtons();
 }
 
@@ -120,6 +174,9 @@ void ClientConfigDialog::resetToDefault()
   ui->sbYScrollScale->setValue(Settings::defaultValue(Settings::Client::YScrollScale).toDouble());
   ui->cbXScrollInvert->setChecked(Settings::defaultValue(Settings::Client::InvertXScroll).toBool());
   ui->sbXScrollScale->setValue(Settings::defaultValue(Settings::Client::XScrollScale).toDouble());
+  ui->teExtraServers->clear();
+  showTakeoverDelay(Settings::defaultValue(Settings::Client::TakeoverDelay).toInt());
+  ui->cbShareClipboard->setChecked(Settings::defaultValue(Settings::Client::ShareClipboardBetweenServers).toBool());
 }
 
 void ClientConfigDialog::save()
@@ -130,6 +187,10 @@ void ClientConfigDialog::save()
   Settings::setValue(Settings::Client::YScrollScale, ui->sbYScrollScale->value());
   Settings::setValue(Settings::Client::InvertXScroll, ui->cbXScrollInvert->isChecked());
   Settings::setValue(Settings::Client::XScrollScale, ui->sbXScrollScale->value());
+  const auto servers = extraServers();
+  Settings::setValue(Settings::Client::ExtraServers, servers.isEmpty() ? QVariant() : QVariant(servers));
+  Settings::setValue(Settings::Client::TakeoverDelay, takeoverDelay());
+  Settings::setValue(Settings::Client::ShareClipboardBetweenServers, ui->cbShareClipboard->isChecked());
   QDialog::accept();
 }
 

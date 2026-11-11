@@ -61,6 +61,12 @@ public:
     return false;
   }
 
+  //! Tell the server another server controls this computer (protocol 1.10; ignored below).
+  virtual void sendControlDenied()
+  {
+    // older servers can't be told; their input is dropped until they leave
+  }
+
   //@}
 
 protected:
