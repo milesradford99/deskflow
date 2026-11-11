@@ -36,6 +36,17 @@ runs:
               fi
             done
           done < <(find "$app" -type f -print0)
+          # Runners have SIP off, so dyld skips library validation and launching
+          # proves little: check the signature the way a normal Mac would.
+          codesign --verify --deep --strict "$app"
+          for f in "$app"/Contents/MacOS/*; do
+            sig=$(codesign -dv "$f" 2>&1)
+            echo "$sig" | grep -E "^(Signature|TeamIdentifier|CodeDirectory)"
+            if echo "$sig" | grep -q "Signature=adhoc" && echo "$sig" | grep -q "flags=.*runtime"; then
+              echo "::error::${f#$app/} is ad-hoc signed with the hardened runtime; dyld will refuse its frameworks"
+              too_new=1
+            fi
+          done
           hdiutil detach /tmp/deskflow-dmg
           exit $too_new
 

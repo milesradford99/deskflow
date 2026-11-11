@@ -78,6 +78,10 @@ gh api repos/OWNER/REPO/actions/jobs/JOB/logs | grep -E "error|FAILED" | head
 
 macOS packages are ad-hoc signed (no Apple developer certificate is configured), so
 each new build has to be allowed again under Privacy & Security > Accessibility.
+Ad-hoc builds must not use the hardened runtime: its library validation makes dyld
+reject the bundled Qt frameworks ("different Team IDs"). Runners have SIP off and never
+show this, so `test-package` checks the signature flags and each binary's minimum macOS
+against `LSMinimumSystemVersion` instead of trusting a successful launch.
 
 ## Feature notes
 
