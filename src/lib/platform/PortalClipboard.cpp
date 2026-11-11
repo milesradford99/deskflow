@@ -300,7 +300,7 @@ bool PortalClipboard::readSelectionIntoCache(
       continue;
     }
 
-    if (entry.format != IClipboard::Format::Bitmap) {
+    if (entry.format != IClipboard::Format::Bitmap && entry.format != IClipboard::Format::Png) {
       while (bytes.endsWith('\0'))
         bytes.chop(1);
       bytes.replace("\r\n", "\n");

@@ -46,6 +46,8 @@ if(WIN32)
     MSWindowsClipboardFacade.h
     MSWindowsClipboardHTMLConverter.cpp
     MSWindowsClipboardHTMLConverter.h
+    MSWindowsClipboardPngConverter.cpp
+    MSWindowsClipboardPngConverter.h
     MSWindowsClipboardUTF16Converter.cpp
     MSWindowsClipboardUTF16Converter.h
     MSWindowsComputer.cpp
@@ -85,6 +87,8 @@ elseif(APPLE)
     OSXClipboardBMPConverter.cpp
     OSXClipboardBMPConverter.h
     OSXClipboardHTMLConverter.cpp
+    OSXClipboardImageConverter.cpp
+    OSXClipboardImageConverter.h
     OSXClipboardHTMLConverter.h
     OSXClipboardTextConverter.cpp
     OSXClipboardTextConverter.h
@@ -132,6 +136,8 @@ elseif(UNIX)
       XWindowsClipboardBMPConverter.cpp
       XWindowsClipboardBMPConverter.h
       XWindowsClipboardHTMLConverter.cpp
+      XWindowsClipboardPNGConverter.cpp
+      XWindowsClipboardPNGConverter.h
       XWindowsClipboardHTMLConverter.h
       XWindowsClipboardTextConverter.cpp
       XWindowsClipboardTextConverter.h
@@ -198,7 +204,8 @@ if(UNIX)
 
   if(APPLE)
     find_library(COCOA_LIBRARY Cocoa)
-    target_link_libraries(platform PUBLIC ${COCOA_LIBRARY})
+    find_library(IMAGEIO_LIBRARY ImageIO)
+    target_link_libraries(platform PUBLIC ${COCOA_LIBRARY} ${IMAGEIO_LIBRARY})
   else()
     if(${LIBXKBCOMMON_VERSION} VERSION_GREATER_EQUAL "1.10")
       target_compile_definitions(platform PRIVATE HAVE_XKB_KEYMAP_MOD_GET_MASK=1)

@@ -131,6 +131,11 @@ void Settings::upgradeSettings()
     }
   }
 
+  // 3 MiB was the default while images were sent as raw bitmaps, and it silently
+  // dropped most screenshots. Let installs still carrying it pick up the new default.
+  if (m_settings->contains(Server::ClipboardSize) && m_settings->value(Server::ClipboardSize).toUInt() == 3)
+    m_settings->remove(Server::ClipboardSize);
+
   // move to computers
 
   m_settings->beginGroup("internalConfig");
@@ -385,7 +390,7 @@ QVariant Settings::defaultValue(const QString &key)
     return 250;
 
   if (key == Server::ClipboardSize)
-    return 3; // 3 MiB
+    return 256; // MiB
 
   return QVariant();
 }

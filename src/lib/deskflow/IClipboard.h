@@ -45,12 +45,18 @@ public:
   \c kHTML is a text format encoded in UTF-8 and containing a valid
   HTML fragment (but not necessarily a complete HTML document).
   Newlines are LF.
+
+  \c Png is the preferred image format: a complete PNG file. Platform
+  clipboards offer it whenever any image is available and marshall()
+  converts a lone \c Bitmap to it, so \c Bitmap never crosses the wire
+  unless that conversion fails.
   */
   enum class Format
   {
     Text,        //!< Text format, UTF-8, newline is LF
     HTML,        //!< HTML format, HTML fragment, UTF-8, newline is LF
     Bitmap,      //!< Bitmap format, BMP 24/32bpp, BI_RGB
+    Png,         //!< Image format, a complete PNG file
     TotalFormats //!< The number of clipboard formats supported
   };
 

@@ -8,6 +8,7 @@
 #include "deskflow/IClipboard.h"
 
 #include "base/Log.h"
+#include "deskflow/ClipboardImage.h"
 
 #include <assert.h>
 #include <vector>
@@ -89,14 +90,36 @@ std::string IClipboard::marshall(const IClipboard *clipboard)
   // FIXME -- use current time
   if (clipboard->open(0)) {
 
+    // An image offered in both forms is only sent as PNG; the DIB is the
+    // same picture at many times the size.
+    const auto bitmap = static_cast<int>(Format::Bitmap);
+    const auto png = static_cast<int>(Format::Png);
+    std::vector<bool> present(totalClipboardFormats, false);
+    for (int format = 0; format != totalClipboardFormats; ++format) {
+      if (format == bitmap && clipboard->has(Format::Png)) {
+        continue;
+      }
+      if (clipboard->has(static_cast<Format>(format))) {
+        present[format] = true;
+        formatData[format] = clipboard->get(static_cast<Format>(format));
+      }
+    }
+
+    if (present[bitmap] && !present[png]) {
+      if (auto converted = deskflow::clipboardImage::dibToPng(formatData[bitmap]); !converted.empty()) {
+        formatData[png] = std::move(converted);
+        present[png] = true;
+        present[bitmap] = false;
+      }
+    }
+
     // compute size of marshalled data
-    uint32_t size = 4;
+    size_t size = 4;
     uint32_t numFormats = 0;
-    for (uint32_t format = 0; format != totalClipboardFormats; ++format) {
-      if (clipboard->has(static_cast<IClipboard::Format>(format))) {
+    for (int format = 0; format != totalClipboardFormats; ++format) {
+      if (present[format]) {
         ++numFormats;
-        formatData[format] = clipboard->get(static_cast<IClipboard::Format>(format));
-        size += 4 + 4 + (uint32_t)formatData[format].size();
+        size += 4 + 4 + formatData[format].size();
       }
     }
 
@@ -105,10 +128,10 @@ std::string IClipboard::marshall(const IClipboard *clipboard)
 
     // marshall the data
     writeUInt32(&data, numFormats);
-    for (uint32_t format = 0; format != totalClipboardFormats; ++format) {
-      if (clipboard->has(static_cast<IClipboard::Format>(format))) {
-        writeUInt32(&data, format);
-        writeUInt32(&data, (uint32_t)formatData[format].size());
+    for (int format = 0; format != totalClipboardFormats; ++format) {
+      if (present[format]) {
+        writeUInt32(&data, static_cast<uint32_t>(format));
+        writeUInt32(&data, static_cast<uint32_t>(formatData[format].size()));
         data += formatData[format];
       }
     }
@@ -137,6 +160,10 @@ bool IClipboard::copy(IClipboard *dst, const IClipboard *src, Time time)
       if (dst->empty()) {
         for (int32_t format = 0; format != static_cast<int>(Format::TotalFormats); ++format) {
           auto eFormat = (IClipboard::Format)format;
+          // the PNG carries the same image, see marshall()
+          if (eFormat == Format::Bitmap && src->has(Format::Png)) {
+            continue;
+          }
           if (src->has(eFormat)) {
             dst->add(eFormat, src->get(eFormat));
           }

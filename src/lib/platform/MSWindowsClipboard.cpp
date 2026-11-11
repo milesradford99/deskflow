@@ -12,6 +12,7 @@
 #include "platform/MSWindowsClipboardBitmapConverter.h"
 #include "platform/MSWindowsClipboardFacade.h"
 #include "platform/MSWindowsClipboardHTMLConverter.h"
+#include "platform/MSWindowsClipboardPngConverter.h"
 #include "platform/MSWindowsClipboardUTF16Converter.h"
 
 //
@@ -28,6 +29,8 @@ MSWindowsClipboard::MSWindowsClipboard(HWND window)
 {
   // add converters, most desired first
   m_converters.push_back(new MSWindowsClipboardUTF16Converter);
+  m_converters.push_back(new MSWindowsClipboardPngConverter);
+  m_converters.push_back(new MSWindowsClipboardDibPngConverter);
   m_converters.push_back(new MSWindowsClipboardBitmapConverter);
   m_converters.push_back(new MSWindowsClipboardHTMLConverter);
 }
@@ -90,7 +93,8 @@ void MSWindowsClipboard::add(Format format, const std::string &data)
     return;
   }
   bool isSucceeded = false;
-  // convert data to win32 form
+  // convert data to win32 form; a format may map to several win32 formats
+  // (e.g. an image is offered as both PNG and DIB) and all of them are written
   for (ConverterList::const_iterator index = m_converters.begin(); index != m_converters.end(); ++index) {
     IMSWindowsClipboardConverter *converter = *index;
 
@@ -101,7 +105,6 @@ void MSWindowsClipboard::add(Format format, const std::string &data)
         LOG_DEBUG("add %d bytes to clipboard format: %d", data.size(), format);
         m_facade->write(win32Data, converter->getWin32Format());
         isSucceeded = true;
-        break;
       } else {
         LOG_DEBUG("failed to convert clipboard data to platform format");
       }
@@ -172,7 +175,7 @@ std::string MSWindowsClipboard::get(Format format) const
   for (ConverterList::const_iterator index = m_converters.begin(); index != m_converters.end(); ++index) {
 
     converter = *index;
-    if (converter->getFormat() == format) {
+    if (converter->getFormat() == format && IsClipboardFormatAvailable(converter->getWin32Format())) {
       break;
     }
     converter = nullptr;
@@ -180,7 +183,7 @@ std::string MSWindowsClipboard::get(Format format) const
 
   // if no converter then we don't recognize any formats
   if (converter == nullptr) {
-    LOG_WARN("no converter for format %d", format);
+    LOG_DEBUG("no clipboard data for format %d", format);
     return std::string();
   }
 

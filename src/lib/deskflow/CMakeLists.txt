@@ -37,6 +37,8 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   Clipboard.cpp
   Clipboard.h
   ClipboardChunk.cpp
+  ClipboardImage.cpp
+  ClipboardImage.h
   ClipboardChunk.h
   Computer.cpp
   Computer.h
@@ -94,6 +96,7 @@ target_link_libraries(${lib_name}
     common
     Qt6::Network
   PRIVATE
+    Qt6::Gui
     platform
 )
 

@@ -11,6 +11,7 @@
 #include "base/Log.h"
 #include "platform/OSXClipboardBMPConverter.h"
 #include "platform/OSXClipboardHTMLConverter.h"
+#include "platform/OSXClipboardImageConverter.h"
 #include "platform/OSXClipboardTextConverter.h"
 #include "platform/OSXClipboardUTF16Converter.h"
 #include "platform/OSXClipboardUTF8Converter.h"
@@ -22,6 +23,11 @@
 OSXClipboard::OSXClipboard() : m_time(0), m_pboard(nullptr)
 {
   m_converters.push_back(new OSXClipboardHTMLConverter);
+  // image types, most desired first; all are read, only PNG and TIFF are written
+  using ImageMode = OSXClipboardImageConverter::Mode;
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.png"), ImageMode::ReadWrite));
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.tiff"), ImageMode::ReadWrite));
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.jpeg"), ImageMode::ReadOnly));
   m_converters.push_back(new OSXClipboardBMPConverter);
   m_converters.push_back(new OSXClipboardUTF8Converter);
   m_converters.push_back(new OSXClipboardUTF16Converter);
@@ -81,13 +87,6 @@ void OSXClipboard::add(Format format, const std::string &data)
     return;
 
   LOG_DEBUG("add %d bytes to clipboard format: %d", data.size(), format);
-  if (format == IClipboard::Format::Text) {
-    LOG_DEBUG("format of data to be added to clipboard was kText");
-  } else if (format == IClipboard::Format::Bitmap) {
-    LOG_DEBUG("format of data to be added to clipboard was kBitmap");
-  } else if (format == IClipboard::Format::HTML) {
-    LOG_DEBUG("format of data to be added to clipboard was kHTML");
-  }
 
   for (ConverterList::const_iterator index = m_converters.begin(); index != m_converters.end(); ++index) {
 
@@ -96,6 +95,10 @@ void OSXClipboard::add(Format format, const std::string &data)
     // skip converters for other formats
     if (converter->getFormat() == format) {
       std::string osXData = converter->fromIClipboard(data);
+      // read-only converters and failed conversions have nothing to offer
+      if (osXData.empty() && !data.empty()) {
+        continue;
+      }
       CFStringRef flavorType = converter->getOSXFormat();
       CFDataRef dataRef = CFDataCreate(kCFAllocatorDefault, (uint8_t *)osXData.data(), osXData.size());
       PasteboardItemID itemID = 0;
