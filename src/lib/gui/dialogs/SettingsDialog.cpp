@@ -134,6 +134,7 @@ void SettingsDialog::initConnections() const
   connect(ui->cbShowVersion, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->cbOverlayKeys, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->cbOverlayActivity, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbCursorHighlight, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->cbRequireClientCert, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->groupLogToFile, &QGroupBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->groupService, &QGroupBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
@@ -242,6 +243,7 @@ void SettingsDialog::accept()
   Settings::setValue(Settings::Gui::ShowVersionInTitle, ui->cbShowVersion->isChecked());
   Settings::setValue(Settings::Gui::OverlayShowKeys, ui->cbOverlayKeys->isChecked());
   Settings::setValue(Settings::Gui::OverlayShowActivity, ui->cbOverlayActivity->isChecked());
+  Settings::setValue(Settings::Gui::CursorHighlight, ui->cbCursorHighlight->isChecked());
   Settings::setValue(Settings::Core::EnableEnterCommand, ui->cbRunEnterCommand->isChecked());
   Settings::setValue(Settings::Core::EnableExitCommand, ui->cbRunExitCommand->isChecked());
   Settings::setValue(Settings::Core::ComputerEnterCommand, ui->lineCommandEnter->text());
@@ -272,6 +274,7 @@ void SettingsDialog::loadFromConfig()
   ui->cbShowVersion->setChecked(Settings::value(Settings::Gui::ShowVersionInTitle).toBool());
   ui->cbOverlayKeys->setChecked(Settings::value(Settings::Gui::OverlayShowKeys).toBool());
   ui->cbOverlayActivity->setChecked(Settings::value(Settings::Gui::OverlayShowActivity).toBool());
+  ui->cbCursorHighlight->setChecked(Settings::value(Settings::Gui::CursorHighlight).toBool());
   ui->cbRunEnterCommand->setChecked(Settings::value(Settings::Core::EnableEnterCommand).toBool());
   ui->cbRunExitCommand->setChecked(Settings::value(Settings::Core::EnableExitCommand).toBool());
   ui->lineCommandEnter->setText(Settings::value(Settings::Core::ComputerEnterCommand).toString());
@@ -382,6 +385,7 @@ void SettingsDialog::updateControls()
   ui->cbShowVersion->setEnabled(writable);
   ui->cbOverlayKeys->setEnabled(writable);
   ui->cbOverlayActivity->setEnabled(writable);
+  ui->cbCursorHighlight->setEnabled(writable);
   ui->cbGuiDebug->setEnabled(writable);
   ui->rbIconColorful->setEnabled(writable);
   ui->rbIconMono->setEnabled(writable);
@@ -444,6 +448,7 @@ bool SettingsDialog::isModified() const
       (ui->cbShowVersion->isChecked() != Settings::value(Settings::Gui::ShowVersionInTitle).toBool()) ||
       (ui->cbOverlayKeys->isChecked() != Settings::value(Settings::Gui::OverlayShowKeys).toBool()) ||
       (ui->cbOverlayActivity->isChecked() != Settings::value(Settings::Gui::OverlayShowActivity).toBool()) ||
+      (ui->cbCursorHighlight->isChecked() != Settings::value(Settings::Gui::CursorHighlight).toBool()) ||
       (ui->rbIconMono->isChecked() != Settings::value(Settings::Gui::SymbolicTrayIcon).toBool()) ||
       (ui->groupService->isChecked() != (processMode == Settings::ProcessMode::Service)) ||
       (ui->lineTlsCertPath->text() != Settings::value(Settings::Security::Certificate).toString()) ||
@@ -481,6 +486,7 @@ bool SettingsDialog::isDefault() const
       (ui->cbShowVersion->isChecked() == Settings::defaultValue(Settings::Gui::ShowVersionInTitle).toBool()) &&
       (ui->cbOverlayKeys->isChecked() == Settings::defaultValue(Settings::Gui::OverlayShowKeys).toBool()) &&
       (ui->cbOverlayActivity->isChecked() == Settings::defaultValue(Settings::Gui::OverlayShowActivity).toBool()) &&
+      (ui->cbCursorHighlight->isChecked() == Settings::defaultValue(Settings::Gui::CursorHighlight).toBool()) &&
       (ui->rbIconMono->isChecked() == Settings::defaultValue(Settings::Gui::SymbolicTrayIcon).toBool()) &&
       (ui->groupService->isChecked() == (processMode == Settings::ProcessMode::Service)) &&
       (ui->comboInterface->currentIndex() == 0) &&
@@ -511,6 +517,7 @@ void SettingsDialog::resetToDefault()
   ui->cbShowVersion->setChecked(Settings::defaultValue(Settings::Gui::ShowVersionInTitle).toBool());
   ui->cbOverlayKeys->setChecked(Settings::defaultValue(Settings::Gui::OverlayShowKeys).toBool());
   ui->cbOverlayActivity->setChecked(Settings::defaultValue(Settings::Gui::OverlayShowActivity).toBool());
+  ui->cbCursorHighlight->setChecked(Settings::defaultValue(Settings::Gui::CursorHighlight).toBool());
   ui->cbRunEnterCommand->setChecked(Settings::defaultValue(Settings::Core::EnableEnterCommand).toBool());
   ui->cbRunExitCommand->setChecked(Settings::defaultValue(Settings::Core::EnableExitCommand).toBool());
   ui->lineCommandEnter->setText(Settings::defaultValue(Settings::Core::ComputerEnterCommand).toString());

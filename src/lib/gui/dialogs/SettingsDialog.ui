@@ -259,6 +259,16 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="cbCursorHighlight">
+            <property name="toolTip">
+             <string>A short ripple around the cursor when it arrives on this computer, so it is easy to find.</string>
+            </property>
+            <property name="text">
+             <string>Highlight the cursor when it arrives on this computer</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

@@ -106,6 +106,8 @@ public:
     inline static const auto IgnoreMissingKeyboardLayouts = QStringLiteral("gui/ignoreMissingKeyboardLayouts");
     inline static const auto OverlayShowKeys = QStringLiteral("gui/overlayShowKeys");
     inline static const auto OverlayShowActivity = QStringLiteral("gui/overlayShowActivity");
+    //! Ripple around the cursor when it arrives on this computer.
+    inline static const auto CursorHighlight = QStringLiteral("gui/cursorHighlight");
   };
   struct Log
   {
@@ -350,6 +352,7 @@ private:
     , Gui::IgnoreMissingKeyboardLayouts
     , Gui::OverlayShowKeys
     , Gui::OverlayShowActivity
+    , Gui::CursorHighlight
     , Security::Certificate
     , Security::CheckPeers
     , Security::KeySize
@@ -409,6 +412,7 @@ private:
   inline static const QStringList m_defaultTrueValues = {
       ClipboardHistory::Enabled
     , ClipboardHistory::IgnoreSensitive
+    , Gui::CursorHighlight
     , Core::UseHooks
     , Gui::CloseToTray
     , Gui::CloseReminder

@@ -30,6 +30,7 @@
 #include "gui/core/CoreProcess.h"
 #include "gui/ipc/DaemonIpcClient.h"
 #include "gui/widgets/ActivityOverlay.h"
+#include "gui/widgets/CursorLocator.h"
 #include "gui/widgets/LogDock.h"
 #include "net/FingerprintDatabase.h"
 #include "widgets/FileTransferWidget.h"
@@ -207,6 +208,7 @@ MainWindow::~MainWindow()
 
   // top level without a parent (so it stays visible while the main window is hidden)
   delete m_activityOverlay;
+  delete m_cursorLocator;
 }
 
 void MainWindow::restoreWindow()
@@ -437,6 +439,7 @@ void MainWindow::setupActivityOverlay()
 
   connect(&m_coreProcess, &CoreProcess::keyPressed, m_activityOverlay, &ActivityOverlay::addKey);
   connect(&m_coreProcess, &CoreProcess::activity, m_activityOverlay, &ActivityOverlay::handleCoreActivity);
+  connect(&m_coreProcess, &CoreProcess::activity, this, &MainWindow::handleCursorArrival);
 
   connect(&m_coreProcess, &CoreProcess::connectedClientsChanged, this, [this](const QStringList &clients) {
     if (m_coreProcess.mode() == CoreMode::Server && m_coreProcess.isStarted())
@@ -468,6 +471,20 @@ void MainWindow::applyActivityOverlaySettings()
 
   // The core only sends key presses while this is on, so nothing flows when the overlay is off.
   m_coreProcess.setKeyOverlayEnabled(showKeys);
+}
+
+void MainWindow::handleCursorArrival(const QString &type, const QStringList &fields)
+{
+  // a client gets "entered"; the server sees "switched" from a client back to itself
+  const bool arrived =
+      type == QStringLiteral("entered") || (type == QStringLiteral("switched") && fields.size() >= 2 &&
+                                            fields.at(1) == Settings::value(Settings::Core::ComputerName).toString());
+  if (!arrived || !Settings::value(Settings::Gui::CursorHighlight).toBool())
+    return;
+
+  if (!m_cursorLocator)
+    m_cursorLocator = new CursorLocator(); // NOSONAR - deleted in destructor, no parent like the overlay
+  m_cursorLocator->locate();
 }
 
 void MainWindow::serverConfigSaving()

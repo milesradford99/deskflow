@@ -34,6 +34,7 @@ class QLocalServer;
 class DeskflowApplication;
 class LogDock;
 class ActivityOverlay;
+class CursorLocator;
 class StatusBar;
 
 namespace deskflow::gui {
@@ -176,6 +177,7 @@ private:
   void serverClientsChanged(const QStringList &clients);
   void setupActivityOverlay();
   void applyActivityOverlaySettings();
+  void handleCursorArrival(const QString &type, const QStringList &fields);
 
   /**
    * @brief handleInstanceConnection a second instance connected, either to ask us to show
@@ -209,6 +211,7 @@ private:
 
   LogDock *m_logDock;
   ActivityOverlay *m_activityOverlay = nullptr;
+  CursorLocator *m_cursorLocator = nullptr;
   StatusBar *m_statusBar = nullptr;
 
   // Window Menu

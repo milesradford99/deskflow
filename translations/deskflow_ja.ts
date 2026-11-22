@@ -1497,6 +1497,14 @@ Enabling this setting will disable the server config GUI.</source>
         <source>Show events: switching computers, clipboard sharing, connections</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>A short ripple around the cursor when it arrives on this computer, so it is easy to find.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight the cursor when it arrives on this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsDialogButtonBox</name>

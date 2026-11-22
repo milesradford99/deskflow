@@ -1499,6 +1499,14 @@ Enabling this setting will disable the server config GUI.</source>
         <source>Show events: switching computers, clipboard sharing, connections</source>
         <translation>显示事件：切换电脑、剪贴板同步、连接状态</translation>
     </message>
+    <message>
+        <source>A short ripple around the cursor when it arrives on this computer, so it is easy to find.</source>
+        <translation>光标切换到这台电脑时，在它周围显示一圈短暂的水波纹，方便立刻找到。</translation>
+    </message>
+    <message>
+        <source>Highlight the cursor when it arrives on this computer</source>
+        <translation>光标切换到这台电脑时突出显示</translation>
+    </message>
 </context>
 <context>
     <name>SettingsDialogButtonBox</name>

@@ -115,6 +115,8 @@ add_library(${target} STATIC
   validators/IpAddressValidator.h
   widgets/ActivityOverlay.cpp
   widgets/ActivityOverlay.h
+  widgets/CursorLocator.cpp
+  widgets/CursorLocator.h
   widgets/ComputerSetupView.cpp
   widgets/ComputerSetupView.h
   widgets/FileTransferWidget.cpp
