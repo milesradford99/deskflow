@@ -884,11 +884,27 @@ QString FileTransferManager::cacheDirFor(const std::string &origin, uint32_t tok
   return QStringLiteral("%1/%2-%3").arg(m_cacheDir, name).arg(token, 8, 16, QChar('0'));
 }
 
+QStringList FileTransferManager::comparablePaths(const QStringList &paths)
+{
+  // The same files come back from a platform clipboard spelled differently: macOS
+  // resolves /var to /private/var (where the temp dir lives) and gives folders a
+  // trailing slash, and the order may change. Compare what the paths point at.
+  QStringList result;
+  result.reserve(paths.size());
+  for (const auto &path : paths) {
+    auto canonical = QFileInfo(path).canonicalFilePath();
+    result.append(canonical.isEmpty() ? QDir::cleanPath(path) : canonical);
+  }
+  result.sort();
+  return result;
+}
+
 std::string FileTransferManager::createOffer(const QStringList &paths)
 {
   // re-reading an unchanged clipboard must produce the same offer,
   // or every read would look like a new clipboard to the other computers
-  if (paths == m_offerPaths && !m_offerJson.empty())
+  const auto comparable = comparablePaths(paths);
+  if (!m_offerJson.empty() && comparable == m_offerComparable)
     return m_offerJson;
 
   std::vector<Entry> entries;
@@ -898,12 +914,14 @@ std::string FileTransferManager::createOffer(const QStringList &paths)
   const bool measured = collectEntries(paths, entries, total, label, count, kMaxOfferEntries);
   if (count == 0) {
     m_offerPaths.clear();
+    m_offerComparable.clear();
     m_offerJson.clear();
     return {};
   }
 
   m_offerToken += 2;
   m_offerPaths = paths;
+  m_offerComparable = comparable;
 
   QJsonObject offer;
   offer["origin"] = QString::fromStdString(m_localName);
@@ -951,8 +969,11 @@ QStringList FileTransferManager::localPathsForOffer(const Offer &offer) const
 
 std::string FileTransferManager::offerForLocalPaths(const QStringList &paths)
 {
+  // Files we fetched keep their origin's offer. Without this, a clipboard set from
+  // fetched files would be offered back as new files and copied again on every switch.
+  const auto comparable = comparablePaths(paths);
   for (const auto &[key, fetched] : m_fetched) {
-    if (fetched.paths == paths)
+    if (comparablePaths(fetched.paths) == comparable)
       return fetched.json;
   }
   return createOffer(paths);

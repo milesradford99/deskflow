@@ -161,6 +161,9 @@ public:
   };
   static Offer parseOffer(const std::string &json);
 
+  //! \c paths resolved (symlinks, trailing slashes) and sorted, for telling whether two lists name the same files.
+  static QStringList comparablePaths(const QStringList &paths);
+
   //! The offer to put on the wire for local clipboard \c paths.
   /*!
   Files we fetched for the clipboard keep the offer of the computer they came
@@ -293,6 +296,7 @@ private:
   // the newest local clipboard offer; older tokens stop being served
   uint32_t m_offerToken = 0;
   QStringList m_offerPaths;
+  QStringList m_offerComparable; //!< m_offerPaths as comparablePaths()
   std::string m_offerJson;
   // clipboard files already fetched: "origin/token" -> local paths
   struct Fetched

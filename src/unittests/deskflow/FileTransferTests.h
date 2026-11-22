@@ -27,6 +27,8 @@ private Q_SLOTS:
   void clipboardOffer_isStableForSamePaths();
   void clipboardOffer_isFetchedThroughRelay();
   void clipboardOffer_staleTokenIsDeclined();
+  void clipboardOffer_isStableForSameFilesSpelledDifferently();
+  void clipboardOffer_bouncedFetchedFilesKeepOrigin();
   void clipboardTransfer_unrequestedIsRejected();
 
 private:

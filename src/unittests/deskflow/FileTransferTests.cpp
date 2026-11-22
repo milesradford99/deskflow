@@ -435,6 +435,46 @@ void FileTransferTests::clipboardOffer_staleTokenIsDeclined()
   QVERIFY(net.run() > 0);
 }
 
+void FileTransferTests::clipboardOffer_isStableForSameFilesSpelledDifferently()
+{
+  Network net;
+  const auto a = net.makeFile("a.txt", "a");
+  net.makeFile("folder/b.txt", "b");
+  const auto folder = net.sourcePath("folder");
+  auto &alice = net.manager("alice");
+
+  const auto first = alice.createOffer({a, folder});
+  // a folder read back with a trailing slash, in another order
+  QCOMPARE(alice.createOffer({folder + "/", a}), first);
+
+#ifndef Q_OS_WIN
+  // macOS hands back /private/var/... for files under /var/...
+  const auto link = net.sourcePath("link");
+  QVERIFY(QFile::link(QFileInfo(folder).absolutePath(), link));
+  QCOMPARE(alice.createOffer({link + "/a.txt", link + "/folder"}), first);
+#endif
+}
+
+void FileTransferTests::clipboardOffer_bouncedFetchedFilesKeepOrigin()
+{
+  Network net;
+  const auto file = net.makeFile("photo.png", "png");
+  net.makeFile("album/one.jpg", "1");
+  const auto json = net.manager("alice").createOffer({file, net.sourcePath("album")});
+  const auto offer = FileTransferManager::parseOffer(json);
+
+  auto &bob = net.manager("bob");
+  QVERIFY(bob.requestOffer(offer));
+  net.run();
+  const auto paths = net.node("bob").clipboardPaths;
+  QCOMPARE(paths.size(), 2);
+
+  // bob's clipboard now holds the fetched files; reading it back, however spelled,
+  // must offer alice's files again rather than new ones that alice would copy back
+  QCOMPARE(bob.offerForLocalPaths({paths.at(1) + "/", paths.at(0)}), json);
+  QCOMPARE(net.manager("alice").localPathsForOffer(offer), (QStringList{file, net.sourcePath("album")}));
+}
+
 void FileTransferTests::clipboardTransfer_unrequestedIsRejected()
 {
   Network net;
