@@ -8,10 +8,11 @@
  */
 
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
+#include "MainWindowUi.h"
 
 #include "Diagnostic.h"
 #include "StyleUtils.h"
+#include "Theme.h"
 
 #include "clipboard/ClipboardHistory.h"
 #include "dialogs/AboutDialog.h"
@@ -19,7 +20,6 @@
 #include "dialogs/FingerprintDialog.h"
 #include "dialogs/HelpDialog.h"
 #include "dialogs/ServerConfigDialog.h"
-#include "dialogs/SettingsDialog.h"
 
 #include "common/PlatformInfo.h"
 #include "common/Settings.h"
@@ -31,16 +31,22 @@
 #include "gui/ipc/DaemonIpcClient.h"
 #include "gui/widgets/ActivityOverlay.h"
 #include "gui/widgets/CursorLocator.h"
-#include "gui/widgets/LogDock.h"
+#include "gui/widgets/LogView.h"
+#include "gui/widgets/MacControls.h"
 #include "net/FingerprintDatabase.h"
+#include "pages/ClipboardPage.h"
+#include "pages/OverlayPage.h"
+#include "pages/SettingsPage.h"
 #include "widgets/FileTransferWidget.h"
 #include "widgets/StatusBar.h"
 
+#include <QApplication>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QLineEdit>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMenu>
@@ -54,6 +60,9 @@
 #include <QScreen>
 #include <QScrollBar>
 #include <QSignalBlocker>
+#include <QStackedWidget>
+#include <QStyle>
+#include <QVBoxLayout>
 
 #include <memory>
 
@@ -69,7 +78,7 @@ MainWindow::MainWindow()
       m_trayIcon{new QSystemTrayIcon(this)},
       m_guiDupeChecker{new QLocalServer(this)},
       m_daemonIpcClient{new ipc::DaemonIpcClient(this)},
-      m_logDock{new LogDock(this)},
+      m_logView{new LogView(this)},
       m_statusBar{new StatusBar(this)},
       m_menuFile{new QMenu(this)},
       m_menuEdit{new QMenu(this)},
@@ -89,34 +98,10 @@ MainWindow::MainWindow()
 {
   ui->setupUi(this);
 
-  // roles the theme styles, see Theme.h
-  ui->rbModeServer->setProperty("segment", true);
-  ui->rbModeServer->setProperty("segmentPosition", "first");
-  ui->rbModeClient->setProperty("segment", true);
-  ui->rbModeClient->setProperty("segmentPosition", "last");
-  ui->btnToggleCore->setProperty("primary", true);
-  ui->lblIpAddresses->setProperty("secondary", true);
-  ui->lblComputerName->setProperty("heading", true);
-
-  // with several servers, one line under the address says how each is doing
-  m_serverStatus = new QLabel(this);
-  m_serverStatus->setProperty("secondary", true);
-  m_serverStatus->setWordWrap(true);
-  m_serverStatus->setVisible(false);
-  if (auto *groupLayout = qobject_cast<QBoxLayout *>(ui->groupBox->layout())) {
-    groupLayout->insertWidget(groupLayout->indexOf(ui->widgetModeOptions) + 1, m_serverStatus);
-  }
-
   m_fileTransfer = new FileTransferWidget(this);
-  if (auto *mainLayout = qobject_cast<QBoxLayout *>(ui->topLevelWidget->layout())) {
-    mainLayout->insertWidget(mainLayout->indexOf(ui->groupBox) + 1, m_fileTransfer);
-    mainLayout->setSpacing(12);
-    mainLayout->setContentsMargins(16, 12, 16, 8);
-  }
+  ui->homeLayout->addWidget(m_fileTransfer);
 
   setWindowIcon(QIcon::fromTheme(kRevFqdnName));
-
-  addDockWidget(Qt::BottomDockWidgetArea, m_logDock);
 
   // Setup Actions
   m_actionAbout->setMenuRole(QAction::AboutRole);
@@ -160,6 +145,7 @@ MainWindow::MainWindow()
   m_guiDupeChecker->listen(m_guiSocketName);
 
   m_clipboardHistory = new deskflow::gui::clipboard::ClipboardHistory(this, this);
+  setupPages();
 
   createMenuBar();
   setupControls();
@@ -214,37 +200,23 @@ MainWindow::~MainWindow()
 void MainWindow::restoreWindow()
 {
   auto windowGeometry = Settings::value(Settings::Gui::WindowGeometry).toRect();
-  const auto totalGeometry = QGuiApplication::primaryScreen()->availableGeometry();
-  if (!windowGeometry.isValid()) {
-    adjustSize();
-    windowGeometry = geometry();
-  } else {
-    setGeometry(windowGeometry);
-  }
-  m_expandedSize = geometry().size();
+  const auto available = QGuiApplication::primaryScreen()->availableGeometry();
 
-  if (!totalGeometry.contains(windowGeometry)) {
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    move(screenGeometry.center() - rect().center());
+  // Older versions saved a small fixed size window: start those, and first runs, centred at the default size.
+  if (!windowGeometry.isValid() || windowGeometry.width() < minimumWidth() ||
+      windowGeometry.height() < minimumHeight() || !available.intersects(windowGeometry)) {
+    const QSize preferred = size().boundedTo(available.size());
+    windowGeometry = QRect(available.center() - QPoint(preferred.width() / 2, preferred.height() / 2), preferred);
   }
-
-  if (!Settings::value(Settings::Gui::LogExpanded).toBool())
-    setFixedSize(size());
+  setGeometry(windowGeometry);
 }
 
 void MainWindow::setupControls()
 {
   secureSocket(false);
 
-  ui->btnConfigureServer->setIcon(QIcon::fromTheme(QStringLiteral("configure")));
-  ui->btnConfigureClient->setIcon(QIcon::fromTheme(QStringLiteral("configure")));
-
   if (Settings::value(Settings::Core::LastVersion).toString() != kVersion) {
     Settings::setValue(Settings::Core::LastVersion, kVersion);
-  }
-
-  if (!Settings::value(Settings::Gui::LogExpanded).toBool()) {
-    m_logDock->hide();
   }
 
   ui->serverOptions->setVisible(false);
@@ -258,14 +230,8 @@ void MainWindow::setupControls()
   ui->lineEditName->setVisible(false);
   ui->lineEditName->installEventFilter(this);
 
-  if (deskflow::platform::isMac()) {
-    ui->rbModeServer->setAttribute(Qt::WA_MacShowFocusRect, false);
-    ui->rbModeClient->setAttribute(Qt::WA_MacShowFocusRect, false);
-    ui->btnSaveServerConfig->setFixedWidth(ui->btnSaveServerConfig->height());
-  } else {
-    ui->btnSaveServerConfig->setIconSize(QSize(22, 22));
-  }
-  setStatusBar(m_statusBar);
+  m_statusBar->setSizeGripEnabled(false);
+  ui->contentLayout->addWidget(m_statusBar);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -351,8 +317,6 @@ void MainWindow::connectSlots()
   connect(ui->rbModeServer, &QRadioButton::toggled, this, &MainWindow::coreModeToggled);
   connect(ui->rbModeClient, &QRadioButton::toggled, this, &MainWindow::coreModeToggled);
 
-  connect(m_logDock->toggleViewAction(), &QAction::toggled, this, &MainWindow::toggleLogVisible);
-
   connect(m_statusBar, &StatusBar::requestShowMyFingerprints, this, &MainWindow::showMyFingerprint);
   connect(m_statusBar, &StatusBar::requestUpdateVersion, this, &MainWindow::openGetNewVersionUrl);
   connect(&m_versionChecker, &VersionChecker::updateFound, m_statusBar, &StatusBar::updateFound);
@@ -366,37 +330,6 @@ void MainWindow::connectSlots()
   connect(m_networkMonitor, &NetworkMonitor::ipAddressesChanged, this, &MainWindow::updateIpLabel);
 }
 
-void MainWindow::toggleLogVisible(bool visible)
-{
-  // When the main window is hidden e.g. close to tray / minimized), this also triggers the log visibility toggle,
-  // but we don't want to hide the log in this case since we would need to un-hide it when the window is shown again.
-  if (!isVisible() || isMinimized()) {
-    qDebug() << "not toggling log, window not visible";
-    return;
-  }
-
-  setFixedSize(16777215, 16777215);
-  Settings::setValue(Settings::Gui::LogExpanded, visible);
-  if (visible) {
-    if (m_logDock->isFloating()) {
-      adjustSize();
-      setFixedSize(size());
-    } else {
-      QTimer::singleShot(15, this, [&] { resize(m_expandedSize); });
-    }
-  } else {
-    if (!m_logDock->isFloating()) {
-      m_expandedSize = geometry().size();
-    }
-    m_logDock->hide();
-    if (!m_logDock->isFloating()) {
-      adjustSize();
-    }
-    setFixedSize(size());
-  }
-  Settings::setValue(Settings::Gui::WindowGeometry, geometry());
-}
-
 void MainWindow::settingsChanged(const QString &key)
 {
   if (key == Settings::Gui::OverlayShowKeys || key == Settings::Gui::OverlayShowActivity) {
@@ -408,6 +341,24 @@ void MainWindow::settingsChanged(const QString &key)
   if (key == Settings::Log::Level) {
     m_coreProcess.applyLogLevel();
     return;
+  }
+
+  // Settings apply as they change; the core only reads some of them when it starts.
+  if (pages::SettingsPage::needsCoreRestart(key) && m_coreProcess.isStarted())
+    m_settingsPage->setRestartNeeded(true);
+
+  if (key == Settings::Gui::ShowVersionInTitle || key == Settings::Gui::SymbolicTrayIcon) {
+    applyConfig();
+    return;
+  }
+
+  if (key == Settings::Core::Interface) {
+    const auto ip = Settings::value(Settings::Core::Interface).toString();
+    if (!ip.isEmpty()) {
+      m_serverStartIPs = {ip};
+      m_serverStartSuggestedIP = ip;
+    }
+    updateModeControls();
   }
 
   if (key == Settings::Core::ComputerName)
@@ -430,6 +381,65 @@ void MainWindow::settingsChanged(const QString &key)
     updateSecurityIcon(m_statusBar->securityIconVisible());
     return;
   }
+}
+
+void MainWindow::setupPages()
+{
+  using UiPage = Ui::MainWindow::PageIndex;
+  using namespace deskflow::gui::pages;
+
+  auto *clipboardPage = new ClipboardPage(m_clipboardHistory, ui->pages);
+  ui->pages->insertWidget(UiPage::ClipboardPage, clipboardPage);
+
+  auto *overlayPage = new OverlayPage(ui->pages);
+  ui->pages->insertWidget(UiPage::OverlayPage, overlayPage);
+  connect(overlayPage, &OverlayPage::previewKeys, this, [this] {
+    for (const auto &key : {QStringLiteral("⌘C"), QStringLiteral("H"), QStringLiteral("i")})
+      m_activityOverlay->addKey(key, key.size() == 1);
+  });
+  connect(overlayPage, &OverlayPage::previewActivity, this, [this] {
+    m_activityOverlay->addActivity(
+        ActivityOverlay::Kind::Switch,
+        tr("Switched to %1").arg(Settings::value(Settings::Core::ComputerName).toString())
+    );
+  });
+  connect(overlayPage, &OverlayPage::previewCursor, this, [this] {
+    if (!m_cursorLocator)
+      m_cursorLocator = new CursorLocator(); // NOSONAR - deleted in destructor
+    m_cursorLocator->locate();
+  });
+
+  ui->pages->insertWidget(UiPage::LogPage, m_logView);
+
+  m_settingsPage = new SettingsPage(ui->pages);
+  ui->pages->insertWidget(UiPage::SettingsPage, m_settingsPage);
+  connect(m_settingsPage, &SettingsPage::restartRequested, this, &MainWindow::resetCore);
+  connect(m_settingsPage, &SettingsPage::requestRemoveAllSettings, this, &MainWindow::clearSettings);
+  connect(m_settingsPage, &SettingsPage::requestShowFingerprint, this, &MainWindow::showMyFingerprint);
+
+  const QList<QPushButton *> nav{ui->navHome, ui->navClipboard, ui->navOverlay, ui->navLog, ui->navSettings};
+  for (int i = 0; i < nav.size(); ++i) {
+    connect(nav.at(i), &QPushButton::clicked, this, [this, i] { showPage(i); });
+    // Settings also has the platform's own shortcut (Cmd+, on macOS) through the Preferences action
+    auto *action = new QAction(this);
+    action->setShortcut(QKeySequence(Qt::CTRL | Qt::Key(Qt::Key_1 + i)));
+    action->setMenuRole(QAction::NoRole);
+    connect(action, &QAction::triggered, this, [this, i] { showPage(i); });
+    m_pageActions.append(action);
+  }
+  ui->navHome->setChecked(true);
+  ui->pages->setCurrentIndex(UiPage::HomePage);
+}
+
+void MainWindow::showPage(int index)
+{
+  const QList<QPushButton *> nav{ui->navHome, ui->navClipboard, ui->navOverlay, ui->navLog, ui->navSettings};
+  if (index < 0 || index >= nav.size())
+    return;
+  if (!isVisible())
+    showAndActivate();
+  nav.at(index)->setChecked(true);
+  ui->pages->setCurrentIndex(index);
 }
 
 void MainWindow::setupActivityOverlay()
@@ -564,7 +574,6 @@ void MainWindow::clearSettings()
   disconnect(&m_versionChecker, nullptr, this, nullptr);
   disconnect(m_guiDupeChecker, nullptr, this, nullptr);
   disconnect(m_trayIcon, nullptr, this, nullptr);
-  disconnect(m_logDock->toggleViewAction(), nullptr, this, nullptr);
 
   m_coreProcess.stop();
   m_coreProcess.clearSettings();
@@ -598,19 +607,7 @@ void MainWindow::openGetNewVersionUrl() const
 
 void MainWindow::openSettings()
 {
-  auto dialog = SettingsDialog(this, m_serverConfig);
-
-  connect(&dialog, &SettingsDialog::requestRemoveAllSettings, this, &MainWindow::clearSettings, Qt::UniqueConnection);
-  if (dialog.exec() == QDialog::Accepted) {
-    Settings::save();
-    disconnect(&dialog, &SettingsDialog::requestRemoveAllSettings, nullptr, nullptr);
-
-    applyConfig();
-
-    if (m_coreProcess.isStarted()) {
-      m_coreProcess.restart();
-    }
-  }
+  showPage(Ui::MainWindow::SettingsPage);
 }
 
 void MainWindow::resetCore()
@@ -661,6 +658,8 @@ void MainWindow::updateModeControls()
   ui->clientOptions->setVisible(isClient);
   updateServerStatus();
   ui->lblNoMode->setVisible(!isServer && !isClient);
+  ui->actionRow->setVisible(isServer || isClient);
+  updateSidebarStatus();
   toggleCanRunCore(canRunCore());
 
   ui->lblIpAddresses->setVisible(
@@ -701,6 +700,9 @@ void MainWindow::updateModeControlLabels()
     startIcon = QIcon::fromTheme(QStringLiteral("network-connect"));
     stopIcon = QIcon::fromTheme(QStringLiteral("network-disconnect"));
   }
+  // the big button carries the app's own symbols; menus keep the platform icons above
+  const auto buttonStart = mac::symbol(mac::Symbol::Play, QColor(Qt::white));
+  const auto buttonStop = mac::symbol(mac::Symbol::Stop, QColor(Qt::white));
 
   m_actionStartCore->setText(startText);
   m_actionStartCore->setIcon(startIcon);
@@ -709,10 +711,10 @@ void MainWindow::updateModeControlLabels()
 
   if (isStarted) {
     ui->btnToggleCore->setText(stopText);
-    ui->btnToggleCore->setIcon(stopIcon);
+    ui->btnToggleCore->setIcon(buttonStop);
   } else {
     ui->btnToggleCore->setText(startText);
-    ui->btnToggleCore->setIcon(startIcon);
+    ui->btnToggleCore->setIcon(buttonStart);
   }
 }
 
@@ -796,7 +798,9 @@ void MainWindow::createMenuBar()
 
   m_menuEdit->addAction(m_actionSettings);
 
-  m_menuView->addAction(m_logDock->toggleViewAction());
+  for (auto *action : std::as_const(m_pageActions))
+    m_menuView->addAction(action);
+  m_menuView->addSeparator();
   m_menuView->addAction(m_clipboardHistory->showAction());
 
   m_menuHelp->addAction(m_actionAbout);
@@ -820,6 +824,7 @@ void MainWindow::setupTrayIcon()
   trayMenu->insertSeparator(m_actionMinimize);
   trayMenu->insertSeparator(m_actionTrayQuit);
   trayMenu->insertAction(m_actionStartCore, m_clipboardHistory->showAction());
+  trayMenu->insertAction(m_actionStartCore, m_actionSettings);
   trayMenu->insertSeparator(m_actionStartCore);
   m_trayIcon->setContextMenu(trayMenu);
 
@@ -899,7 +904,7 @@ void MainWindow::setTrayIcon()
 
 void MainWindow::handleLogLine(const QString &line)
 {
-  m_logDock->appendLine(line);
+  m_logView->appendLine(line);
   m_clipboardHistory->handleCoreLogLine(line);
 }
 
@@ -1094,10 +1099,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
   }
   qDebug() << "quitting application";
 
-  // any connected dock view acitons will be triggered
-  // disconnect them before accepting the event
-  disconnect(m_logDock->toggleViewAction(), &QAction::toggled, nullptr, nullptr);
-
   event->accept();
   QApplication::quit();
 }
@@ -1121,12 +1122,99 @@ void MainWindow::updateStatus()
     ui->btnEditName->setVisible(process == Stopped);
   }
   m_statusBar->setStatus(connection, process, isServer);
+  updateSidebarStatus();
+}
+
+void MainWindow::updateSidebarStatus()
+{
+  using enum ProcessState;
+  const auto connection = m_coreProcess.connectionState();
+  const auto process = m_coreProcess.processState();
+  const auto mode = m_coreProcess.mode();
+  const bool isServer = mode == CoreMode::Server;
+
+  QString state = QStringLiteral("off");
+  QString text;
+  QString detail;
+  QString hint;
+
+  switch (process) {
+  case Starting:
+    state = QStringLiteral("busy");
+    text = tr("Starting…");
+    break;
+  case Stopping:
+    state = QStringLiteral("busy");
+    text = tr("Stopping…");
+    break;
+  case RetryPending:
+    state = QStringLiteral("busy");
+    text = tr("Trying again shortly…");
+    break;
+  case Stopped:
+    text = tr("Not sharing");
+    if (mode == CoreMode::None)
+      detail = tr("Choose a role to begin");
+    else if (isServer)
+      hint = tr("Press Start, then connect your other computers to this one.");
+    else if (ui->cbHostname->currentText().isEmpty())
+      hint = tr("Enter the server's address, then press Connect.");
+    else
+      hint = tr("Press Connect to use the server's keyboard and mouse.");
+    break;
+  case Started:
+    switch (connection) {
+    case ConnectionState::Listening:
+    case ConnectionState::Connected:
+      if (isServer) {
+        state = m_connectedClients.isEmpty() ? QStringLiteral("busy") : QStringLiteral("ok");
+        text = m_connectedClients.isEmpty() ? tr("Waiting for computers")
+                                            : tr("%n computer(s) connected", nullptr, m_connectedClients.size());
+        detail = m_connectedClients.join(QStringLiteral(", "));
+        hint = m_connectedClients.isEmpty()
+                   ? tr("On each other computer, choose \"Use another computer's keyboard "
+                        "and mouse\" and enter %1.")
+                         .arg(m_currentIpAddress.isEmpty() ? tr("this computer's IP address") : m_currentIpAddress)
+                   : tr("Move the cursor off the edge of the screen to switch computers.");
+      } else if (connection == ConnectionState::Connected) {
+        state = QStringLiteral("ok");
+        text = tr("Connected");
+        detail = Settings::value(Settings::Client::RemoteHost).toString();
+        hint = tr("This computer now follows the server's keyboard and mouse.");
+      } else {
+        state = QStringLiteral("busy");
+        text = tr("Waiting for the server");
+      }
+      break;
+    case ConnectionState::Connecting:
+      state = QStringLiteral("busy");
+      text = tr("Connecting…");
+      detail = Settings::value(Settings::Client::RemoteHost).toString();
+      break;
+    case ConnectionState::Disconnected:
+      text = tr("Disconnected");
+      break;
+    }
+    break;
+  }
+
+  ui->statusText->setText(text);
+  ui->statusDetail->setText(detail);
+  ui->statusDetail->setVisible(!detail.isEmpty());
+  ui->statusDot->setProperty("state", state);
+  ui->statusDot->style()->unpolish(ui->statusDot);
+  ui->statusDot->style()->polish(ui->statusDot);
+  ui->lblActionHint->setText(hint);
 }
 
 void MainWindow::coreProcessStateChanged(ProcessState state)
 {
   using enum ProcessState;
   updateStatus();
+  if (state == Stopped || state == Starting) {
+    m_settingsPage->setRestartNeeded(false);
+    m_connectedClients.clear();
+  }
   if (state == Started) {
     qDebug() << "recording that core has started";
     Settings::setValue(Settings::Gui::AutoStartCore, true);
@@ -1167,7 +1255,7 @@ void MainWindow::updateServerStatus()
 {
   const auto extra = Settings::value(Settings::Client::ExtraServers).toStringList();
   const bool show = ui->rbModeClient->isChecked() && !extra.isEmpty();
-  m_serverStatus->setVisible(show);
+  ui->serverStatus->setVisible(show);
   if (!show)
     return;
 
@@ -1199,7 +1287,7 @@ void MainWindow::updateServerStatus()
     hosts.removeAll(QString());
     parts.append(tr("Connects to %1 at the same time").arg(hosts.join(QStringLiteral(", "))));
   }
-  m_serverStatus->setText(parts.join(QStringLiteral("  ·  ")));
+  ui->serverStatus->setText(parts.join(QStringLiteral("  ·  ")));
 }
 
 void MainWindow::coreConnectionStateChanged(ConnectionState state)
@@ -1258,6 +1346,9 @@ void MainWindow::changeEvent(QEvent *e)
   QMainWindow::changeEvent(e);
   if (e->type() == QEvent::PaletteChange) {
     updateIconTheme();
+    ui->updateIcons();
+    updateModeControlLabels();
+    updateStatus();
     setWindowIcon(QIcon::fromTheme(kRevFqdnName));
     setTrayIcon();
   } else if (e->type() == QEvent::LanguageChange) {
@@ -1265,7 +1356,7 @@ void MainWindow::changeEvent(QEvent *e)
     updateModeControlLabels();
     updateNetworkInfo();
     updateStatus();
-    serverClientsChanged({});
+    serverClientsChanged(m_connectedClients);
     updateText();
   }
 }
@@ -1443,6 +1534,8 @@ bool MainWindow::generateCertificate()
 
 void MainWindow::serverClientsChanged(const QStringList &clients)
 {
+  m_connectedClients = clients;
+  updateSidebarStatus();
   if (m_coreProcess.mode() != CoreMode::Server || !m_coreProcess.isStarted())
     return;
   m_statusBar->setServerClients(clients);
@@ -1467,6 +1560,7 @@ void MainWindow::toggleCanRunCore(bool enableButtons)
 void MainWindow::remoteHostChanged(const QString &newRemoteHost)
 {
   m_coreProcess.setAddress(newRemoteHost);
+  updateSidebarStatus();
   toggleCanRunCore(!newRemoteHost.isEmpty() && ui->rbModeClient->isChecked());
   if (newRemoteHost.isEmpty()) {
     Settings::setValue(Settings::Client::RemoteHost);

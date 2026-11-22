@@ -6,29 +6,27 @@
 
 #pragma once
 
-#include <QDockWidget>
+#include <QWidget>
 
 class LogWidget;
 class QLabel;
-class QPushButton;
 class SearchWidget;
 
-class LogDock : public QDockWidget
+//! The log as a page of the main window, with search.
+class LogView : public QWidget
 {
   Q_OBJECT
 public:
-  explicit LogDock(QWidget *parent = nullptr);
+  explicit LogView(QWidget *parent = nullptr);
   void appendLine(const QString &msg);
-  void setFloating(bool floating);
 
 protected:
-  bool eventFilter(QObject *watched, QEvent *event) override;
   void changeEvent(QEvent *e) override;
 
 private:
+  void updateText();
   LogWidget *m_textLog = nullptr;
-  QPushButton *m_btnClose = nullptr;
-  QPushButton *m_btnFloat = nullptr;
   QLabel *m_lblTitle = nullptr;
+  QLabel *m_lblHint = nullptr;
   SearchWidget *m_searchWidget = nullptr;
 };

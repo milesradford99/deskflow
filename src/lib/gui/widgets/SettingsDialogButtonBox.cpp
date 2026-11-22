@@ -25,6 +25,15 @@ SettingsDialogButtonBox::SettingsDialogButtonBox(QWidget *parent)
   m_buttonBox->addButton(QDialogButtonBox::Cancel);
   m_buttonBox->addButton(QDialogButtonBox::Reset);
   m_buttonBox->addButton(QDialogButtonBox::RestoreDefaults);
+  // Save stays the highlighted button even while it is disabled (nothing changed yet)
+  auto *save = m_buttonBox->button(QDialogButtonBox::Save);
+  save->setProperty("primary", true);
+  save->setDefault(true);
+  for (auto *button : m_buttonBox->buttons()) {
+    button->setIcon(QIcon());
+    if (auto *push = qobject_cast<QPushButton *>(button); push && push != save)
+      push->setAutoDefault(false);
+  }
   settingsWritableChanged(Settings::isWritable());
 
   auto layout = new QHBoxLayout(this);
@@ -74,6 +83,10 @@ void SettingsDialogButtonBox::updateText()
   m_lblText->setText(tr("Settings are read only"));
   m_lblText->setToolTip(tr("%1 is not writable").arg(Settings::settingsFile()));
 
+  m_buttonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
+  m_buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
+  m_buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Revert"));
+  m_buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
   m_buttonBox->button(QDialogButtonBox::Save)->setToolTip(tr("Close and save changes"));
   m_buttonBox->button(QDialogButtonBox::Cancel)->setToolTip(tr("Close and forget changes"));
   m_buttonBox->button(QDialogButtonBox::Reset)->setToolTip(tr("Reset to stored values"));

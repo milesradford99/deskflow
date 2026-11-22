@@ -588,19 +588,19 @@ Do you want to connect to the server?
     <name>LogDock</name>
     <message>
         <source>Log</source>
-        <translation>로그</translation>
+        <translation type="vanished">로그</translation>
     </message>
     <message>
         <source>Detach from window</source>
-        <translation>창에서 분리</translation>
+        <translation type="vanished">창에서 분리</translation>
     </message>
     <message>
         <source>Close Log</source>
-        <translation>로그 닫기</translation>
+        <translation type="vanished">로그 닫기</translation>
     </message>
     <message>
         <source>Attach to window</source>
-        <translation>창에 붙이기</translation>
+        <translation type="vanished">창에 붙이기</translation>
     </message>
 </context>
 <context>
@@ -631,42 +631,149 @@ Do you want to connect to the server?
     </message>
 </context>
 <context>
+    <name>LogView</name>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished">로그</translation>
+    </message>
+    <message>
+        <source>What Deskflow is doing right now. Useful when something doesn&apos;t connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>This computer&apos;s name:</source>
-        <translation>이 컴퓨터 이름:</translation>
+        <translation type="vanished">이 컴퓨터 이름:</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name can&apos;t have have spaces or special characters&lt;/p&gt;&lt;p&gt;Use Enter to save the name change.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;이름에는 공백이나 특수문자를 사용할 수 없습니다&lt;/p&gt;&lt;p&gt;Enter 키로 이름 변경을 저장합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;이름에는 공백이나 특수문자를 사용할 수 없습니다&lt;/p&gt;&lt;p&gt;Enter 키로 이름 변경을 저장합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Edit Computer Name</source>
-        <translation>컴퓨터 이름 편집</translation>
+        <translation type="vanished">컴퓨터 이름 편집</translation>
     </message>
     <message>
         <source>Use this computer&apos;s keyboard and mouse
 (make this computer the server)</source>
-        <translation>이 컴퓨터의 키보드와 마우스를 사용
+        <translation type="vanished">이 컴퓨터의 키보드와 마우스를 사용
 (이 컴퓨터를 서버로 설정)</translation>
     </message>
     <message>
         <source>Use another computer’s mouse and keyboard
 (make this computer the client)</source>
-        <translation>다른 컴퓨터의 키보드와 마우스를 사용
+        <translation type="vanished">다른 컴퓨터의 키보드와 마우스를 사용
 (이 컴퓨터를 클라이언트로 설정)</translation>
     </message>
     <message>
         <source>&amp;Configure Server</source>
-        <translation>서버 설정(&amp;C)</translation>
+        <translation type="vanished">서버 설정(&amp;C)</translation>
+    </message>
+    <message>
+        <source>One keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Hints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished">로그</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Letters, numbers, - and _ only. Press Return to save or Esc to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What should this computer do?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Share this keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control your other computers from this one. It becomes the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use another computer&apos;s keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another computer controls this one. It becomes a client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose one of the two above to get started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place your other computers around this one, the way they sit on your desk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange Screens…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export server configuration</source>
         <translation>서버 설정 내보내기</translation>
     </message>
     <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The name or IP address shown on the computer whose keyboard you want to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other servers, scrolling and reconnecting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>You must select a mode</source>
-        <translation>모드를 선택해야 합니다</translation>
+        <translation type="vanished">모드를 선택해야 합니다</translation>
     </message>
     <message>
         <source>&amp;Start</source>
@@ -683,6 +790,10 @@ Do you want to connect to the server?
     <message>
         <source>invalid certificate, generating a new one</source>
         <translation type="unfinished">유효하지 않은 인증서입니다. 새 인증서를 생성하는 중입니다</translation>
+    </message>
+    <message>
+        <source>Switched to %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Address missing</source>
@@ -723,6 +834,80 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;서버 &apos;%1&apos;에 연결하지 못했습니다.&lt;/p&gt;&lt;p&gt;같은 이름의 클라이언트가 이미 서버에 연결되어 있습니다.&lt;/p&gt;&lt;p&gt;고유한 이름을 사용하고, 클라이언트 프로세스가 하나만 실행 중인지 확인하세요.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopping…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trying again shortly…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a role to begin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Start, then connect your other computers to this one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the server&apos;s address, then press Connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Connect to use the server&apos;s keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for computers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n computer(s) connected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>On each other computer, choose &quot;Use another computer&apos;s keyboard and mouse&quot; and enter %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this computer&apos;s IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the cursor off the edge of the screen to switch computers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer now follows the server&apos;s keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1: in control</source>
@@ -871,11 +1056,11 @@ Valid names:
     </message>
     <message>
         <source>&amp;Configure Client</source>
-        <translation type="unfinished">클라이언트 구성 (&amp;C)</translation>
+        <translation type="obsolete">클라이언트 구성 (&amp;C)</translation>
     </message>
     <message>
         <source>Connect to:</source>
-        <translation type="unfinished">연결 대상:</translation>
+        <translation type="obsolete">연결 대상:</translation>
     </message>
     <message>
         <source>&lt;html&gt;Hostname or IP address of the server computer.&lt;br/&gt;May contain a comma seperated list.&lt;/html&gt;</source>
@@ -1289,219 +1474,195 @@ Enabling this setting will disable the server config GUI.</source>
     <name>SettingsDialog</name>
     <message>
         <source>Preferences</source>
-        <translation>환경설정</translation>
+        <translation type="vanished">환경설정</translation>
     </message>
     <message>
         <source>Check for updates on startup</source>
-        <translation>시작 시 업데이트 확인</translation>
+        <translation type="vanished">시작 시 업데이트 확인</translation>
     </message>
     <message>
         <source>Prevent this computer from going to sleep</source>
-        <translation>이 컴퓨터를 절전 모드로 전환하지 않음</translation>
+        <translation type="vanished">이 컴퓨터를 절전 모드로 전환하지 않음</translation>
     </message>
     <message>
         <source>Tray icon style</source>
-        <translation>트레이 아이콘 스타일</translation>
+        <translation type="vanished">트레이 아이콘 스타일</translation>
     </message>
     <message>
         <source>Colorful</source>
-        <translation>컬러</translation>
+        <translation type="vanished">컬러</translation>
     </message>
     <message>
         <source>Monocolor</source>
-        <translation>단색</translation>
+        <translation type="vanished">단색</translation>
     </message>
     <message>
         <source>Enable TLS Encryption</source>
-        <translation>TLS 암호화 사용</translation>
+        <translation type="vanished">TLS 암호화 사용</translation>
     </message>
     <message>
         <source>Certificate</source>
-        <translation>인증서</translation>
+        <translation type="vanished">인증서</translation>
     </message>
     <message>
         <source>Key length</source>
-        <translation>키 길이</translation>
+        <translation type="vanished">키 길이</translation>
     </message>
     <message>
         <source>Regenerate certificate</source>
-        <translation>인증서 재생성</translation>
+        <translation type="vanished">인증서 재생성</translation>
     </message>
     <message>
         <source>Require client certificates</source>
-        <translation>클라이언트 인증서 요구</translation>
+        <translation type="vanished">클라이언트 인증서 요구</translation>
     </message>
     <message>
         <source>&amp;Advanced</source>
-        <translation>고급(&amp;A)</translation>
+        <translation type="vanished">고급(&amp;A)</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation>포트</translation>
+        <translation type="vanished">포트</translation>
     </message>
     <message>
         <source>Network IP</source>
-        <translation>네트워크 IP</translation>
+        <translation type="vanished">네트워크 IP</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation>레벨</translation>
+        <translation type="vanished">레벨</translation>
     </message>
     <message>
         <source>Log path</source>
-        <translation>로그 경로</translation>
+        <translation type="vanished">로그 경로</translation>
     </message>
     <message>
         <source>Enable GUI debug messages</source>
-        <translation>GUI 디버그 메시지 사용</translation>
+        <translation type="vanished">GUI 디버그 메시지 사용</translation>
     </message>
     <message>
         <source>Use background service (daemon)</source>
-        <translation>백그라운드 서비스(daemon) 사용</translation>
+        <translation type="vanished">백그라운드 서비스(daemon) 사용</translation>
     </message>
     <message>
         <source>Always run as system (work at login screen and UAC)</source>
-        <translation>항상 시스템 권한으로 실행(로그인 화면 및 UAC에서 동작)</translation>
+        <translation type="vanished">항상 시스템 권한으로 실행(로그인 화면 및 UAC에서 동작)</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>언어</translation>
+        <translation type="vanished">언어</translation>
     </message>
     <message>
         <source>TLS Certificate Regenerated</source>
-        <translation>TLS 인증서 재생성됨</translation>
+        <translation type="vanished">TLS 인증서 재생성됨</translation>
     </message>
     <message>
         <source>TLS certificate regenerated successfully.</source>
-        <translation>TLS 인증서를 성공적으로 재생성했습니다.</translation>
+        <translation type="vanished">TLS 인증서를 성공적으로 재생성했습니다.</translation>
     </message>
     <message>
         <source>Select a TLS certificate to use...</source>
-        <translation>사용할 TLS 인증서 선택...</translation>
+        <translation type="vanished">사용할 TLS 인증서 선택...</translation>
     </message>
     <message>
         <source>Save log file to...</source>
-        <translation>로그 파일 저장 위치...</translation>
+        <translation type="vanished">로그 파일 저장 위치...</translation>
     </message>
     <message>
         <source>%1 Clear Settings</source>
-        <translation type="unfinished">%1 설정 초기화</translation>
+        <translation type="obsolete">%1 설정 초기화</translation>
     </message>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;모든 설정을 지우고 %1을(를) 다시 시작하시겠습니까?&lt;/p&gt; &lt;p&gt;이 작업은 되돌릴 수 없습니다.&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;모든 설정을 지우고 %1을(를) 다시 시작하시겠습니까?&lt;/p&gt; &lt;p&gt;이 작업은 되돌릴 수 없습니다.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>Required messages</source>
-        <translation>필수 메시지</translation>
+        <translation type="vanished">필수 메시지</translation>
     </message>
     <message>
         <source>Non-fatal errors</source>
-        <translation>치명적이지 않은 오류</translation>
+        <translation type="vanished">치명적이지 않은 오류</translation>
     </message>
     <message>
         <source>General warnings</source>
-        <translation>일반 경고</translation>
+        <translation type="vanished">일반 경고</translation>
     </message>
     <message>
         <source>General events [Default]</source>
-        <translation>일반 이벤트 [기본값]</translation>
+        <translation type="vanished">일반 이벤트 [기본값]</translation>
     </message>
     <message>
         <source>Debug entries</source>
-        <translation>디버그 항목</translation>
+        <translation type="vanished">디버그 항목</translation>
     </message>
     <message>
         <source>Verbose debug output</source>
-        <translation>상세 디버그 출력</translation>
+        <translation type="vanished">상세 디버그 출력</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished">자동</translation>
+        <translation type="obsolete">자동</translation>
     </message>
     <message>
         <source>Include version in the window title</source>
-        <translation type="unfinished">창 제목에 버전 정보 포함</translation>
+        <translation type="obsolete">창 제목에 버전 정보 포함</translation>
     </message>
     <message>
         <source>Log to file</source>
-        <translation>파일로 로그 저장</translation>
+        <translation type="vanished">파일로 로그 저장</translation>
     </message>
     <message>
         <source>&amp;Logs</source>
-        <translation>로그 (&amp;L)</translation>
+        <translation type="vanished">로그 (&amp;L)</translation>
     </message>
     <message>
         <source>&amp;General</source>
-        <translation>일반(&amp;G)</translation>
+        <translation type="vanished">일반(&amp;G)</translation>
     </message>
     <message>
         <source>&amp;Network</source>
-        <translation>네트워크(&amp;N)</translation>
+        <translation type="vanished">네트워크(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Window</source>
-        <translation type="unfinished">창문(&amp;W)</translation>
+        <translation type="obsolete">창문(&amp;W)</translation>
     </message>
     <message>
         <source>When the main window is closed</source>
-        <translation type="unfinished">메인 창이 닫혔을 때</translation>
+        <translation type="obsolete">메인 창이 닫혔을 때</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">출구</translation>
+        <translation type="obsolete">출구</translation>
     </message>
     <message>
         <source>Send to background</source>
-        <translation type="unfinished">백그라운드로 보내기</translation>
+        <translation type="obsolete">백그라운드로 보내기</translation>
     </message>
     <message>
         <source>When the application starts</source>
-        <translation type="unfinished">애플리케이션이 시작될 때</translation>
+        <translation type="obsolete">애플리케이션이 시작될 때</translation>
     </message>
     <message>
         <source>Show the main window</source>
-        <translation type="unfinished">메인 창을 표시합니다</translation>
+        <translation type="obsolete">메인 창을 표시합니다</translation>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">Enter 키를 누르면 명령 실행</translation>
+        <translation type="obsolete">Enter 키를 누르면 명령 실행</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">종료 시 명령 실행</translation>
+        <translation type="obsolete">종료 시 명령 실행</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
-        <translation type="unfinished">Info보다 높은 로그 레벨을 사용하면 성능에 영향을 미칠 수 있습니다.</translation>
+        <translation type="obsolete">Info보다 높은 로그 레벨을 사용하면 성능에 영향을 미칠 수 있습니다.</translation>
     </message>
     <message>
         <source>Remove all settings</source>
-        <translation type="unfinished">모든 설정 제거</translation>
-    </message>
-    <message>
-        <source>Activity overlay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Keys typed through Deskflow appear in a translucent bubble on screen. They are never logged.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show key presses sent through Deskflow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show events: switching computers, clipboard sharing, connections</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A short ripple around the cursor when it arrives on this computer, so it is easy to find.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlight the cursor when it arrives on this computer</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">모든 설정 제거</translation>
     </message>
 </context>
 <context>
@@ -1513,6 +1674,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>%1 is not writable</source>
         <translation type="unfinished">%1은(는) 쓰기 가능하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Close and save changes</source>
@@ -1981,6 +2158,437 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>server</source>
         <translation type="unfinished">서버</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::ClipboardPage</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Everything you copy on any linked computer is kept here, on this computer only. Pick an item to paste it anywhere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New copies are not saved until you turn this off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password managers mark what they copy as concealed; those items are never saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep up to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The oldest unpinned items go first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Works from any app, on whichever computer the cursor is on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps register shortcuts. Add one in your system settings that runs: %1 --%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned items stay.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Everything…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear everything</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes pinned items too. This can&apos;t be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">없음</translation>
+    </message>
+    <message>
+        <source>Another app is using this shortcut; choose a different one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>The oldest unpinned items go first. %n saved now.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::OverlayPage</name>
+    <message>
+        <source>Screen Hints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Small hints on screen show which computer your keys and cursor are on. They fade away on their own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try It</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys you press</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Each key shows for a moment in the top-right corner of the computer you are typing on. Nothing is recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What Deskflow is doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switching computers, sharing the clipboard, computers connecting and leaving.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Where the cursor arrives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A short ripple around the cursor when it comes to this computer, so it is easy to find.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply right away.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some changes take effect when sharing restarts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These settings are read-only: the settings file can&apos;t be written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network &amp;&amp; Security</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">고급</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open this window when Deskflow starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep sharing when the window is closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow stays in the menu bar. Quit it from there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow stays in the system tray. Quit it from there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorful</source>
+        <translation type="unfinished">컬러</translation>
+    </message>
+    <message>
+        <source>Monochrome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu bar icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tray icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the version in the title bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished">언어</translation>
+    </message>
+    <message>
+        <source>Keep this computer awake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stops it from going to sleep while Deskflow is sharing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates when Deskflow starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished">자동</translation>
+    </message>
+    <message>
+        <source>IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic is right for most networks. Pick one if this computer is on several.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished">포트</translation>
+    </message>
+    <message>
+        <source>Every computer must use the same port.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encrypt connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recommended. Turn it on or off on every computer at the same time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2048-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4096-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key length</source>
+        <translation type="unfinished">키 길이</translation>
+    </message>
+    <message>
+        <source>Longer keys are stronger but take a moment to create.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1, %2-bit key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a TLS certificate to use...</source>
+        <translation type="unfinished">사용할 TLS 인증서 선택...</translation>
+    </message>
+    <message>
+        <source>Regenerate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLS Certificate Regenerated</source>
+        <translation type="unfinished">TLS 인증서 재생성됨</translation>
+    </message>
+    <message>
+        <source>TLS certificate regenerated successfully.</source>
+        <translation type="unfinished">TLS 인증서를 성공적으로 재생성했습니다.</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation type="unfinished">인증서</translation>
+    </message>
+    <message>
+        <source>Only allow trusted computers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A computer can join only after you have confirmed its fingerprint here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer&apos;s fingerprint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compare it with what the other computer shows when you connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the background service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keeps sharing running when you switch users or lock the screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run as system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also works at the login screen and on administrator (UAC) prompts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a command when the cursor arrives on this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a command when the cursor leaves this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More detail than Info can slow things down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the log to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save log file to...</source>
+        <translation type="unfinished">로그 파일 저장 위치...</translation>
+    </message>
+    <message>
+        <source>Log file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include GUI debug messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove All Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes every setting, including the screen layout, and restarts Deskflow.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 설정 초기화</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;모든 설정을 지우고 %1을(를) 다시 시작하시겠습니까?&lt;/p&gt; &lt;p&gt;이 작업은 되돌릴 수 없습니다.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

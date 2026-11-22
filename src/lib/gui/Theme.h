@@ -7,19 +7,22 @@
 #pragma once
 
 class QApplication;
+class QColor;
 
 //! The application's look: one palette and style sheet for every platform
 /*!
-Follows Fluent 2: quiet neutral surfaces, content on rounded cards, one accent
-colour for the primary action and selection. Light and dark variants follow the
-system setting and switch live.
+Follows macOS conventions, shared with the owner's DayOfFlow app: warm neutral
+surfaces, a sidebar for navigation, settings grouped on rounded cards with one
+row per setting (label on the left, control on the right), capsule buttons and
+one quiet iris accent. Light and dark variants follow the system and switch live.
 
 Widgets opt into roles with dynamic properties rather than their own style sheets:
-- `card` (QFrame): a raised surface
-- `primary` (QPushButton): the main action of a view
-- `link` (QPushButton): a text-only action
-- `heading` / `secondary` / `error` (QLabel): text roles
-- `segment` (QRadioButton): one half of a segmented control
+- `card` (QFrame): a grouped surface; `rowSeparator` (QFrame) a hairline between rows
+- `banner` (QFrame): a tinted notice, e.g. "restart to apply"
+- `primary` / `large` / `destructive` / `iconOnly` / `link` (QPushButton)
+- `nav` (QPushButton): a sidebar row; `segment` (QPushButton) inside a `segmentTrack` (QFrame)
+- `title` / `heading` / `eyebrow` / `secondary` / `tertiary` / `rowTitle` / `rowDetail` /
+  `error` / `keycap` (QLabel): text roles
 - `status` (QLabel) with `state` = ok | busy | off: a status pill
 */
 namespace deskflow::gui::theme {
@@ -29,5 +32,10 @@ void apply(QApplication &app);
 
 //! True if the dark variant is in use.
 bool isDark();
+
+//! Colours for custom painted controls, in the variant in use.
+QColor accent();
+QColor textSecondary();
+QColor border();
 
 } // namespace deskflow::gui::theme

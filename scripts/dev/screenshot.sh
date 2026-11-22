@@ -5,7 +5,8 @@
 # Screenshot the GUI without a desktop: scripts/dev/screenshot.sh out.png [light|dark] [settings.conf]
 # The optional settings file seeds a throwaway configuration (e.g. client mode, servers).
 # Set SHOT_DIALOG to a window title to capture that window instead of the main one;
-# SHOT_KEYS is typed into the main window first (xdotool key syntax), e.g. "alt+f".
+# SHOT_KEYS is typed into the main window first (xdotool key syntax), e.g. "alt+f";
+# SHOT_CLICKS then clicks window-relative points, e.g. "366,146 120,80".
 # Needs: Xvfb, xdotool, ImageMagick, a built tree (DESKFLOW_BUILD_DIR, default ./build-dev).
 set -euo pipefail
 
@@ -39,6 +40,12 @@ if [ -n "${SHOT_KEYS:-}" ]; then
   DISPLAY=$DISPLAY_NUM xdotool windowactivate --sync "$WIN" 2>/dev/null || true
   for k in $SHOT_KEYS; do DISPLAY=$DISPLAY_NUM xdotool key "$k"; sleep 0.4; done
   sleep 1
+fi
+if [ -n "${SHOT_CLICKS:-}" ]; then
+  for xy in $SHOT_CLICKS; do
+    DISPLAY=$DISPLAY_NUM xdotool mousemove --window "$WIN" "${xy%,*}" "${xy#*,}" click 1; sleep 0.5
+  done
+  sleep 0.5
 fi
 if [ -n "${SHOT_DIALOG:-}" ]; then
   WIN=$(DISPLAY=$DISPLAY_NUM xdotool search --onlyvisible --name "$SHOT_DIALOG" | tail -1)

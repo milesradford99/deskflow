@@ -53,11 +53,22 @@ public:
 
   static QString storageDir();
 
+  //! Ask for a new global shortcut.
+  void editShortcut();
+  //! Remove items; asks first when pinned items go too.
+  void clearHistory(bool includePinned);
+  //! The shortcut as shown to the user, empty when none; @p registered is false when another app holds it.
+  QString shortcutText(bool *registered = nullptr) const;
+  //! Number of items kept.
+  int itemCount() const;
+
+Q_SIGNALS:
+  //! The shortcut, pause state or item count changed.
+  void stateChanged();
+
 private:
   void buildMenu();
   void applyShortcut();
-  void editShortcut();
-  void clearHistory(bool includePinned);
   void updateStateUi();
   void copy(const QString &id, bool plainTextOnly);
 

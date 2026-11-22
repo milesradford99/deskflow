@@ -55,6 +55,9 @@ ClipboardHistory::ClipboardHistory(QWidget *dialogParent, QObject *parent)
   });
   connect(m_monitor, &ClipboardMonitor::pausedChanged, this, &ClipboardHistory::updateStateUi);
   connect(m_monitor, &ClipboardMonitor::ignoreNextChanged, this, &ClipboardHistory::updateStateUi);
+  connect(m_model, &QAbstractItemModel::rowsInserted, this, &ClipboardHistory::stateChanged);
+  connect(m_model, &QAbstractItemModel::rowsRemoved, this, &ClipboardHistory::stateChanged);
+  connect(m_model, &QAbstractItemModel::modelReset, this, &ClipboardHistory::stateChanged);
 
   reloadSettings();
 }
@@ -245,6 +248,7 @@ void ClipboardHistory::clearHistory(bool includePinned)
   }
   m_model->clear(!includePinned);
   m_model->saveNow();
+  Q_EMIT stateChanged();
 }
 
 void ClipboardHistory::updateStateUi()
@@ -266,6 +270,19 @@ void ClipboardHistory::updateStateUi()
   );
 
   m_popup->setRecordingState(m_monitor->isPaused(), m_monitor->isIgnoringNextCopy());
+  Q_EMIT stateChanged();
+}
+
+QString ClipboardHistory::shortcutText(bool *registered) const
+{
+  if (registered)
+    *registered = m_hotkey->isRegistered();
+  return m_hotkey->shortcut().toString(QKeySequence::NativeText);
+}
+
+int ClipboardHistory::itemCount() const
+{
+  return m_model->rowCount();
 }
 
 void ClipboardHistory::copy(const QString &id, bool plainTextOnly)

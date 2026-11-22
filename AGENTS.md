@@ -141,6 +141,20 @@ the clipboard again with cached local copies when they arrive. Sets larger than
 the way to move big things.
 
 **GUI theme** (`gui/Theme.cpp`): Fusion style with one palette and style sheet for all
-platforms, Fluent 2 flavoured, light and dark. Widgets opt into roles with dynamic
-properties (`card`, `primary`, `secondary`, `segment`, ...), documented in `Theme.h`.
-Don't give widgets their own style sheets; add a role instead.
+platforms, following macOS conventions and the owner's DayOfFlow app (warm neutrals,
+iris accent `#5A55D6`/`#8B87F5`, capsule buttons, 16 px cards). Widgets opt into roles
+with dynamic properties (`card`, `primary`, `nav`, `segment`, `eyebrow`, ...), documented
+in `Theme.h`. Don't give widgets their own style sheets; add a role instead. Custom
+painted controls take colours from `theme::accent()` etc. or the palette.
+
+**GUI layout**: `MainWindowUi` builds the main window in code (no `.ui` file): a sidebar
+and a `QStackedWidget` of pages (This Computer, Clipboard, Screen Hints, Log, Settings;
+Ctrl/Cmd+1..5). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
+`SegmentedControl`, `FormCard` rows, `ChoiceCard`, `Page`, line `symbol()`s drawn with
+QPainter, since the GUI doesn't link QtSvg). Pages under `pages/` derive from
+`RebuildablePage`: they read Settings each time they are shown or the language changes,
+and write every change straight back; there is no Save button. Keys the running core
+only reads at start-up are listed in `SettingsPage::needsCoreRestart()` and raise a
+"restart to apply" banner instead of restarting the core silently. The server layout and
+client options are still dialogs (`ServerConfigDialog`, `ClientConfigDialog`).
+`screenshot.sh` accepts `SHOT_CLICKS="x,y ..."` to click into a page before capturing.

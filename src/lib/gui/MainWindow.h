@@ -32,7 +32,7 @@ class QMenu;
 class QLocalServer;
 
 class DeskflowApplication;
-class LogDock;
+class LogView;
 class ActivityOverlay;
 class CursorLocator;
 class StatusBar;
@@ -51,6 +51,10 @@ class ClipboardHistory;
 
 namespace deskflow::gui::ipc {
 class DaemonIpcClient;
+}
+
+namespace deskflow::gui::pages {
+class SettingsPage;
 }
 
 class MainWindow : public QMainWindow
@@ -96,7 +100,9 @@ private:
    * @brief updateText Update all text not in the UI
    */
   void updateText();
-  void toggleLogVisible(bool visible);
+  void setupPages();
+  void showPage(int index);
+  void updateSidebarStatus();
 
   void settingsChanged(const QString &key = QString());
   void serverConfigSaving();
@@ -196,20 +202,18 @@ private:
   deskflow::gui::CoreProcess m_coreProcess;
   deskflow::gui::FileTransferWidget *m_fileTransfer = nullptr;
   //! Client mode with several servers: which are connected and which is in control
-  QLabel *m_serverStatus = nullptr;
   QJsonArray m_serverStates;
   void updateServerStatus();
   QSet<QString> m_ignoredClients;
   bool m_newClientPromptShowing = false;
   bool m_serverConfigDialogVisible = false;
-  QSize m_expandedSize = QSize();
   QStringList m_checkedClients;
   QStringList m_checkedServers;
   QSystemTrayIcon *m_trayIcon = nullptr;
   QLocalServer *m_guiDupeChecker = nullptr;
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
 
-  LogDock *m_logDock;
+  LogView *m_logView;
   ActivityOverlay *m_activityOverlay = nullptr;
   CursorLocator *m_cursorLocator = nullptr;
   StatusBar *m_statusBar = nullptr;
@@ -242,4 +246,9 @@ private:
   QUrl m_helpPath;
 
   deskflow::gui::clipboard::ClipboardHistory *m_clipboardHistory = nullptr;
+
+  deskflow::gui::pages::SettingsPage *m_settingsPage = nullptr;
+  //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..5)
+  QList<QAction *> m_pageActions;
+  QStringList m_connectedClients;
 };

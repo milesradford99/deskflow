@@ -25,11 +25,20 @@ add_library(${target} STATIC
   Logger.h
   MainWindow.cpp
   MainWindow.h
-  MainWindow.ui
+  MainWindowUi.cpp
+  MainWindowUi.h
   Messages.cpp
   Messages.h
   StyleUtils.h
   Theme.cpp
+  pages/ClipboardPage.cpp
+  pages/ClipboardPage.h
+  pages/OverlayPage.cpp
+  pages/OverlayPage.h
+  pages/RebuildablePage.cpp
+  pages/RebuildablePage.h
+  pages/SettingsPage.cpp
+  pages/SettingsPage.h
   Theme.h
   TlsUtility.cpp
   TlsUtility.h
@@ -84,9 +93,6 @@ add_library(${target} STATIC
   dialogs/ServerConfigDialog.cpp
   dialogs/ServerConfigDialog.h
   dialogs/ServerConfigDialog.ui
-  dialogs/SettingsDialog.cpp
-  dialogs/SettingsDialog.h
-  dialogs/SettingsDialog.ui
   ipc/IpcClient.cpp
   ipc/IpcClient.h
   ipc/DaemonIpcClient.cpp
@@ -125,8 +131,10 @@ add_library(${target} STATIC
   widgets/FingerprintPreview.h
   widgets/KeySequenceWidget.cpp
   widgets/KeySequenceWidget.h
-  widgets/LogDock.cpp
-  widgets/LogDock.h
+  widgets/LogView.cpp
+  widgets/LogView.h
+  widgets/MacControls.cpp
+  widgets/MacControls.h
   widgets/LogWidget.h
   widgets/LogWidget.cpp
   widgets/NewComputerWidget.cpp
