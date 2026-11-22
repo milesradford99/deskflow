@@ -387,6 +387,22 @@ QVariant Settings::defaultValue(const QString &key)
   if (key == Server::ClipboardSize)
     return 3; // 3 MiB
 
+  if (key == ClipboardHistory::MaxItems)
+    return 200;
+
+  if (key == ClipboardHistory::SortMode)
+    return 0; // most recent first
+
+  if (key == ClipboardHistory::Shortcut) {
+    // On macOS Qt maps "Ctrl" to the Command key, giving the familiar Cmd+Shift+V.
+    // Ctrl+Shift+V is paste in most Linux terminals, so avoid stealing it elsewhere.
+#ifdef Q_OS_MACOS
+    return QStringLiteral("Ctrl+Shift+V");
+#else
+    return QStringLiteral("Ctrl+Alt+V");
+#endif
+  }
+
   return QVariant();
 }
 
