@@ -27,6 +27,11 @@ void CoreIpcClient::sendCommand(const QString &command, const QString &args)
   sendMessage(QStringLiteral("%1=%2").arg(command, args));
 }
 
+void CoreIpcClient::sendKeyOverlay(bool enabled)
+{
+  sendMessage(QStringLiteral("overlayKeys=%1").arg(enabled ? QStringLiteral("on") : QStringLiteral("off")));
+}
+
 void CoreIpcClient::processCommand(const QString &command, const QStringList &parts)
 {
   const auto args = parts.size() >= 2 ? parts.at(1) : QString();

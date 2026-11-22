@@ -28,6 +28,7 @@
 #include "gui/TlsUtility.h"
 #include "gui/core/CoreProcess.h"
 #include "gui/ipc/DaemonIpcClient.h"
+#include "gui/widgets/ActivityOverlay.h"
 #include "gui/widgets/LogDock.h"
 #include "net/FingerprintDatabase.h"
 #include "widgets/FileTransferWidget.h"
@@ -200,6 +201,9 @@ MainWindow::~MainWindow()
 
   m_guiDupeChecker->close();
   m_coreProcess.cleanup();
+
+  // top level without a parent (so it stays visible while the main window is hidden)
+  delete m_activityOverlay;
 }
 
 void MainWindow::restoreWindow()
@@ -325,6 +329,8 @@ void MainWindow::connectSlots()
   connect(&m_coreProcess, &CoreProcess::peerFingerprint, this, &MainWindow::handlePeerFingerprint);
   connect(&m_coreProcess, &CoreProcess::missingKeyboardLayouts, this, &MainWindow::handleMissingKeyboardLayouts);
 
+  setupActivityOverlay();
+
   connect(ui->btnToggleCore, &QPushButton::clicked, m_actionStartCore, &QAction::trigger, Qt::UniqueConnection);
 
   connect(ui->btnRestartCore, &QPushButton::clicked, this, &MainWindow::resetCore);
@@ -388,6 +394,12 @@ void MainWindow::toggleLogVisible(bool visible)
 
 void MainWindow::settingsChanged(const QString &key)
 {
+  if (key == Settings::Gui::OverlayShowKeys || key == Settings::Gui::OverlayShowActivity) {
+    if (m_activityOverlay)
+      applyActivityOverlaySettings();
+    return;
+  }
+
   if (key == Settings::Log::Level) {
     m_coreProcess.applyLogLevel();
     return;
@@ -409,6 +421,46 @@ void MainWindow::settingsChanged(const QString &key)
     updateSecurityIcon(m_statusBar->securityIconVisible());
     return;
   }
+}
+
+void MainWindow::setupActivityOverlay()
+{
+  // No parent: a child tool window would be hidden along with the main window (e.g. when sent to the tray).
+  m_activityOverlay = new ActivityOverlay(); // NOSONAR - deleted in destructor
+
+  connect(&m_coreProcess, &CoreProcess::keyPressed, m_activityOverlay, &ActivityOverlay::addKey);
+  connect(&m_coreProcess, &CoreProcess::activity, m_activityOverlay, &ActivityOverlay::handleCoreActivity);
+
+  connect(&m_coreProcess, &CoreProcess::connectedClientsChanged, this, [this](const QStringList &clients) {
+    if (m_coreProcess.mode() == CoreMode::Server && m_coreProcess.isStarted())
+      m_activityOverlay->handleServerClients(clients);
+  });
+
+  connect(&m_coreProcess, &CoreProcess::connectionStateChanged, this, [this](ConnectionState state) {
+    if (m_coreProcess.mode() == CoreMode::Client)
+      m_activityOverlay->handleClientConnectionState(state);
+  });
+
+  connect(&m_coreProcess, &CoreProcess::processStateChanged, this, [this](ProcessState state) {
+    if (state != ProcessState::Started)
+      m_activityOverlay->resetConnectionTracking();
+  });
+
+  applyActivityOverlaySettings();
+}
+
+void MainWindow::applyActivityOverlaySettings()
+{
+  const bool showKeys = Settings::value(Settings::Gui::OverlayShowKeys).toBool();
+  const bool showActivity = Settings::value(Settings::Gui::OverlayShowActivity).toBool();
+
+  m_activityOverlay->setShowKeys(showKeys);
+  m_activityOverlay->setShowActivity(showActivity);
+  if (!showKeys && !showActivity)
+    m_activityOverlay->clear();
+
+  // The core only sends key presses while this is on, so nothing flows when the overlay is off.
+  m_coreProcess.setKeyOverlayEnabled(showKeys);
 }
 
 void MainWindow::serverConfigSaving()

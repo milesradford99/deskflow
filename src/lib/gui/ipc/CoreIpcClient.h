@@ -23,6 +23,9 @@ public:
   //! Send `command=args`; args must not contain newlines or `=` (see IpcPayload.h).
   void sendCommand(const QString &command, const QString &args);
 
+  //! Ask the core to stream key presses for the activity overlay (or stop).
+  void sendKeyOverlay(bool enabled);
+
 Q_SIGNALS:
   void commandReceived(const QString &command, const QString &args);
 

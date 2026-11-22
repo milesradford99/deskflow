@@ -33,6 +33,7 @@ class QLocalServer;
 
 class DeskflowApplication;
 class LogDock;
+class ActivityOverlay;
 class StatusBar;
 
 namespace deskflow::gui {
@@ -168,6 +169,8 @@ private:
   Fingerprint m_fingerprint;
 
   void serverClientsChanged(const QStringList &clients);
+  void setupActivityOverlay();
+  void applyActivityOverlaySettings();
 
   inline static const auto m_guiSocketName = QStringLiteral("deskflow-gui");
   inline static const auto m_nameRegEx = QRegularExpression(QStringLiteral("^[\\w\\-_\\.]{0,255}$"));
@@ -194,6 +197,7 @@ private:
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
 
   LogDock *m_logDock;
+  ActivityOverlay *m_activityOverlay = nullptr;
   StatusBar *m_statusBar = nullptr;
 
   // Window Menu

@@ -28,6 +28,7 @@
 #include <QMetaEnum>
 #include <QMutexLocker>
 #include <QRegularExpression>
+#include <QUrl>
 
 namespace deskflow::gui {
 
@@ -472,8 +473,11 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
               m_coreIpcClient, &ipc::CoreIpcClient::commandReceived, this, &CoreProcess::onCoreIpcMessageReceived,
               Qt::QueuedConnection
           );
-          connect(m_coreIpcClient, &ipc::CoreIpcClient::connected, this, [] {
+          connect(m_coreIpcClient, &ipc::CoreIpcClient::connected, this, [this] {
             qDebug("connected to core ipc server");
+            if (m_coreIpcClient && m_keyOverlayEnabled) {
+              m_coreIpcClient->sendKeyOverlay(true);
+            }
           });
           connect(m_coreIpcClient, &ipc::CoreIpcClient::connectionFailed, this, [] {
             qWarning("failed to establish core ipc connection");
@@ -691,6 +695,35 @@ void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString
     Q_EMIT peerFingerprint(args);
   } else if (command == "missingKeyboardLayouts") {
     Q_EMIT missingKeyboardLayouts(args);
+  } else if (command == "activity") {
+    QStringList fields;
+    for (const auto &part : args.split(',')) {
+      fields.append(QUrl::fromPercentEncoding(part.toLatin1()));
+    }
+    if (!fields.isEmpty()) {
+      const auto type = fields.takeFirst();
+      Q_EMIT activity(type, fields);
+    }
+  } else if (command == "key") {
+    if (!m_keyOverlayEnabled) {
+      return;
+    }
+    // never log key presses
+    const auto decoded = QUrl::fromPercentEncoding(args.toLatin1());
+    if (decoded.size() > 2) {
+      Q_EMIT keyPressed(decoded.mid(2), decoded.startsWith(QStringLiteral("t:")));
+    }
+  }
+}
+
+void CoreProcess::setKeyOverlayEnabled(bool enabled)
+{
+  if (m_keyOverlayEnabled == enabled) {
+    return;
+  }
+  m_keyOverlayEnabled = enabled;
+  if (m_coreIpcClient && m_coreIpcClient->isConnected()) {
+    m_coreIpcClient->sendKeyOverlay(enabled);
   }
 }
 

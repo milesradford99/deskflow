@@ -584,6 +584,10 @@ void Server::switchComputer(BaseClientProxy *dst, int32_t x, int32_t y, bool for
     }
 #endif
 
+    ipcSendActivity(
+        QStringLiteral("switched"), {QString::fromStdString(getName(m_active)), QString::fromStdString(getName(dst))}
+    );
+
     // cut over
     m_active = dst;
 
@@ -1503,6 +1507,9 @@ void Server::handleKeyboardBroadcastEvent(const Event &event)
   if (newState != m_keyboardBroadcasting || info->m_computers != m_keyboardBroadcastingComputers) {
     m_keyboardBroadcasting = newState;
     m_keyboardBroadcastingComputers = info->m_computers;
+    ipcSendActivity(
+        QStringLiteral("keyboardBroadcast"), {m_keyboardBroadcasting ? QStringLiteral("on") : QStringLiteral("off")}
+    );
     LOG(
         (CLOG_DEBUG "keyboard broadcasting %s: %s", m_keyboardBroadcasting ? "on" : "off",
          m_keyboardBroadcastingComputers.c_str())
@@ -1535,6 +1542,10 @@ void Server::handleLockCursorToComputerEvent(const Event &event)
   if (newState != m_lockedToComputer) {
     m_lockedToComputer = newState;
     LOG_INFO("cursor %s current computer", m_lockedToComputer ? "locked to" : "unlocked from");
+    ipcSendActivity(
+        QStringLiteral("cursorLock"),
+        {m_lockedToComputer ? QStringLiteral("on") : QStringLiteral("off"), QString::fromStdString(getName(m_active))}
+    );
 
     m_primaryClient->reconfigure(getActivePrimarySides());
     if (!isLockedToComputerServer()) {
@@ -1574,6 +1585,11 @@ void Server::onClipboardChanged(const BaseClientProxy *sender, ClipboardID id, u
   // got new data
   LOG_INFO("computer \"%s\" updated clipboard %d", clipboard.m_clipboardOwner.c_str(), id);
   clipboard.m_clipboardData = data;
+
+  // only the regular clipboard: the X11 selection changes on every text selection and would be noise
+  if (id == kClipboardClipboard) {
+    ipcSendActivity(QStringLiteral("clipboardShared"), {QString::fromStdString(clipboard.m_clipboardOwner)});
+  }
 
   // tell all clients except the sender that the clipboard is dirty
   for (ClientList::const_iterator index = m_clients.begin(); index != m_clients.end(); ++index) {
@@ -1642,6 +1658,11 @@ void Server::onKeyDown(KeyID id, KeyModifierMask mask, KeyButton button, const s
 {
   LOG_VERBOSE("onKeyDown id=%d mask=0x%04x button=0x%04x lang=%s", id, mask, button, lang.c_str());
   assert(m_active != nullptr);
+
+  // only keys that deskflow sends to another computer (local typing never reaches the server)
+  if (m_active != m_primaryClient || m_keyboardBroadcasting) {
+    ipcSendKeyPress(id, mask);
+  }
 
   // relay
   if (!m_keyboardBroadcasting && IKeyState::KeyInfo::isDefault(computers)) {
