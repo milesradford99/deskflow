@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <QJsonArray>
+#include <QLabel>
 #include <QMainWindow>
 #include <QProcess>
 #include <QRegularExpression>
@@ -30,15 +32,29 @@ class QMenu;
 class QLocalServer;
 
 class DeskflowApplication;
-class LogDock;
+class LogView;
+class ActivityOverlay;
+class CursorLocator;
 class StatusBar;
+
+namespace deskflow::gui {
+class FileTransferWidget;
+}
 
 namespace Ui {
 class MainWindow;
 }
 
+namespace deskflow::gui::clipboard {
+class ClipboardHistory;
+}
+
 namespace deskflow::gui::ipc {
 class DaemonIpcClient;
+}
+
+namespace deskflow::gui::pages {
+class SettingsPage;
 }
 
 class MainWindow : public QMainWindow
@@ -67,6 +83,7 @@ public:
     return m_coreProcess.mode();
   }
   void open();
+  void showClipboardHistory();
   ServerConfig &serverConfig()
   {
     return m_serverConfig;
@@ -83,7 +100,9 @@ private:
    * @brief updateText Update all text not in the UI
    */
   void updateText();
-  void toggleLogVisible(bool visible);
+  void setupPages();
+  void showPage(int index);
+  void updateSidebarStatus();
 
   void settingsChanged(const QString &key = QString());
   void serverConfigSaving();
@@ -162,6 +181,15 @@ private:
   Fingerprint m_fingerprint;
 
   void serverClientsChanged(const QStringList &clients);
+  void setupActivityOverlay();
+  void applyActivityOverlaySettings();
+  void handleCursorArrival(const QString &type, const QStringList &fields);
+
+  /**
+   * @brief handleInstanceConnection a second instance connected, either to ask us to show
+   * ourselves or to run a command such as opening clipboard history
+   */
+  void handleInstanceConnection();
 
   inline static const auto m_guiSocketName = QStringLiteral("deskflow-gui");
   inline static const auto m_nameRegEx = QRegularExpression(QStringLiteral("^[\\w\\-_\\.]{0,255}$"));
@@ -172,17 +200,22 @@ private:
   bool m_clientErrorVisible = false;
   ServerConfig m_serverConfig;
   deskflow::gui::CoreProcess m_coreProcess;
+  deskflow::gui::FileTransferWidget *m_fileTransfer = nullptr;
+  //! Client mode with several servers: which are connected and which is in control
+  QJsonArray m_serverStates;
+  void updateServerStatus();
   QSet<QString> m_ignoredClients;
   bool m_newClientPromptShowing = false;
   bool m_serverConfigDialogVisible = false;
-  QSize m_expandedSize = QSize();
   QStringList m_checkedClients;
   QStringList m_checkedServers;
   QSystemTrayIcon *m_trayIcon = nullptr;
   QLocalServer *m_guiDupeChecker = nullptr;
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
 
-  LogDock *m_logDock;
+  LogView *m_logView;
+  ActivityOverlay *m_activityOverlay = nullptr;
+  CursorLocator *m_cursorLocator = nullptr;
   StatusBar *m_statusBar = nullptr;
 
   // Window Menu
@@ -211,4 +244,11 @@ private:
   QStringList m_serverStartIPs;
   QString m_serverStartSuggestedIP;
   QUrl m_helpPath;
+
+  deskflow::gui::clipboard::ClipboardHistory *m_clipboardHistory = nullptr;
+
+  deskflow::gui::pages::SettingsPage *m_settingsPage = nullptr;
+  //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..5)
+  QList<QAction *> m_pageActions;
+  QStringList m_connectedClients;
 };

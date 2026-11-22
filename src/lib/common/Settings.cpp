@@ -131,6 +131,11 @@ void Settings::upgradeSettings()
     }
   }
 
+  // 3 MiB was the default while images were sent as raw bitmaps, and it silently
+  // dropped most screenshots. Let installs still carrying it pick up the new default.
+  if (m_settings->contains(Server::ClipboardSize) && m_settings->value(Server::ClipboardSize).toUInt() == 3)
+    m_settings->remove(Server::ClipboardSize);
+
   // move to computers
 
   m_settings->beginGroup("internalConfig");
@@ -369,6 +374,10 @@ QVariant Settings::defaultValue(const QString &key)
   if (key == Client::YScrollScale || key == Client::XScrollScale)
     return 1.0;
 
+  // another server takes over once the one in control has been idle this long
+  if (key == Client::TakeoverDelay)
+    return 2000; // ms
+
   if (key == Server::Protocol)
     return networkProtocolToOption(NetworkProtocol::Barrier);
 
@@ -385,7 +394,27 @@ QVariant Settings::defaultValue(const QString &key)
     return 250;
 
   if (key == Server::ClipboardSize)
-    return 3; // 3 MiB
+    return 256; // MiB
+
+  // copied files up to this size are fetched as soon as the clipboard arrives
+  if (key == Core::ClipboardFilesLimit)
+    return 500; // MiB
+
+  if (key == ClipboardHistory::MaxItems)
+    return 200;
+
+  if (key == ClipboardHistory::SortMode)
+    return 0; // most recent first
+
+  if (key == ClipboardHistory::Shortcut) {
+    // On macOS Qt maps "Ctrl" to the Command key, giving the familiar Cmd+Shift+V.
+    // Ctrl+Shift+V is paste in most Linux terminals, so avoid stealing it elsewhere.
+#ifdef Q_OS_MACOS
+    return QStringLiteral("Ctrl+Shift+V");
+#else
+    return QStringLiteral("Ctrl+Alt+V");
+#endif
+  }
 
   return QVariant();
 }

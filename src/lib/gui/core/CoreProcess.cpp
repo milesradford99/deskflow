@@ -8,6 +8,7 @@
 #include "CoreProcess.h"
 
 #include "common/ExitCodes.h"
+#include "common/IpcPayload.h"
 #include "gui/ipc/CoreIpcClient.h"
 #include "gui/ipc/DaemonIpcClient.h"
 
@@ -23,9 +24,11 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QJsonArray>
 #include <QMetaEnum>
 #include <QMutexLocker>
 #include <QRegularExpression>
+#include <QUrl>
 
 namespace deskflow::gui {
 
@@ -470,8 +473,11 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
               m_coreIpcClient, &ipc::CoreIpcClient::commandReceived, this, &CoreProcess::onCoreIpcMessageReceived,
               Qt::QueuedConnection
           );
-          connect(m_coreIpcClient, &ipc::CoreIpcClient::connected, this, [] {
+          connect(m_coreIpcClient, &ipc::CoreIpcClient::connected, this, [this] {
             qDebug("connected to core ipc server");
+            if (m_coreIpcClient && m_keyOverlayEnabled) {
+              m_coreIpcClient->sendKeyOverlay(true);
+            }
           });
           connect(m_coreIpcClient, &ipc::CoreIpcClient::connectionFailed, this, [] {
             qWarning("failed to establish core ipc connection");
@@ -624,6 +630,27 @@ void CoreProcess::setProcessState(ProcessState state)
   Q_EMIT processStateChanged(state);
 }
 
+void CoreProcess::sendFiles(const QString &target, const QStringList &paths)
+{
+  if (!m_coreIpcClient || !m_coreIpcClient->isConnected()) {
+    qWarning("cannot send files, core is not connected");
+    return;
+  }
+  QJsonObject payload;
+  payload["target"] = target;
+  payload["paths"] = QJsonArray::fromStringList(paths);
+  m_coreIpcClient->sendCommand(deskflow::ipc::kSendFiles, deskflow::ipc::encodePayload(payload));
+}
+
+void CoreProcess::cancelFileTransfer(quint32 id)
+{
+  if (!m_coreIpcClient || !m_coreIpcClient->isConnected())
+    return;
+  QJsonObject payload;
+  payload["id"] = static_cast<qint64>(id);
+  m_coreIpcClient->sendCommand(deskflow::ipc::kCancelTransfer, deskflow::ipc::encodePayload(payload));
+}
+
 void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString &args)
 {
   if (command == "connectionState") {
@@ -635,6 +662,12 @@ void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString
       return;
     }
     setConnectionState(state);
+  } else if (command == deskflow::ipc::kFilePeers) {
+    Q_EMIT filePeersChanged(deskflow::ipc::decodePayload(args)["peers"].toVariant().toStringList());
+  } else if (command == deskflow::ipc::kServers) {
+    Q_EMIT serversChanged(deskflow::ipc::decodePayload(args)["servers"].toArray());
+  } else if (command == deskflow::ipc::kFileTransfer) {
+    Q_EMIT fileTransferProgress(deskflow::ipc::decodePayload(args));
   } else if (command == "connectedClients") {
     const auto clients = args.isEmpty() ? QStringList() : args.split(",");
     Q_EMIT connectedClientsChanged(clients);
@@ -662,6 +695,35 @@ void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString
     Q_EMIT peerFingerprint(args);
   } else if (command == "missingKeyboardLayouts") {
     Q_EMIT missingKeyboardLayouts(args);
+  } else if (command == "activity") {
+    QStringList fields;
+    for (const auto &part : args.split(',')) {
+      fields.append(QUrl::fromPercentEncoding(part.toLatin1()));
+    }
+    if (!fields.isEmpty()) {
+      const auto type = fields.takeFirst();
+      Q_EMIT activity(type, fields);
+    }
+  } else if (command == "key") {
+    if (!m_keyOverlayEnabled) {
+      return;
+    }
+    // never log key presses
+    const auto decoded = QUrl::fromPercentEncoding(args.toLatin1());
+    if (decoded.size() > 2) {
+      Q_EMIT keyPressed(decoded.mid(2), decoded.startsWith(QStringLiteral("t:")));
+    }
+  }
+}
+
+void CoreProcess::setKeyOverlayEnabled(bool enabled)
+{
+  if (m_keyOverlayEnabled == enabled) {
+    return;
+  }
+  m_keyOverlayEnabled = enabled;
+  if (m_coreIpcClient && m_coreIpcClient->isConnected()) {
+    m_coreIpcClient->sendKeyOverlay(enabled);
   }
 }
 

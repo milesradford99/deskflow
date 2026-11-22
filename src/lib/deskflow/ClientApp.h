@@ -8,26 +8,41 @@
 
 #pragma once
 
+#include "common/Enums.h"
 #include "deskflow/App.h"
 #include "net/NetworkAddress.h"
 
 #include <QList>
+#include <QString>
+
+#include <memory>
+#include <vector>
 
 namespace deskflow {
 class Computer;
 class ClientArgs;
 } // namespace deskflow
+namespace deskflow::client {
+class ClientHub;
+} // namespace deskflow::client
 
 class Event;
+class EventQueueTimer;
 class Client;
 class Thread;
 class ISocketFactory;
 
+//! The core in client mode
+/*!
+Connects this computer to one server, or to several at once (Settings::Client::ExtraServers).
+Each server is a session with its own connection, retries and failover list; they share
+one computer through a ClientHub, which decides which server is in control.
+*/
 class ClientApp : public App
 {
 public:
   explicit ClientApp(IEventQueue *events, const QString &processName = QString());
-  ~ClientApp() override = default;
+  ~ClientApp() override;
 
   //
   // IApp overrides
@@ -52,22 +67,8 @@ public:
   //
   // Regular functions
   //
-  deskflow::Computer *openClientComputer();
-  void closeClientComputer(deskflow::Computer *computer);
-  void handleClientRestart(const Event &, EventQueueTimer *vtimer);
-  void scheduleClientRestart(double retryTime);
-  void handleClientConnected();
-  void handleClientFailed(const Event &e);
-  void handleClientRefused(const Event &e);
-  void handleClientDisconnected();
-  Client *openClient(const std::string &name, const NetworkAddress &address, deskflow::Computer *computer);
-  void closeClient(Client *client);
   bool startClient();
   void stopClient();
-  Client *getClientPtr()
-  {
-    return m_client;
-  }
 
   //
   // Static functions
@@ -78,22 +79,46 @@ public:
     return (ClientApp &)App::instance();
   }
 
-  /**
-   * @brief retryTime
-   * @return next retry time based on number of current retries
-   */
-  double retryTime() const;
-
 private:
-  ISocketFactory *getSocketFactory() const;
-  NetworkAddress &getCurrentServerAddress();
-  void tryNextServer();
+  //! One server (with its failover addresses) and the connection to it
+  struct Session
+  {
+    QString label; //!< as configured, for logs and the GUI
+    QList<NetworkAddress> addresses;
+    Client *client = nullptr;
+    qsizetype currentServerIndex = 0;
+    size_t lastAddressIndex = 0;
+    uint retryCount = 0;
+    deskflow::core::ConnectionState state = deskflow::core::ConnectionState::Disconnected;
+    EventQueueTimer *restartTimer = nullptr;
+    bool stopped = false; //!< refused for good; never retried
+  };
 
-  bool m_suspended = false;
-  Client *m_client = nullptr;
+  static double retryTime(uint retryCount);
+  bool addSession(const QString &hosts);
+  ISocketFactory *getSocketFactory() const;
+  deskflow::Computer *openClientComputer();
+  void closeClientComputer(deskflow::Computer *computer);
+  Client *openClient(Session &session);
+  void closeClient(Session &session);
+  void connectSession(Session &session);
+  void scheduleRestart(Session &session, double retryTime);
+  void scheduleComputerRestart();
+  void cancelRestart(Session &session);
+  void tryNextServer(Session &session);
+
+  void handleClientConnected(Session &session);
+  void handleClientFailed(Session &session, const Event &e);
+  void handleClientRefused(Session &session, const Event &e);
+  void handleClientDisconnected(Session &session);
+
+  void setState(Session &session, deskflow::core::ConnectionState state);
+  //! Tell the GUI how every server is doing, and the overall state.
+  void publishStates();
+
+  std::vector<std::unique_ptr<Session>> m_sessions;
   deskflow::Computer *m_clientComputer = nullptr;
-  QList<NetworkAddress> m_serverAddresses;
-  size_t m_currentServerIndex = 0;
-  size_t m_lastServerAddressIndex = 0;
-  uint m_retryCount = 0;
+  std::unique_ptr<deskflow::client::ClientHub> m_hub;
+  deskflow::core::ConnectionState m_publishedState = deskflow::core::ConnectionState::Disconnected;
+  bool m_publishedOnce = false;
 };

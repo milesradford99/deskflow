@@ -23,6 +23,7 @@ const char *const kMsgCScreenSaver = "CSEC%1i";
 const char *const kMsgCResetOptions = "CROP";
 const char *const kMsgCInfoAck = "CIAK";
 const char *const kMsgCKeepAlive = "CALV";
+const char *const kMsgCControlDenied = "CDNY";
 
 // This is weird, it goes from DKDN to DKDL. Someone misunderstood the pattern (keep the
 // code, pick the form by negotiated version). Do not copy this.
@@ -48,6 +49,13 @@ const char *const kMsgDFileTransfer = "DFTR%1i%s";
 const char *const kMsgDDragInfo = "DDRG%2i%s";
 const char *const kMsgDSecureInputNotification = "SECN%s";
 const char *const kMsgDLanguageSynchronisation = "LSYN%s";
+const char *const kMsgDFileStart = "DFTS%4i%s";
+const char *const kMsgDFileData = "DFTD%4i%s";
+const char *const kMsgDFileAck = "DFTA%4i%4i";
+const char *const kMsgDFileEnd = "DFTE%4i%1i%s";
+const char *const kMsgDFileRequest = "DFTQ%4i%s";
+const char *const kMsgDFileDecline = "DFTN%4i%s";
+const char *const kMsgDFilePeers = "DFTP%s";
 const char *const kMsgQInfo = "QINF";
 const char *const kMsgEIncompatible = "EICV%2i%2i";
 const char *const kMsgEBusy = "EBSY";

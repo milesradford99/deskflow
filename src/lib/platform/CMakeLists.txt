@@ -13,22 +13,24 @@ if(UNIX AND NOT APPLE)
   pkg_check_modules(LIBXKBREGISTRY REQUIRED xkbregistry)
   message(STATUS "xkbregistry version: ${LIBXKBREGISTRY_VERSION}")
 
-  pkg_check_modules(LIBEI REQUIRED QUIET "libei-1.0 >= ${REQUIRED_LIBEI_VERSION}")
-  message(STATUS "libei version: ${LIBEI_VERSION}")
+  if(BUILD_LIBEI_SUPPORT)
+    pkg_check_modules(LIBEI REQUIRED QUIET "libei-1.0 >= ${REQUIRED_LIBEI_VERSION}")
+    message(STATUS "libei version: ${LIBEI_VERSION}")
 
-  pkg_check_modules(LIBPORTAL REQUIRED QUIET "libportal >= ${REQUIRED_LIBPORTAL_VERSION}")
-  message(STATUS "libportal version: ${LIBPORTAL_VERSION}")
+    pkg_check_modules(LIBPORTAL REQUIRED QUIET "libportal >= ${REQUIRED_LIBPORTAL_VERSION}")
+    message(STATUS "libportal version: ${LIBPORTAL_VERSION}")
 
-  # Check if we have the restore ability in the IC portal
-  include(CMakePushCheckState)
-  include(CheckSymbolExists)
-  cmake_push_check_state(RESET)
-  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${LIBPORTAL_INCLUDE_DIRS};")
-  set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};${LIBPORTAL_LINK_LIBRARIES};")
-  check_symbol_exists(xdp_input_capture_session_get_restore_token "libportal/inputcapture.h" HAVE_IC_RESTORE)
-  check_symbol_exists(xdp_session_request_clipboard "libportal/portal-helpers.h;libportal/clipboard.h" HAVE_LP_CLIPBOARD)
-  check_symbol_exists(xdp_global_shortcut_new "libportal/globalshortcuts.h" HAVE_LP_SHORTCUTS)
-  cmake_pop_check_state()
+    # Check if we have the restore ability in the IC portal
+    include(CMakePushCheckState)
+    include(CheckSymbolExists)
+    cmake_push_check_state(RESET)
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${LIBPORTAL_INCLUDE_DIRS};")
+    set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};${LIBPORTAL_LINK_LIBRARIES};")
+    check_symbol_exists(xdp_input_capture_session_get_restore_token "libportal/inputcapture.h" HAVE_IC_RESTORE)
+    check_symbol_exists(xdp_session_request_clipboard "libportal/portal-helpers.h;libportal/clipboard.h" HAVE_LP_CLIPBOARD)
+    check_symbol_exists(xdp_global_shortcut_new "libportal/globalshortcuts.h" HAVE_LP_SHORTCUTS)
+    cmake_pop_check_state()
+  endif()
 endif()
 
 if(WIN32)
@@ -42,8 +44,12 @@ if(WIN32)
     MSWindowsClipboardBitmapConverter.h
     MSWindowsClipboardFacade.cpp
     MSWindowsClipboardFacade.h
+    MSWindowsClipboardFilesConverter.cpp
+    MSWindowsClipboardFilesConverter.h
     MSWindowsClipboardHTMLConverter.cpp
     MSWindowsClipboardHTMLConverter.h
+    MSWindowsClipboardPngConverter.cpp
+    MSWindowsClipboardPngConverter.h
     MSWindowsClipboardUTF16Converter.cpp
     MSWindowsClipboardUTF16Converter.h
     MSWindowsComputer.cpp
@@ -83,6 +89,8 @@ elseif(APPLE)
     OSXClipboardBMPConverter.cpp
     OSXClipboardBMPConverter.h
     OSXClipboardHTMLConverter.cpp
+    OSXClipboardImageConverter.cpp
+    OSXClipboardImageConverter.h
     OSXClipboardHTMLConverter.h
     OSXClipboardTextConverter.cpp
     OSXClipboardTextConverter.h
@@ -129,7 +137,11 @@ elseif(UNIX)
       XWindowsClipboardAnyBitmapConverter.h
       XWindowsClipboardBMPConverter.cpp
       XWindowsClipboardBMPConverter.h
+      XWindowsClipboardFilesConverter.cpp
+      XWindowsClipboardFilesConverter.h
       XWindowsClipboardHTMLConverter.cpp
+      XWindowsClipboardPNGConverter.cpp
+      XWindowsClipboardPNGConverter.h
       XWindowsClipboardHTMLConverter.h
       XWindowsClipboardTextConverter.cpp
       XWindowsClipboardTextConverter.h
@@ -191,17 +203,23 @@ add_library(platform STATIC ${PLATFORM_SOURCES})
 
 target_link_libraries(platform PUBLIC client ${libs})
 
+# the clipboard converters use the shared image helpers that live next to IClipboard
+target_link_libraries(platform PRIVATE app Qt6::Gui)
+
 if(UNIX)
   target_link_libraries(platform PRIVATE net app)
 
   if(APPLE)
     find_library(COCOA_LIBRARY Cocoa)
-    target_link_libraries(platform PUBLIC ${COCOA_LIBRARY})
+    find_library(IMAGEIO_LIBRARY ImageIO)
+    target_link_libraries(platform PUBLIC ${COCOA_LIBRARY} ${IMAGEIO_LIBRARY})
   else()
     if(${LIBXKBCOMMON_VERSION} VERSION_GREATER_EQUAL "1.10")
       target_compile_definitions(platform PRIVATE HAVE_XKB_KEYMAP_MOD_GET_MASK=1)
     endif()
-    target_compile_definitions(platform PUBLIC WINAPI_LIBEI WINAPI_LIBPORTAL)
+    if(BUILD_LIBEI_SUPPORT)
+      target_compile_definitions(platform PUBLIC WINAPI_LIBEI WINAPI_LIBPORTAL)
+    endif()
     if (HAVE_IC_RESTORE)
       target_compile_definitions(platform PUBLIC HAVE_LIBPORTAL_INPUTCAPTURE_RESTORE)
     endif()

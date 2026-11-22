@@ -16,12 +16,19 @@
 #include "gui/MainWindow.h"
 #include "gui/Messages.h"
 #include "gui/StyleUtils.h"
+#include "gui/Theme.h"
+#include "gui/clipboard/ClipboardHistory.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDesktopServices>
 #include <QLocalSocket>
 #include <QMessageBox>
+#include <QProcess>
+#include <QPushButton>
 #include <QSharedMemory>
+#include <QTimer>
+#include <QUrl>
 
 #if defined(Q_OS_MACOS)
 #include <Carbon/Carbon.h>
@@ -71,12 +78,17 @@ int main(int argc, char *argv[])
   auto helpOption = QCommandLineOption({"h", "help"}, "Display Help on the command line");
   auto versionOption = QCommandLineOption({"v", "version"}, "Display version information");
   auto resetOption = QCommandLineOption("reset", "Reset all settings");
+  auto clipboardOption = QCommandLineOption(
+      deskflow::gui::clipboard::ClipboardHistory::kShowCommand,
+      "Open clipboard history (bind this to a keyboard shortcut where apps cannot register global shortcuts)"
+  );
 
   QCommandLineParser parser;
   parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
   parser.addOption(helpOption);
   parser.addOption(versionOption);
   parser.addOption(resetOption);
+  parser.addOption(clipboardOption);
   parser.parse(QCoreApplication::arguments());
 
   if (!parser.errorText().isEmpty()) {
@@ -107,24 +119,23 @@ int main(int argc, char *argv[])
 
   // If we can create 1 byte of SHM we are the only instance
   if (!sharedMemory.create(1)) {
-    // Ping the running instance to have it show itself
+    // Ping the running instance to have it show itself, or run a command
     QLocalSocket socket;
-    socket.connectToServer(shmId, QLocalSocket::ReadOnly);
+    socket.connectToServer(shmId, QLocalSocket::ReadWrite);
     if (!socket.waitForConnected()) {
       // If we can't connect to the other instance tell the user its running.
       // This should never happen but just incase we should show something
       QMessageBox::information(nullptr, kAppName, QObject::tr("%1 is already running").arg(kAppName));
+    } else if (parser.isSet(clipboardOption)) {
+      socket.write(deskflow::gui::clipboard::ClipboardHistory::kShowCommand.toUtf8() + '\n');
+      socket.waitForBytesWritten(1000);
     }
     socket.disconnectFromServer();
     return s_exitDuplicate;
   }
 
-  if (!deskflow::platform::isMac() && qEnvironmentVariable("XDG_CURRENT_DESKTOP") != QLatin1String("KDE")) {
-    QApplication::setStyle("fusion");
-  }
-
-  // Sets the fallback icon path and fallback theme
-  updateIconTheme();
+  // one look on every platform; also picks the icon set that matches the colour scheme
+  deskflow::gui::theme::apply(app);
 
   qInstallMessageHandler(deskflow::gui::messages::messageHandler);
   qInfo("%s v%s", kAppName, kDisplayVersion);
@@ -153,28 +164,82 @@ int main(int argc, char *argv[])
   MainWindow mainWindow;
   mainWindow.open();
 
+  if (parser.isSet(clipboardOption))
+    QMetaObject::invokeMethod(&mainWindow, &MainWindow::showClipboardHistory, Qt::QueuedConnection);
+
   return QApplication::exec();
 }
 
 #if defined(Q_OS_MACOS)
 bool checkMacAssistiveDevices()
 {
-  // new in mavericks, applications are trusted individually
-  // with use of the accessibility api. this call will show a
-  // prompt which can show the security/privacy/accessibility
-  // tab, with a list of allowed applications. deskflow should
-  // show up there automatically, but will be unchecked.
-
+  // Applications are trusted individually through the Accessibility list in
+  // Privacy & Security; the core needs it to read and send input.
   if (AXIsProcessTrusted()) {
     return true;
+  }
+
+  // macOS ties the entry to the app's code signature. Each new ad-hoc signed build
+  // leaves the old entry switched on but no longer matching, and the switch then
+  // does nothing. Clearing our own entry makes the prompt add a fresh one.
+  if (CFStringRef bundleId = CFBundleGetIdentifier(CFBundleGetMainBundle()); bundleId != nullptr) {
+    const auto id = QString::fromCFString(bundleId);
+    qInfo().noquote() << "not trusted for accessibility, clearing any stale entry for" << id;
+    const QStringList args = {QStringLiteral("reset"), QStringLiteral("Accessibility"), id};
+    if (QProcess::execute(QStringLiteral("/usr/bin/tccutil"), args) != 0) {
+      qWarning("unable to clear the accessibility entry");
+    }
   }
 
   const void *keys[] = {kAXTrustedCheckOptionPrompt};
   const void *trueValue[] = {kCFBooleanTrue};
   CFDictionaryRef options = CFDictionaryCreate(nullptr, keys, trueValue, 1, nullptr, nullptr);
-
-  bool result = AXIsProcessTrustedWithOptions(options);
+  const bool trusted = AXIsProcessTrustedWithOptions(options);
   CFRelease(options);
-  return result;
+  if (trusted) {
+    return true;
+  }
+
+  // Wait for the permission instead of quitting, so the first launch carries on by
+  // itself once the switch is turned on.
+  QMessageBox box;
+  box.setIcon(QMessageBox::Information);
+  box.setWindowTitle(kAppName);
+  box.setText(QObject::tr("%1 needs Accessibility permission to share your keyboard and mouse.").arg(kAppName));
+  box.setInformativeText(
+      QObject::tr(
+          "In System Settings, open Privacy & Security > Accessibility and switch on %1. "
+          "This window closes by itself once the permission is granted.\n\n"
+          "If %1 is already switched on, remove it with the minus button and open %1 again."
+      )
+          .arg(kAppName)
+  );
+  const auto openSettings = box.addButton(QObject::tr("Open System Settings"), QMessageBox::ActionRole);
+  const auto quit = box.addButton(QObject::tr("Quit"), QMessageBox::RejectRole);
+
+  QTimer poll;
+  QObject::connect(&poll, &QTimer::timeout, &box, [&box] {
+    if (AXIsProcessTrusted()) {
+      box.done(QMessageBox::Ok);
+    }
+  });
+  poll.start(500);
+
+  // any button closes the box, so show it again until the permission arrives or the user quits
+  while (!AXIsProcessTrusted()) {
+    box.exec();
+    if (AXIsProcessTrusted()) {
+      break;
+    }
+    if (box.clickedButton() == quit) {
+      return false;
+    }
+    if (box.clickedButton() == openSettings) {
+      QDesktopServices::openUrl(
+          QUrl(QStringLiteral("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"))
+      );
+    }
+  }
+  return true;
 }
 #endif

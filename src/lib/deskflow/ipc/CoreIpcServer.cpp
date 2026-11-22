@@ -6,8 +6,11 @@
 
 #include "CoreIpcServer.h"
 
+#include "CoreIpc.h"
+
 #include "base/Log.h"
 #include "common/Constants.h"
+#include "deskflow/FileTransferIpc.h"
 
 #include <QLocalSocket>
 
@@ -19,6 +22,19 @@ CoreIpcServer::CoreIpcServer(QObject *parent) : IpcServer(parent, kCoreIpcName, 
 {
   assert(s_instance == nullptr);
   s_instance = this;
+
+  // Stop producing key presses as soon as no GUI is listening, even if it never said "off".
+  connect(this, &IpcServer::clientCountChanged, this, [](int count) {
+    if (count == 0 && ipcKeyOverlayEnabled()) {
+      LOG_DEBUG("core ipc server has no clients, key overlay off");
+      ipcSetKeyOverlayEnabled(false);
+    }
+  });
+}
+
+bool CoreIpcServer::hasInstance()
+{
+  return s_instance != nullptr;
 }
 
 CoreIpcServer &CoreIpcServer::instance()
@@ -29,12 +45,20 @@ CoreIpcServer &CoreIpcServer::instance()
 
 void CoreIpcServer::processCommand(QLocalSocket *clientSocket, const QString &command, const QStringList &parts)
 {
-  Q_UNUSED(parts)
+  if (deskflow::fileTransferIpc::postCommand(command, parts.size() >= 2 ? parts.at(1) : QString()))
+    return;
+
   if (command == QStringLiteral("stop")) {
     LOG_DEBUG("core ipc server got stop message");
     writeToClientSocket(clientSocket, QStringLiteral("ok"));
     broadcastCommand(QStringLiteral("bye"));
     Q_EMIT stopProcessRequested();
+    return;
+  }
+  if (command == QStringLiteral("overlayKeys")) {
+    const bool enabled = parts.size() >= 2 && parts.at(1) == QStringLiteral("on");
+    LOG_DEBUG("core ipc server key overlay %s", enabled ? "on" : "off");
+    ipcSetKeyOverlayEnabled(enabled);
     return;
   }
   LOG_WARN("core ipc server got unknown command: %s", command.toUtf8().constData());

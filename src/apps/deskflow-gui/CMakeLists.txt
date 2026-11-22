@@ -24,6 +24,13 @@ elseif(BUILD_OSX_BUNDLE)
   set(BUNDLE_ICON_FILE ${target}.icns)
   set(BUNDLE_INFO_STRING "${CMAKE_PROJECT_DESCRIPTION}")
   set(BUNDLE_COPYRIGHT "${CMAKE_PROJECT_COPYRIGHT}")
+  # Finder refuses to open the app on anything older than this, so it must match
+  # the deployment target the binaries are built for.
+  if(CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(BUNDLE_MINIMUM_SYSTEM_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+  else()
+    set(BUNDLE_MINIMUM_SYSTEM_VERSION "12.0")
+  endif()
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/../res/deskflow.plist.in

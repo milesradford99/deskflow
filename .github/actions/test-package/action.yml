@@ -18,7 +18,37 @@ runs:
           dmg=$(ls build/deskflow-*.dmg | head -1)
           echo "Y" | hdiutil attach "$dmg" -nobrowse -mountpoint /tmp/deskflow-dmg
           /tmp/deskflow-dmg/Deskflow.app/Contents/MacOS/deskflow-core --version
+          # Every Mach-O in the bundle must load on the oldest macOS we target;
+          # one newer than that makes Finder refuse to open the app.
+          app=/tmp/deskflow-dmg/Deskflow.app
+          plutil -p "$app/Contents/Info.plist" | grep -E "LSMinimumSystemVersion|CFBundleExecutable" || true
+          min=$(plutil -extract LSMinimumSystemVersion raw "$app/Contents/Info.plist")
+          # 12 and 12.0 are the same system; compare as three numeric fields.
+          ver3() { echo "$1.0.0" | awk -F. '{printf "%05d%05d%05d", $1, $2, $3}'; }
+          too_new=0
+          while IFS= read -r -d '' f; do
+            file -b "$f" | grep -q Mach-O || continue
+            for v in $(vtool -show-build "$f" 2>/dev/null | awk '$1=="minos"{print $2} /LC_VERSION_MIN_MACOSX/{vm=1} vm&&$1=="version"{print $2;vm=0}'); do
+              echo "$v  ${f#$app/}"
+              if [[ "$(ver3 "$v")" > "$(ver3 "$min")" ]]; then
+                echo "::error::${f#$app/} needs macOS $v, newer than LSMinimumSystemVersion $min"
+                too_new=1
+              fi
+            done
+          done < <(find "$app" -type f -print0)
+          # Runners have SIP off, so dyld skips library validation and launching
+          # proves little: check the signature the way a normal Mac would.
+          codesign --verify --deep --strict "$app"
+          for f in "$app"/Contents/MacOS/*; do
+            sig=$(codesign -dv "$f" 2>&1)
+            echo "$sig" | grep -E "^(Signature|TeamIdentifier|CodeDirectory)"
+            if echo "$sig" | grep -q "Signature=adhoc" && echo "$sig" | grep -q "flags=.*runtime"; then
+              echo "::error::${f#$app/} is ad-hoc signed with the hardened runtime; dyld will refuse its frameworks"
+              too_new=1
+            fi
+          done
           hdiutil detach /tmp/deskflow-dmg
+          exit $too_new
 
         elif [ "$RUNNER_OS" == "Windows" ]; then
           7z x build/deskflow-*-portable.zip -otmp/deskflow-pkg

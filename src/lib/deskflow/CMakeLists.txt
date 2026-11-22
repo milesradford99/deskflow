@@ -37,6 +37,10 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   Clipboard.cpp
   Clipboard.h
   ClipboardChunk.cpp
+  ClipboardFileSync.cpp
+  ClipboardFileSync.h
+  ClipboardImage.cpp
+  ClipboardImage.h
   ClipboardChunk.h
   Computer.cpp
   Computer.h
@@ -45,6 +49,12 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   DisplayException.cpp
   DisplayException.h
   DisplayInvalidException.h
+  FileTransfer.cpp
+  FileTransfer.h
+  FileTransferIpc.cpp
+  FileTransferIpc.h
+  FileTransferProtocol.cpp
+  FileTransferProtocol.h
   IApp.h
   IClient.h
   IClipboard.cpp
@@ -57,6 +67,8 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   IPrimaryComputer.h
   IScreenSaver.h
   ISecondaryComputer.h
+  KeyDisplay.cpp
+  KeyDisplay.h
   KeyTypes.cpp
   KeyTypes.h
   KeyMap.cpp
@@ -94,6 +106,7 @@ target_link_libraries(${lib_name}
     common
     Qt6::Network
   PRIVATE
+    Qt6::Gui
     platform
 )
 

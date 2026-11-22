@@ -5,15 +5,30 @@
  * SPDX-License-Identifier: GPL-2.0-only WITH LicenseRef-OpenSSL-Exception
  */
 
+#include <climits>
+#include <sys/stat.h>
+
 #include "platform/OSXClipboard.h"
 
 #include "arch/ArchException.h"
 #include "base/Log.h"
 #include "platform/OSXClipboardBMPConverter.h"
 #include "platform/OSXClipboardHTMLConverter.h"
+#include "platform/OSXClipboardImageConverter.h"
 #include "platform/OSXClipboardTextConverter.h"
 #include "platform/OSXClipboardUTF16Converter.h"
 #include "platform/OSXClipboardUTF8Converter.h"
+
+namespace {
+const CFStringRef kFileUrlFlavor = CFSTR("public.file-url");
+
+// Item ids are opaque pointers that only have to differ from each other. The text
+// and image flavors have always used id 0, so the first file joins them there.
+PasteboardItemID itemId(size_t index)
+{
+  return reinterpret_cast<PasteboardItemID>(index);
+}
+} // namespace
 
 //
 // OSXClipboard
@@ -22,6 +37,11 @@
 OSXClipboard::OSXClipboard() : m_time(0), m_pboard(nullptr)
 {
   m_converters.push_back(new OSXClipboardHTMLConverter);
+  // image types, most desired first; all are read, only PNG and TIFF are written
+  using ImageMode = OSXClipboardImageConverter::Mode;
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.png"), ImageMode::ReadWrite));
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.tiff"), ImageMode::ReadWrite));
+  m_converters.push_back(new OSXClipboardImageConverter(CFSTR("public.jpeg"), ImageMode::ReadOnly));
   m_converters.push_back(new OSXClipboardBMPConverter);
   m_converters.push_back(new OSXClipboardUTF8Converter);
   m_converters.push_back(new OSXClipboardUTF16Converter);
@@ -69,10 +89,9 @@ bool OSXClipboard::synchronize()
   PasteboardSyncFlags flags = PasteboardSynchronize(m_pboard);
   LOG_VERBOSE("flags: %x", flags);
 
-  if (flags & kPasteboardModified) {
-    return true;
-  }
-  return false;
+  // While we own the pasteboard the change is one we made (a clipboard from another
+  // computer). Reporting it as a local copy would cancel copied files still on their way.
+  return (flags & kPasteboardModified) && !(flags & kPasteboardClientIsOwner);
 }
 
 void OSXClipboard::add(Format format, const std::string &data)
@@ -80,14 +99,12 @@ void OSXClipboard::add(Format format, const std::string &data)
   if (m_pboard == nullptr)
     return;
 
-  LOG_DEBUG("add %d bytes to clipboard format: %d", data.size(), format);
-  if (format == IClipboard::Format::Text) {
-    LOG_DEBUG("format of data to be added to clipboard was kText");
-  } else if (format == IClipboard::Format::Bitmap) {
-    LOG_DEBUG("format of data to be added to clipboard was kBitmap");
-  } else if (format == IClipboard::Format::HTML) {
-    LOG_DEBUG("format of data to be added to clipboard was kHTML");
+  if (format == IClipboard::Format::Files) {
+    addFiles(data);
+    return;
   }
+
+  LOG_DEBUG("add %d bytes to clipboard format: %d", data.size(), format);
 
   for (ConverterList::const_iterator index = m_converters.begin(); index != m_converters.end(); ++index) {
 
@@ -96,6 +113,10 @@ void OSXClipboard::add(Format format, const std::string &data)
     // skip converters for other formats
     if (converter->getFormat() == format) {
       std::string osXData = converter->fromIClipboard(data);
+      // read-only converters and failed conversions have nothing to offer
+      if (osXData.empty() && !data.empty()) {
+        continue;
+      }
       CFStringRef flavorType = converter->getOSXFormat();
       CFDataRef dataRef = CFDataCreate(kCFAllocatorDefault, (uint8_t *)osXData.data(), osXData.size());
       PasteboardItemID itemID = 0;
@@ -136,6 +157,9 @@ bool OSXClipboard::has(Format format) const
   if (m_pboard == nullptr)
     return false;
 
+  if (format == IClipboard::Format::Files)
+    return hasFiles();
+
   PasteboardItemID item;
   PasteboardGetItemIdentifier(m_pboard, (CFIndex)1, &item);
 
@@ -164,6 +188,9 @@ std::string OSXClipboard::get(Format format) const
 
   if (m_pboard == nullptr)
     return result;
+
+  if (format == IClipboard::Format::Files)
+    return getFiles();
 
   PasteboardGetItemIdentifier(m_pboard, (CFIndex)1, &item);
 
@@ -208,6 +235,115 @@ std::string OSXClipboard::get(Format format) const
     CFRelease(buffer);
 
   return converter->toIClipboard(result);
+}
+
+bool OSXClipboard::hasFiles() const
+{
+  ItemCount count = 0;
+  if (PasteboardGetItemCount(m_pboard, &count) != noErr)
+    return false;
+
+  for (ItemCount i = 1; i <= count; ++i) {
+    PasteboardItemID item;
+    PasteboardFlavorFlags flags;
+    if (PasteboardGetItemIdentifier(m_pboard, i, &item) == noErr &&
+        PasteboardGetItemFlavorFlags(m_pboard, item, kFileUrlFlavor, &flags) == noErr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::string OSXClipboard::getFiles() const
+{
+  std::string paths;
+  ItemCount count = 0;
+  if (PasteboardGetItemCount(m_pboard, &count) != noErr)
+    return paths;
+
+  for (ItemCount i = 1; i <= count; ++i) {
+    PasteboardItemID item;
+    CFDataRef data = nullptr;
+    if (PasteboardGetItemIdentifier(m_pboard, i, &item) != noErr ||
+        PasteboardCopyItemFlavorData(m_pboard, item, kFileUrlFlavor, &data) != noErr || data == nullptr) {
+      continue;
+    }
+
+    CFURLRef url = CFURLCreateWithBytes(
+        kCFAllocatorDefault, CFDataGetBytePtr(data), CFDataGetLength(data), kCFStringEncodingUTF8, nullptr
+    );
+    CFRelease(data);
+    if (url == nullptr)
+      continue;
+
+    // Finder hands out file reference URLs (file:///.file/id=...); turn them into real paths
+    CFURLRef pathUrl = CFURLCreateFilePathURL(kCFAllocatorDefault, url, nullptr);
+    char path[PATH_MAX];
+    if (CFURLGetFileSystemRepresentation(
+            pathUrl != nullptr ? pathUrl : url, true, reinterpret_cast<UInt8 *>(path), sizeof(path)
+        )) {
+      if (!paths.empty())
+        paths += '\n';
+      paths += path;
+    }
+
+    if (pathUrl != nullptr)
+      CFRelease(pathUrl);
+    CFRelease(url);
+  }
+
+  LOG_DEBUG("clipboard holds %d file item(s)", static_cast<int>(count));
+  return paths;
+}
+
+void OSXClipboard::addFiles(const std::string &paths)
+{
+  CFMutableArrayRef names = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+  size_t index = 0;
+  size_t start = 0;
+
+  while (start < paths.size()) {
+    auto end = paths.find('\n', start);
+    if (end == std::string::npos)
+      end = paths.size();
+    const auto path = paths.substr(start, end - start);
+    start = end + 1;
+    if (path.empty())
+      continue;
+
+    struct stat info;
+    const bool isDirectory = stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
+    CFURLRef url = CFURLCreateFromFileSystemRepresentation(
+        kCFAllocatorDefault, reinterpret_cast<const UInt8 *>(path.data()), path.size(), isDirectory
+    );
+    if (url == nullptr)
+      continue;
+
+    // the first file shares item 0 with the other flavors; each further file is an item of its own
+    const auto item = itemId(index == 0 ? 0 : index + 1);
+    if (CFDataRef data = CFURLCreateData(kCFAllocatorDefault, url, kCFStringEncodingUTF8, true); data != nullptr) {
+      PasteboardPutItemFlavor(m_pboard, item, kFileUrlFlavor, data, kPasteboardFlavorNoFlags);
+      CFRelease(data);
+      ++index;
+    }
+
+    if (CFStringRef name = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle); name != nullptr) {
+      CFArrayAppendValue(names, name);
+      CFRelease(name);
+    }
+    CFRelease(url);
+  }
+
+  // older apps still ask for the list of file names rather than URLs
+  if (index > 0) {
+    CFDataRef list = CFPropertyListCreateData(kCFAllocatorDefault, names, kCFPropertyListXMLFormat_v1_0, 0, nullptr);
+    if (list != nullptr) {
+      PasteboardPutItemFlavor(m_pboard, itemId(0), CFSTR("NSFilenamesPboardType"), list, kPasteboardFlavorNoFlags);
+      CFRelease(list);
+    }
+  }
+  CFRelease(names);
+  LOG_DEBUG("added %d file(s) to clipboard", static_cast<int>(index));
 }
 
 void OSXClipboard::clearConverters()

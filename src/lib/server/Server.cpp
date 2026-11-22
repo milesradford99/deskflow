@@ -11,8 +11,11 @@
 #include "base/IEventQueue.h"
 #include "base/Log.h"
 #include "deskflow/AppUtil.h"
+#include "deskflow/ClipboardFileSync.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DeskflowException.h"
+#include "deskflow/FileTransfer.h"
+#include "deskflow/FileTransferIpc.h"
 #include "deskflow/IPlatformComputer.h"
 #include "deskflow/OptionTypes.h"
 #include "deskflow/PacketStreamFilter.h"
@@ -65,6 +68,26 @@ Server::Server(ServerConfig &config, PrimaryClient *primaryClient, deskflow::Com
     }
     clipboard.m_clipboardData = clipboard.m_clipboard.marshall();
   }
+
+  // file transfers: this server receives, sends, and relays between clients
+  m_fileTransfer = std::make_unique<deskflow::FileTransferManager>(
+      primaryName, true,
+      [this](const std::string &peer, const deskflow::FileTransferMessage &message) {
+        const auto it = m_clients.find(peer);
+        return it != m_clients.end() && it->second->sendFileTransferMessage(message);
+      }
+  );
+  deskflow::fileTransferIpc::configure(*m_fileTransfer);
+  deskflow::fileTransferIpc::attach(m_events);
+  m_clipboardFiles = std::make_unique<deskflow::ClipboardFileSync>(
+      *m_fileTransfer, deskflow::fileTransferIpc::clipboardFilesLimit(),
+      [this](ClipboardID id, const IClipboard *clipboard) { m_computer->setClipboard(id, clipboard); }
+  );
+  m_primaryClient->setClipboardFileSync(m_clipboardFiles.get());
+  m_events->addHandler(
+      EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
+      [this](const auto &e) { handleFileTransferCommand(e); }
+  );
 
   // install event handlers
   m_events->addHandler(EventTypes::Timer, this, [this](const auto &) { handleSwitchWaitTimeout(); });
@@ -167,6 +190,9 @@ Server::~Server()
   m_events->removeHandler(PrimaryComputerFakeInputBegin, m_inputFilter);
   m_events->removeHandler(PrimaryComputerFakeInputEnd, m_inputFilter);
   m_events->removeHandler(Timer, this);
+  m_events->removeHandler(FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
+  deskflow::fileTransferIpc::attach(nullptr);
+  m_primaryClient->setClipboardFileSync(nullptr);
   stopSwitch();
 
   try {
@@ -326,6 +352,75 @@ void Server::sendConnectedClientsIpc() const
   ipcSendToClient("connectedClients", clientList.join(","));
 }
 
+void Server::handleControlDenied(const BaseClientProxy *client)
+{
+  // only matters while our cursor is on that client (and not for the screen saver)
+  if (client != m_active || m_activeSaver != nullptr || client == m_primaryClient) {
+    return;
+  }
+
+  LOG_INFO("\"%s\" is controlled by another server, taking the cursor back", getName(client).c_str());
+
+  // back where it left, a little way in from the edge so it doesn't cross straight over again
+  int32_t dx;
+  int32_t dy;
+  int32_t dw;
+  int32_t dh;
+  m_primaryClient->getShape(dx, dy, dw, dh);
+  const double centerX = dx + dw / 2.0;
+  const double centerY = dy + dh / 2.0;
+  double x = m_returnX;
+  double y = m_returnY;
+  if (const auto distance = std::hypot(centerX - x, centerY - y); distance > 0) {
+    const auto step = std::min(48.0, distance);
+    x += (centerX - x) / distance * step;
+    y += (centerY - y) / distance * step;
+  }
+  const auto backX = std::clamp(static_cast<int32_t>(std::lround(x)), dx, dx + dw - 1);
+  const auto backY = std::clamp(static_cast<int32_t>(std::lround(y)), dy, dy + dh - 1);
+
+  switchComputer(m_primaryClient, backX, backY, false);
+}
+
+void Server::handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message)
+{
+  // only a client that is part of the layout may send, receive or relay
+  // the user may have picked another folder in the GUI since the last transfer
+  if (message.type == deskflow::FileTransferMessage::Type::Start)
+    m_fileTransfer->setDownloadDir(deskflow::fileTransferIpc::downloadDir());
+  if (m_clientSet.contains(const_cast<BaseClientProxy *>(client)))
+    m_fileTransfer->handleMessage(getName(client), message);
+}
+
+void Server::handleFileTransferCommand(const Event &event)
+{
+  const auto *command = static_cast<const deskflow::fileTransferIpc::Command *>(event.getDataObject());
+  if (command->action == deskflow::fileTransferIpc::Command::Action::Cancel) {
+    m_fileTransfer->cancel(command->id);
+  } else {
+    m_fileTransfer->sendFiles(command->target, command->paths);
+  }
+}
+
+void Server::sendFilePeers() const
+{
+  const auto self = getName(m_primaryClient);
+  QStringList everyone{QString::fromStdString(self)};
+  QStringList others;
+  for (const auto &[name, client] : m_clients) {
+    if (name != self) {
+      everyone.append(QString::fromStdString(name));
+      others.append(QString::fromStdString(name));
+    }
+  }
+
+  for (const auto &[name, client] : m_clients) {
+    if (name != self)
+      client->sendFilePeers(everyone);
+  }
+  deskflow::fileTransferIpc::sendPeers(self, others);
+}
+
 std::string Server::getName(const BaseClientProxy *client) const
 {
   std::string name = m_config->getCanonicalName(client->getName());
@@ -441,6 +536,12 @@ void Server::switchComputer(BaseClientProxy *dst, int32_t x, int32_t y, bool for
   // stop waiting to switch
   stopSwitch();
 
+  // remember where we left our own computer
+  if (m_active == m_primaryClient && dst != m_primaryClient) {
+    m_returnX = m_x;
+    m_returnY = m_y;
+  }
+
   // record new position
   m_x = x;
   m_y = y;
@@ -482,6 +583,10 @@ void Server::switchComputer(BaseClientProxy *dst, int32_t x, int32_t y, bool for
       }
     }
 #endif
+
+    ipcSendActivity(
+        QStringLiteral("switched"), {QString::fromStdString(getName(m_active)), QString::fromStdString(getName(dst))}
+    );
 
     // cut over
     m_active = dst;
@@ -1187,6 +1292,11 @@ void Server::handleClipboardGrabbed(const Event &event, BaseClientProxy *grabber
       clipboard.m_clipboardOwner.c_str()
   );
   clipboard.m_clipboardOwner = getName(grabber);
+
+  // a local app took the server's clipboard: stop waiting for files meant for the old one
+  if (grabber == m_primaryClient) {
+    m_clipboardFiles->localChanged(info->m_id);
+  }
   clipboard.m_clipboardSeqNum = info->m_sequenceNumber;
 
   // clear the clipboard data (since it's not known at this point)
@@ -1397,6 +1507,9 @@ void Server::handleKeyboardBroadcastEvent(const Event &event)
   if (newState != m_keyboardBroadcasting || info->m_computers != m_keyboardBroadcastingComputers) {
     m_keyboardBroadcasting = newState;
     m_keyboardBroadcastingComputers = info->m_computers;
+    ipcSendActivity(
+        QStringLiteral("keyboardBroadcast"), {m_keyboardBroadcasting ? QStringLiteral("on") : QStringLiteral("off")}
+    );
     LOG(
         (CLOG_DEBUG "keyboard broadcasting %s: %s", m_keyboardBroadcasting ? "on" : "off",
          m_keyboardBroadcastingComputers.c_str())
@@ -1429,6 +1542,10 @@ void Server::handleLockCursorToComputerEvent(const Event &event)
   if (newState != m_lockedToComputer) {
     m_lockedToComputer = newState;
     LOG_INFO("cursor %s current computer", m_lockedToComputer ? "locked to" : "unlocked from");
+    ipcSendActivity(
+        QStringLiteral("cursorLock"),
+        {m_lockedToComputer ? QStringLiteral("on") : QStringLiteral("off"), QString::fromStdString(getName(m_active))}
+    );
 
     m_primaryClient->reconfigure(getActivePrimarySides());
     if (!isLockedToComputerServer()) {
@@ -1468,6 +1585,11 @@ void Server::onClipboardChanged(const BaseClientProxy *sender, ClipboardID id, u
   // got new data
   LOG_INFO("computer \"%s\" updated clipboard %d", clipboard.m_clipboardOwner.c_str(), id);
   clipboard.m_clipboardData = data;
+
+  // only the regular clipboard: the X11 selection changes on every text selection and would be noise
+  if (id == kClipboardClipboard) {
+    ipcSendActivity(QStringLiteral("clipboardShared"), {QString::fromStdString(clipboard.m_clipboardOwner)});
+  }
 
   // tell all clients except the sender that the clipboard is dirty
   for (ClientList::const_iterator index = m_clients.begin(); index != m_clients.end(); ++index) {
@@ -1537,6 +1659,13 @@ void Server::onKeyDown(KeyID id, KeyModifierMask mask, KeyButton button, const s
   LOG_VERBOSE("onKeyDown id=%d mask=0x%04x button=0x%04x lang=%s", id, mask, button, lang.c_str());
   assert(m_active != nullptr);
 
+  // The overlay shows keys on the computer they are typed into: here only while this
+  // computer is in control. Keys sent to a client are shown by that client instead.
+  // (The primary only reports local typing where the platform hook sees it, e.g. macOS.)
+  if (m_active == m_primaryClient) {
+    ipcSendKeyPress(id, mask);
+  }
+
   // relay
   if (!m_keyboardBroadcasting && IKeyState::KeyInfo::isDefault(computers)) {
     m_active->keyDown(id, mask, button, lang);
@@ -1559,6 +1688,9 @@ void Server::onKeyUp(KeyID id, KeyModifierMask mask, KeyButton button, const cha
 {
   LOG_VERBOSE("onKeyUp id=%d mask=0x%04x button=0x%04x", id, mask, button);
   assert(m_active != nullptr);
+
+  // only shows a lone modifier that ipcSendKeyPress held back, so no forwarding check is needed
+  ipcSendKeyRelease(id);
 
   // relay
   if (!m_keyboardBroadcasting && IKeyState::KeyInfo::isDefault(computers)) {
@@ -1917,6 +2049,7 @@ bool Server::addClient(BaseClientProxy *client)
   // tell primary client about the active sides
   m_primaryClient->reconfigure(getActivePrimarySides());
 
+  sendFilePeers();
   return true;
 }
 
@@ -1935,9 +2068,12 @@ bool Server::removeClient(BaseClientProxy *client)
   m_events->removeHandler(ClipboardChanged, client->getEventTarget());
 
   // remove from list
-  m_clients.erase(getName(client));
+  const auto name = getName(client);
+  m_clients.erase(name);
   m_clientSet.erase(i);
 
+  m_fileTransfer->peerDisconnected(name);
+  sendFilePeers();
   return true;
 }
 

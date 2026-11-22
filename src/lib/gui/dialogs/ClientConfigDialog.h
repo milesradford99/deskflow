@@ -76,6 +76,14 @@ private:
 
   void clearServerHistory();
 
+  //! The other servers as typed, one per line, without blanks or repeats.
+  QStringList extraServers() const;
+  //! The takeover delay the controls describe, in ms (see Settings::Client::TakeoverDelay).
+  int takeoverDelay() const;
+  void showTakeoverDelay(int delay);
+  //! cbTakeover's value for "after the idle time"; the real delay is in sbTakeoverDelay
+  static constexpr int kTakeoverIdle = 1;
+
   Ui::ClientConfigDialog *ui = nullptr;
   SettingsDialogButtonBox *m_buttonBox = nullptr;
 };

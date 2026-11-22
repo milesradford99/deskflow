@@ -43,9 +43,25 @@ public:
     inline static const auto XScrollScale = QStringLiteral("client/xScrollScale");
     inline static const auto LanguageSync = QStringLiteral("client/languageSync");
     inline static const auto RemoteHost = QStringLiteral("client/remoteHost");
+    //! More servers to stay connected to at the same time; each entry is a remoteHost value.
+    inline static const auto ExtraServers = QStringLiteral("client/extraServers");
+    //! With several servers: how long (ms) the one in control must be idle before another
+    //! takes over. 0 means the latest server always wins, -1 that the first one keeps it.
+    inline static const auto TakeoverDelay = QStringLiteral("client/takeoverDelay");
+    //! With several servers: pass a clipboard received from one on to the others.
+    inline static const auto ShareClipboardBetweenServers = QStringLiteral("client/shareClipboardBetweenServers");
     inline static const auto RecentRemoteHosts = QStringLiteral("client/recentRemoteHosts");
     inline static const auto XdpClipboardRetried = QStringLiteral("client/xdpClipboardRetried");
     inline static const auto XdpRestoreToken = QStringLiteral("client/xdpRestoreToken");
+  };
+  struct ClipboardHistory
+  {
+    inline static const auto Enabled = QStringLiteral("clipboardHistory/enabled");
+    inline static const auto IgnoreSensitive = QStringLiteral("clipboardHistory/ignoreSensitive");
+    inline static const auto MaxItems = QStringLiteral("clipboardHistory/maxItems");
+    inline static const auto Paused = QStringLiteral("clipboardHistory/paused");
+    inline static const auto Shortcut = QStringLiteral("clipboardHistory/shortcut");
+    inline static const auto SortMode = QStringLiteral("clipboardHistory/sortMode");
   };
   struct Core
   {
@@ -63,6 +79,8 @@ public:
     inline static const auto ComputerEnterCommand = QStringLiteral("core/enterCommand");
     inline static const auto EnableExitCommand = QStringLiteral("core/enableExitCommand");
     inline static const auto ComputerExitCommand = QStringLiteral("core/exitCommand");
+    inline static const auto DownloadDir = QStringLiteral("core/downloadDir");
+    inline static const auto ClipboardFilesLimit = QStringLiteral("core/clipboardFilesLimit");
   };
   struct Daemon
   {
@@ -86,6 +104,10 @@ public:
     inline static const auto ShownServerFirstStartMessage = QStringLiteral("gui/shownServerFirstStartMessage");
     inline static const auto ShowVersionInTitle = QStringLiteral("gui/showVersionInTitle");
     inline static const auto IgnoreMissingKeyboardLayouts = QStringLiteral("gui/ignoreMissingKeyboardLayouts");
+    inline static const auto OverlayShowKeys = QStringLiteral("gui/overlayShowKeys");
+    inline static const auto OverlayShowActivity = QStringLiteral("gui/overlayShowActivity");
+    //! Ripple around the cursor when it arrives on this computer.
+    inline static const auto CursorHighlight = QStringLiteral("gui/cursorHighlight");
   };
   struct Log
   {
@@ -264,6 +286,7 @@ private:
   // clang-format off
   inline static const QStringList m_validGroup = {
       QStringLiteral("client")
+    , QStringLiteral("clipboardHistory")
     , QStringLiteral("core")
     , QStringLiteral("daemon")
     , QStringLiteral("gui")
@@ -279,9 +302,18 @@ private:
     , Client::InvertXScroll
     , Client::LanguageSync
     , Client::RemoteHost
+    , Client::ExtraServers
+    , Client::TakeoverDelay
+    , Client::ShareClipboardBetweenServers
     , Client::RecentRemoteHosts
     , Client::YScrollScale
     , Client::XScrollScale
+    , ClipboardHistory::Enabled
+    , ClipboardHistory::IgnoreSensitive
+    , ClipboardHistory::MaxItems
+    , ClipboardHistory::Paused
+    , ClipboardHistory::Shortcut
+    , ClipboardHistory::SortMode
     , Core::CoreMode
     , Core::Interface
     , Core::LastVersion
@@ -292,6 +324,8 @@ private:
     , Core::EnableExitCommand
     , Core::ComputerEnterCommand
     , Core::ComputerExitCommand
+    , Core::DownloadDir
+    , Core::ClipboardFilesLimit
     , Core::ComputerName
     , Core::Display
     , Core::UseHooks
@@ -316,6 +350,9 @@ private:
     , Gui::ShownServerFirstStartMessage
     , Gui::ShowVersionInTitle
     , Gui::IgnoreMissingKeyboardLayouts
+    , Gui::OverlayShowKeys
+    , Gui::OverlayShowActivity
+    , Gui::CursorHighlight
     , Security::Certificate
     , Security::CheckPeers
     , Security::KeySize
@@ -347,6 +384,8 @@ private:
     , Gui::ShownServerFirstStartMessage
     , Gui::ShowVersionInTitle
     , Gui::IgnoreMissingKeyboardLayouts
+    , Gui::OverlayShowKeys
+    , Gui::OverlayShowActivity
     , Core::PreventSleep
     , Core::EnableEnterCommand
     , Core::EnableExitCommand
@@ -354,7 +393,9 @@ private:
     , Client::InvertYScroll
     , Client::InvertXScroll
     , Client::LanguageSync
+    , Client::ShareClipboardBetweenServers
     , Client::XdpClipboardRetried
+    , ClipboardHistory::Paused
     , Log::ToFile
     , Log::GuiDebug
     , Server::DefaultLockToComputerState
@@ -369,7 +410,10 @@ private:
 
   // When checking the default values this list contains the ones that default to true.
   inline static const QStringList m_defaultTrueValues = {
-      Core::UseHooks
+      ClipboardHistory::Enabled
+    , ClipboardHistory::IgnoreSensitive
+    , Gui::CursorHighlight
+    , Core::UseHooks
     , Gui::CloseToTray
     , Gui::CloseReminder
     , Gui::LogExpanded

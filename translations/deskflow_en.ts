@@ -2,6 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
+    <name>MainWindow</name>
+    <message numerus="yes">
+        <source>%n computer(s) connected</source>
+        <translation>
+            <numerusform>%n computer connected</numerusform>
+            <numerusform>%n computers connected</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>StatusBar</name>
     <message numerus="yes">
         <source>%1 is connected, with %n client(s): %2</source>
@@ -9,6 +19,16 @@
         <translation>
             <numerusform>%1 is connected, with a client: %2</numerusform>
             <numerusform>%1 is connected, with %n clients: %2</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::ClipboardPage</name>
+    <message numerus="yes">
+        <source>The oldest unpinned items go first. %n saved now.</source>
+        <translation>
+            <numerusform>The oldest unpinned items go first. %n item saved now.</numerusform>
+            <numerusform>The oldest unpinned items go first. %n items saved now.</numerusform>
         </translation>
     </message>
 </context>

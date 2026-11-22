@@ -19,10 +19,16 @@
 
 #include <climits>
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 
 class BaseClientProxy;
+namespace deskflow {
+class ClipboardFileSync;
+class FileTransferManager;
+struct FileTransferMessage;
+} // namespace deskflow
 class EventQueueTimer;
 class PrimaryClient;
 class InputFilter;
@@ -198,6 +204,18 @@ public:
   */
   void getClients(std::vector<std::string> &list) const;
   void sendConnectedClientsIpc() const;
+
+  //! Feed a file transfer message that arrived from a client.
+  void handleFileTransferMessage(const BaseClientProxy *client, const deskflow::FileTransferMessage &message);
+
+  //! The client is controlled by another server: take the cursor back from it.
+  void handleControlDenied(const BaseClientProxy *client);
+
+  //! The manager that sends, receives and relays files for this server.
+  deskflow::FileTransferManager &fileTransfer() const
+  {
+    return *m_fileTransfer;
+  }
   size_t getMaximumClipboardSizeBytes() const;
 
   //@}
@@ -410,6 +428,12 @@ private:
   using ClientList = std::map<std::string, BaseClientProxy *>;
   using ClientSet = std::set<BaseClientProxy *>;
   ClientList m_clients;
+
+  std::unique_ptr<deskflow::FileTransferManager> m_fileTransfer;
+  std::unique_ptr<deskflow::ClipboardFileSync> m_clipboardFiles;
+  void handleFileTransferCommand(const Event &event);
+  //! Tell every client and the GUI which computers files can be sent to.
+  void sendFilePeers() const;
   ClientSet m_clientSet;
 
   // all old connections that we're waiting to hangup
@@ -429,6 +453,10 @@ private:
   // whichever computer is active
   int32_t m_x;
   int32_t m_y;
+
+  // where the cursor left the primary computer, to put it back if a client turns us down
+  int32_t m_returnX = 0;
+  int32_t m_returnY = 0;
 
   // last mouse deltas.  this is needed to smooth out double tap
   // on win32 which reports bogus mouse motion at the edge of

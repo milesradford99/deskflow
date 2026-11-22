@@ -136,6 +136,65 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ActivityOverlay</name>
+    <message>
+        <source>Control: %1 → %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control moved to this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control left this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard from %1 shared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor locked to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor unlocked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected to server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ClientConfigDialog</name>
     <message>
         <source>Client Configuration</source>
@@ -176,6 +235,93 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Clear Server History</source>
         <translation type="unfinished">サーバー履歴を消去</translation>
+    </message>
+    <message>
+        <source>Other servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also stay connected to these servers, one per line. Each can control this computer, one at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.20 or office-pc:24800</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When another server&apos;s cursor arrives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying on one server makes it pasteable on the others too. Leave this off if the servers belong to different people.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pass a clipboard from one server on to the others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch once the server in control is idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch at once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wait until the server in control leaves</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -442,19 +588,19 @@ Do you want to connect to the server?
     <name>LogDock</name>
     <message>
         <source>Log</source>
-        <translation>ログ</translation>
+        <translation type="vanished">ログ</translation>
     </message>
     <message>
         <source>Detach from window</source>
-        <translation>ウィンドウから切り離し</translation>
+        <translation type="vanished">ウィンドウから切り離し</translation>
     </message>
     <message>
         <source>Close Log</source>
-        <translation>ログを閉じる</translation>
+        <translation type="vanished">ログを閉じる</translation>
     </message>
     <message>
         <source>Attach to window</source>
-        <translation>ウィンドウに結合</translation>
+        <translation type="vanished">ウィンドウに結合</translation>
     </message>
 </context>
 <context>
@@ -485,42 +631,149 @@ Do you want to connect to the server?
     </message>
 </context>
 <context>
+    <name>LogView</name>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished">ログ</translation>
+    </message>
+    <message>
+        <source>What Deskflow is doing right now. Useful when something doesn&apos;t connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>This computer&apos;s name:</source>
-        <translation>このコンピューターの名前:</translation>
+        <translation type="vanished">このコンピューターの名前:</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name can&apos;t have have spaces or special characters&lt;/p&gt;&lt;p&gt;Use Enter to save the name change.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;名前は英数字のみで空白や特殊文字は使えません&lt;/p&gt;&lt;p&gt;Enterキーで確定&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;名前は英数字のみで空白や特殊文字は使えません&lt;/p&gt;&lt;p&gt;Enterキーで確定&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Edit Computer Name</source>
-        <translation>コンピューター名を編集</translation>
+        <translation type="vanished">コンピューター名を編集</translation>
     </message>
     <message>
         <source>Use this computer&apos;s keyboard and mouse
 (make this computer the server)</source>
-        <translation>このコンピューターのキーボードとマウスを使用する
+        <translation type="vanished">このコンピューターのキーボードとマウスを使用する
 (このコンピューターをサーバーにする)</translation>
     </message>
     <message>
         <source>Use another computer’s mouse and keyboard
 (make this computer the client)</source>
-        <translation>別のコンピューターのキーボードとマウスを使用する
+        <translation type="vanished">別のコンピューターのキーボードとマウスを使用する
 (このコンピューターをクライアントにする)</translation>
     </message>
     <message>
         <source>&amp;Configure Server</source>
-        <translation>サーバー設定(&amp;C)</translation>
+        <translation type="vanished">サーバー設定(&amp;C)</translation>
+    </message>
+    <message>
+        <source>One keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Hints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished">ログ</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Letters, numbers, - and _ only. Press Return to save or Esc to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What should this computer do?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Share this keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control your other computers from this one. It becomes the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use another computer&apos;s keyboard and mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another computer controls this one. It becomes a client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose one of the two above to get started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place your other computers around this one, the way they sit on your desk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrange Screens…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export server configuration</source>
         <translation>サーバー設定をエクスポート</translation>
     </message>
     <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The name or IP address shown on the computer whose keyboard you want to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. 192.168.1.10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other servers, scrolling and reconnecting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>You must select a mode</source>
-        <translation>動作モードを選択してください</translation>
+        <translation type="vanished">動作モードを選択してください</translation>
     </message>
     <message>
         <source>&amp;Start</source>
@@ -537,6 +790,10 @@ Do you want to connect to the server?
     <message>
         <source>invalid certificate, generating a new one</source>
         <translation>無効な証明書、新しい証明書を生成しています</translation>
+    </message>
+    <message>
+        <source>Switched to %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Address missing</source>
@@ -577,6 +834,100 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;サーバー &apos;%1&apos; への接続に失敗しました。&lt;/p&gt;&lt;p&gt;同じ名前のクライアントがサーバーに接続済です。&lt;/p&gt;&lt;p&gt;名前の重複がないことと、クライアントプロセスが多重起動していない事を確認してください。&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Starting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopping…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trying again shortly…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a role to begin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Start, then connect your other computers to this one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the server&apos;s address, then press Connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Connect to use the server&apos;s keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for computers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n computer(s) connected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>On each other computer, choose &quot;Use another computer&apos;s keyboard and mouse&quot; and enter %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this computer&apos;s IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the cursor off the edge of the screen to switch computers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer now follows the server&apos;s keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: in control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connects to %1 at the same time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>
@@ -705,11 +1056,11 @@ Valid names:
     </message>
     <message>
         <source>&amp;Configure Client</source>
-        <translation>クライアント設定 (&amp;C)</translation>
+        <translation type="vanished">クライアント設定 (&amp;C)</translation>
     </message>
     <message>
         <source>Connect to:</source>
-        <translation>接続先:</translation>
+        <translation type="vanished">接続先:</translation>
     </message>
     <message>
         <source>&lt;html&gt;Hostname or IP address of the server computer.&lt;br/&gt;May contain a comma seperated list.&lt;/html&gt;</source>
@@ -927,6 +1278,24 @@ Additionally, check you are able to %1 the server config file: %2</source>
         <source>Super</source>
         <translation type="unfinished">Super</translation>
     </message>
+    <message>
+        <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
+
+If %1 is already switched on, remove it with the minus button and open %1 again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open System Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SearchWidget</name>
@@ -1107,195 +1476,195 @@ Enabling this setting will disable the server config GUI.</source>
     <name>SettingsDialog</name>
     <message>
         <source>Preferences</source>
-        <translation>設定</translation>
+        <translation type="vanished">設定</translation>
     </message>
     <message>
         <source>Check for updates on startup</source>
-        <translation>起動時にソフトウェア更新を確認する</translation>
+        <translation type="vanished">起動時にソフトウェア更新を確認する</translation>
     </message>
     <message>
         <source>Prevent this computer from going to sleep</source>
-        <translation>このコンピューターがスリープしないようにする</translation>
+        <translation type="vanished">このコンピューターがスリープしないようにする</translation>
     </message>
     <message>
         <source>Tray icon style</source>
-        <translation>トレイアイコン</translation>
+        <translation type="vanished">トレイアイコン</translation>
     </message>
     <message>
         <source>Colorful</source>
-        <translation>カラフル</translation>
+        <translation type="vanished">カラフル</translation>
     </message>
     <message>
         <source>Monocolor</source>
-        <translation>モノクロ</translation>
+        <translation type="vanished">モノクロ</translation>
     </message>
     <message>
         <source>Enable TLS Encryption</source>
-        <translation>TLS 暗号化を有効にする</translation>
+        <translation type="vanished">TLS 暗号化を有効にする</translation>
     </message>
     <message>
         <source>Certificate</source>
-        <translation>証明書</translation>
+        <translation type="vanished">証明書</translation>
     </message>
     <message>
         <source>Key length</source>
-        <translation>鍵長</translation>
+        <translation type="vanished">鍵長</translation>
     </message>
     <message>
         <source>Regenerate certificate</source>
-        <translation>証明書を再生成</translation>
+        <translation type="vanished">証明書を再生成</translation>
     </message>
     <message>
         <source>Require client certificates</source>
-        <translation>クライアント証明書を要求する</translation>
+        <translation type="vanished">クライアント証明書を要求する</translation>
     </message>
     <message>
         <source>&amp;Advanced</source>
-        <translation>詳細(&amp;A)</translation>
+        <translation type="vanished">詳細(&amp;A)</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation>ポート</translation>
+        <translation type="vanished">ポート</translation>
     </message>
     <message>
         <source>Network IP</source>
-        <translation>IPアドレス</translation>
+        <translation type="vanished">IPアドレス</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation>レベル</translation>
+        <translation type="vanished">レベル</translation>
     </message>
     <message>
         <source>Log path</source>
-        <translation>ログファイルのパス</translation>
+        <translation type="vanished">ログファイルのパス</translation>
     </message>
     <message>
         <source>Enable GUI debug messages</source>
-        <translation>GUIのデバッグメッセージを有効にする</translation>
+        <translation type="vanished">GUIのデバッグメッセージを有効にする</translation>
     </message>
     <message>
         <source>Use background service (daemon)</source>
-        <translation>バックグラウンドサービス(デーモン)を有効にする</translation>
+        <translation type="vanished">バックグラウンドサービス(デーモン)を有効にする</translation>
     </message>
     <message>
         <source>Always run as system (work at login screen and UAC)</source>
-        <translation>常にsystem権限で実行する(ログイン画面とUACで必要)</translation>
+        <translation type="vanished">常にsystem権限で実行する(ログイン画面とUACで必要)</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>言語</translation>
+        <translation type="vanished">言語</translation>
     </message>
     <message>
         <source>TLS Certificate Regenerated</source>
-        <translation>TLS 証明書再生成</translation>
+        <translation type="vanished">TLS 証明書再生成</translation>
     </message>
     <message>
         <source>TLS certificate regenerated successfully.</source>
-        <translation>TLS 証明書が再生成されました。</translation>
+        <translation type="vanished">TLS 証明書が再生成されました。</translation>
     </message>
     <message>
         <source>Select a TLS certificate to use...</source>
-        <translation>使用する TLS 証明書を選択…</translation>
+        <translation type="vanished">使用する TLS 証明書を選択…</translation>
     </message>
     <message>
         <source>Save log file to...</source>
-        <translation>ログをファイルに保存…</translation>
+        <translation type="vanished">ログをファイルに保存…</translation>
     </message>
     <message>
         <source>%1 Clear Settings</source>
-        <translation>%1 設定消去</translation>
+        <translation type="vanished">%1 設定消去</translation>
     </message>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;すべての設定を消去して %1 を再起動してもよろしいですか？&lt;/p&gt; &lt;p&gt;この操作は元に戻せません。&lt;/p&gt;</translation>
+        <translation type="vanished">&lt;p&gt;すべての設定を消去して %1 を再起動してもよろしいですか？&lt;/p&gt; &lt;p&gt;この操作は元に戻せません。&lt;/p&gt;</translation>
     </message>
     <message>
         <source>Required messages</source>
-        <translation>必須のメッセージ</translation>
+        <translation type="vanished">必須のメッセージ</translation>
     </message>
     <message>
         <source>Non-fatal errors</source>
-        <translation>致命的でないエラー</translation>
+        <translation type="vanished">致命的でないエラー</translation>
     </message>
     <message>
         <source>General warnings</source>
-        <translation>一般的な警告</translation>
+        <translation type="vanished">一般的な警告</translation>
     </message>
     <message>
         <source>General events [Default]</source>
-        <translation>一般的な事象 [既定]</translation>
+        <translation type="vanished">一般的な事象 [既定]</translation>
     </message>
     <message>
         <source>Debug entries</source>
-        <translation>デバッグ情報</translation>
+        <translation type="vanished">デバッグ情報</translation>
     </message>
     <message>
         <source>Verbose debug output</source>
-        <translation>詳細なデバッグ出力</translation>
+        <translation type="vanished">詳細なデバッグ出力</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation>自動</translation>
+        <translation type="vanished">自動</translation>
     </message>
     <message>
         <source>Include version in the window title</source>
-        <translation>ウィンドウタイトルにバージョン情報を含める</translation>
+        <translation type="vanished">ウィンドウタイトルにバージョン情報を含める</translation>
     </message>
     <message>
         <source>Log to file</source>
-        <translation>ファイルにログを保存する</translation>
+        <translation type="vanished">ファイルにログを保存する</translation>
     </message>
     <message>
         <source>&amp;Logs</source>
-        <translation>ログ(&amp;L)</translation>
+        <translation type="vanished">ログ(&amp;L)</translation>
     </message>
     <message>
         <source>&amp;General</source>
-        <translation>一般(&amp;G)</translation>
+        <translation type="vanished">一般(&amp;G)</translation>
     </message>
     <message>
         <source>&amp;Network</source>
-        <translation>ネットワーク(&amp;N)</translation>
+        <translation type="vanished">ネットワーク(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Window</source>
-        <translation>ウィンドウ(&amp;W)</translation>
+        <translation type="vanished">ウィンドウ(&amp;W)</translation>
     </message>
     <message>
         <source>When the main window is closed</source>
-        <translation>メインウィンドウを閉じたとき</translation>
+        <translation type="vanished">メインウィンドウを閉じたとき</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>アプリケーションを終了する</translation>
+        <translation type="vanished">アプリケーションを終了する</translation>
     </message>
     <message>
         <source>Send to background</source>
-        <translation>バックグラウンドで実行する</translation>
+        <translation type="vanished">バックグラウンドで実行する</translation>
     </message>
     <message>
         <source>When the application starts</source>
-        <translation>アプリケーション起動時</translation>
+        <translation type="vanished">アプリケーション起動時</translation>
     </message>
     <message>
         <source>Show the main window</source>
-        <translation>メインウィンドウを表示する</translation>
+        <translation type="vanished">メインウィンドウを表示する</translation>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation>画面に入る時にコマンドを実行</translation>
+        <translation type="vanished">画面に入る時にコマンドを実行</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation>画面から出る時にコマンドを実行</translation>
+        <translation type="vanished">画面から出る時にコマンドを実行</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
-        <translation>Infoよりも高いログレベルを使用すると、パフォーマンスに影響を及ぼす可能性があります。</translation>
+        <translation type="vanished">Infoよりも高いログレベルを使用すると、パフォーマンスに影響を及ぼす可能性があります。</translation>
     </message>
     <message>
         <source>Remove all settings</source>
-        <translation>すべての設定を消去する</translation>
+        <translation type="vanished">すべての設定を消去する</translation>
     </message>
 </context>
 <context>
@@ -1307,6 +1676,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>%1 is not writable</source>
         <translation>%1 は書き込み可能ではありません</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Close and save changes</source>
@@ -1395,6 +1780,817 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Encryption Disabled</source>
         <translation>暗号化無効</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::FileTransferWidget</name>
+    <message>
+        <source>Send files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received files are saved to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save received files to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect another computer to send files to it. Files you copy are also pasted across.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drop files or folders on a computer, or click it to choose them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send files to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a folder…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send a folder to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied files from %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied files to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 from %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to paste · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sent · %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dismiss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show in folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistory</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore next copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Handy before copying a password or other one-off secret</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip passwords and concealed content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep history of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change shortcut…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear history (keep pinned)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear everything…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard History Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press the keys you want to use to open clipboard history from anywhere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your desktop does not let apps register global shortcuts (for example on Wayland). Add a custom shortcut in your system keyboard settings that runs:
+
+    %1 --%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is already used by another application. Your previous shortcut has been restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete every item in your clipboard history, including pinned items? This cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set shortcut…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change shortcut (%1)%2…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistoryPopup</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search clipboard history…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recently copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard history settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignoring next copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 × %2 pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>rich text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is paused.
+Resume it from the ⋯ menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing here yet.
+Copy something on any of your computers and it will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No matches for “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing in this category yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy as plain text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardMonitor</name>
+    <message>
+        <source>server</source>
+        <translation type="unfinished">サーバー</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::ClipboardPage</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Everything you copy on any linked computer is kept here, on this computer only. Pick an item to paste it anywhere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New copies are not saved until you turn this off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password managers mark what they copy as concealed; those items are never saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep up to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The oldest unpinned items go first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Works from any app, on whichever computer the cursor is on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps register shortcuts. Add one in your system settings that runs: %1 --%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned items stay.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Everything…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear everything</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes pinned items too. This can&apos;t be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">なし</translation>
+    </message>
+    <message>
+        <source>Another app is using this shortcut; choose a different one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>The oldest unpinned items go first. %n saved now.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::OverlayPage</name>
+    <message>
+        <source>Screen Hints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Small hints on screen show which computer your keys and cursor are on. They fade away on their own.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try It</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys you press</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Each key shows for a moment in the top-right corner of the computer you are typing on. Nothing is recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What Deskflow is doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switching computers, sharing the clipboard, computers connecting and leaving.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Where the cursor arrives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A short ripple around the cursor when it comes to this computer, so it is easy to find.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes apply right away.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some changes take effect when sharing restarts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These settings are read-only: the settings file can&apos;t be written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network &amp;&amp; Security</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">詳細設定</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open this window when Deskflow starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep sharing when the window is closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow stays in the menu bar. Quit it from there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow stays in the system tray. Quit it from there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorful</source>
+        <translation type="unfinished">カラフル</translation>
+    </message>
+    <message>
+        <source>Monochrome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu bar icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tray icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the version in the title bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished">言語</translation>
+    </message>
+    <message>
+        <source>Keep this computer awake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stops it from going to sleep while Deskflow is sharing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates when Deskflow starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished">自動</translation>
+    </message>
+    <message>
+        <source>IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic is right for most networks. Pick one if this computer is on several.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished">ポート</translation>
+    </message>
+    <message>
+        <source>Every computer must use the same port.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encrypt connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recommended. Turn it on or off on every computer at the same time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2048-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4096-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key length</source>
+        <translation type="unfinished">鍵長</translation>
+    </message>
+    <message>
+        <source>Longer keys are stronger but take a moment to create.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1, %2-bit key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a TLS certificate to use...</source>
+        <translation type="unfinished">使用する TLS 証明書を選択…</translation>
+    </message>
+    <message>
+        <source>Regenerate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLS Certificate Regenerated</source>
+        <translation type="unfinished">TLS 証明書再生成</translation>
+    </message>
+    <message>
+        <source>TLS certificate regenerated successfully.</source>
+        <translation type="unfinished">TLS 証明書が再生成されました。</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation type="unfinished">証明書</translation>
+    </message>
+    <message>
+        <source>Only allow trusted computers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A computer can join only after you have confirmed its fingerprint here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer&apos;s fingerprint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compare it with what the other computer shows when you connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the background service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keeps sharing running when you switch users or lock the screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run as system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also works at the login screen and on administrator (UAC) prompts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a command when the cursor arrives on this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a command when the cursor leaves this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More detail than Info can slow things down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the log to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save log file to...</source>
+        <translation type="unfinished">ログをファイルに保存…</translation>
+    </message>
+    <message>
+        <source>Log file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include GUI debug messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove All Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes every setting, including the screen layout, and restarts Deskflow.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 設定消去</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;すべての設定を消去して %1 を再起動してもよろしいですか？&lt;/p&gt; &lt;p&gt;この操作は元に戻せません。&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

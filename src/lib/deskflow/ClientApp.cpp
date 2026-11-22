@@ -12,7 +12,9 @@
 #include "base/IEventQueue.h"
 #include "base/Log.h"
 #include "client/Client.h"
+#include "client/ClientHub.h"
 #include "common/ExitCodes.h"
+#include "common/IpcPayload.h"
 #include "common/PlatformInfo.h"
 #include "common/Settings.h"
 #include "deskflow/Computer.h"
@@ -41,6 +43,9 @@
 #include "platform/OSXComputer.h"
 #endif
 
+#include <QJsonArray>
+#include <QJsonObject>
+
 #include <memory>
 
 ClientApp::ClientApp(IEventQueue *events, const QString &processName) : App(events, processName)
@@ -48,47 +53,75 @@ ClientApp::ClientApp(IEventQueue *events, const QString &processName) : App(even
   // do nothing
 }
 
+ClientApp::~ClientApp() = default;
+
 void ClientApp::parseArgs()
 {
-  // save server addresses (comma-separated list supported)
-  if (const auto addressList = Settings::value(Settings::Client::RemoteHost).toString(); !addressList.isEmpty()) {
-    const int port = Settings::value(Settings::Core::Port).toInt();
-    const QStringList addresses = addressList.split(',', Qt::SkipEmptyParts);
+  // the main server (a comma-separated list is tried in turn), then any servers to
+  // stay connected to at the same time, each with the same syntax
+  QStringList servers;
+  if (const auto main = Settings::value(Settings::Client::RemoteHost).toString(); !main.trimmed().isEmpty())
+    servers.append(main);
+  for (const auto &extra : Settings::value(Settings::Client::ExtraServers).toStringList()) {
+    if (!extra.trimmed().isEmpty() && !servers.contains(extra))
+      servers.append(extra);
+  }
 
-    for (const QString &addr : addresses) {
-      const QString trimmedAddr = addr.trimmed();
-      if (trimmedAddr.isEmpty()) {
-        continue;
-      }
-
-      try {
-        NetworkAddress netAddr(trimmedAddr.toStdString(), port);
-        netAddr.resolve();
-        m_serverAddresses.append(netAddr);
-        LOG_DEBUG("added server address: %s", qPrintable(trimmedAddr));
-      } catch (SocketAddressException &e) {
-        // allow an address that we can't look up if we're restartable.
-        // we'll try to resolve the address each time we connect to the
-        // server.  a bad port will never get better.
-        if (e.getError() == SocketAddressException::SocketError::BadPort) {
-          LOG_CRIT("%s: %s" BYE, qPrintable(processName()), e.what(), qPrintable(processName()));
-          bye(s_exitFailed);
-        } else {
-          // Still add it - we'll try to resolve later
-          NetworkAddress netAddr(trimmedAddr.toStdString(), port);
-          m_serverAddresses.append(netAddr);
-          LOG_WARN("could not resolve address '%s': %s (will retry later)", qPrintable(trimmedAddr), e.what());
-        }
-      }
-    }
-
-    if (m_serverAddresses.isEmpty()) {
-      LOG_CRIT("%s: no valid server addresses specified" BYE, qPrintable(processName()), qPrintable(processName()));
+  for (const auto &hosts : servers) {
+    if (!addSession(hosts)) {
+      LOG_CRIT(
+          "%s: no valid server addresses in \"%s\"" BYE, qPrintable(processName()), qPrintable(hosts),
+          qPrintable(processName())
+      );
       bye(s_exitFailed);
     }
-
-    LOG_INFO("configured %zu server address(es)", static_cast<size_t>(m_serverAddresses.size()));
   }
+
+  if (m_sessions.size() > 1) {
+    LOG_INFO("connecting to %zu servers at the same time", m_sessions.size());
+  }
+}
+
+bool ClientApp::addSession(const QString &hosts)
+{
+  auto session = std::make_unique<Session>();
+  session->label = hosts.trimmed();
+
+  const int port = Settings::value(Settings::Core::Port).toInt();
+  for (const QString &addr : hosts.split(',', Qt::SkipEmptyParts)) {
+    const QString trimmedAddr = addr.trimmed();
+    if (trimmedAddr.isEmpty()) {
+      continue;
+    }
+    try {
+      NetworkAddress netAddr(trimmedAddr.toStdString(), port);
+      netAddr.resolve();
+      session->addresses.append(netAddr);
+      LOG_DEBUG("added server address: %s", qPrintable(trimmedAddr));
+    } catch (SocketAddressException &e) {
+      // allow an address that we can't look up if we're restartable.
+      // we'll try to resolve the address each time we connect to the
+      // server.  a bad port will never get better.
+      if (e.getError() == SocketAddressException::SocketError::BadPort) {
+        LOG_CRIT("%s: %s" BYE, qPrintable(processName()), e.what(), qPrintable(processName()));
+        bye(s_exitFailed);
+      } else {
+        // Still add it - we'll try to resolve later
+        NetworkAddress netAddr(trimmedAddr.toStdString(), port);
+        session->addresses.append(netAddr);
+        LOG_WARN("could not resolve address '%s': %s (will retry later)", qPrintable(trimmedAddr), e.what());
+      }
+    }
+  }
+
+  if (session->addresses.isEmpty())
+    return false;
+  LOG_INFO(
+      "configured %zu address(es) for server \"%s\"", static_cast<size_t>(session->addresses.size()),
+      qPrintable(session->label)
+  );
+  m_sessions.push_back(std::move(session));
+  return true;
 }
 
 const char *ClientApp::daemonName() const
@@ -148,172 +181,254 @@ void ClientApp::closeClientComputer(deskflow::Computer *computer)
   }
 }
 
-void ClientApp::handleClientRestart(const Event &, EventQueueTimer *timer)
+void ClientApp::scheduleRestart(Session &session, double retryTime)
 {
-  // discard old timer
-  getEvents()->deleteTimer(timer);
-  getEvents()->removeHandler(EventTypes::Timer, timer);
+  cancelRestart(session);
+  LOG_DEBUG("retry \"%s\" in %.0f seconds", qPrintable(session.label), retryTime);
+  if (m_publishedState != deskflow::core::ConnectionState::Connected) {
+    ipcSendToClient("retryIn", QString::number(retryTime, 'f', 0));
+  }
 
-  // reconnect
-  startClient();
-}
-
-void ClientApp::scheduleClientRestart(double retryTime)
-{
-  LOG_DEBUG("retry in %.0f seconds", retryTime);
-  ipcSendToClient("retryIn", QString::number(retryTime, 'f', 0));
   // install a timer and handler to retry later
-  EventQueueTimer *timer = getEvents()->newOneShotTimer(retryTime, nullptr);
-  getEvents()->addHandler(EventTypes::Timer, timer, [this, timer](const auto &e) { handleClientRestart(e, timer); });
+  auto *timer = getEvents()->newOneShotTimer(retryTime, nullptr);
+  session.restartTimer = timer;
+  getEvents()->addHandler(EventTypes::Timer, timer, [this, &session](const auto &) {
+    cancelRestart(session);
+    if (m_clientComputer == nullptr) {
+      startClient();
+    } else {
+      connectSession(session);
+    }
+  });
 }
 
-void ClientApp::handleClientConnected()
+void ClientApp::scheduleComputerRestart()
 {
-  LOG_DEBUG("connected to server");
-  ipcSendConnectionState(deskflow::core::ConnectionState::Connected);
+  // the computer couldn't be opened yet (e.g. no display): try everything again later
+  ipcSendToClient("retryIn", QString::number(retryTime(0), 'f', 0));
+  auto *timer = getEvents()->newOneShotTimer(retryTime(0), nullptr);
+  getEvents()->addHandler(EventTypes::Timer, timer, [this, timer](const auto &) {
+    getEvents()->removeHandler(EventTypes::Timer, timer);
+    getEvents()->deleteTimer(timer);
+    startClient();
+  });
+}
+
+void ClientApp::cancelRestart(Session &session)
+{
+  if (session.restartTimer != nullptr) {
+    getEvents()->removeHandler(EventTypes::Timer, session.restartTimer);
+    getEvents()->deleteTimer(session.restartTimer);
+    session.restartTimer = nullptr;
+  }
+}
+
+void ClientApp::handleClientConnected(Session &session)
+{
+  LOG_DEBUG("connected to server \"%s\"", qPrintable(session.label));
+  setState(session, deskflow::core::ConnectionState::Connected);
+
   // Reset server index on successful connection
-  m_currentServerIndex = 0;
-  m_lastServerAddressIndex = 0;
+  session.currentServerIndex = 0;
+  session.lastAddressIndex = 0;
 }
 
-void ClientApp::handleClientFailed(const Event &e)
+void ClientApp::handleClientFailed(Session &session, const Event &e)
 {
-  if ((++m_lastServerAddressIndex) < m_client->getLastResolvedAddressesCount()) {
+  if ((++session.lastAddressIndex) < session.client->getLastResolvedAddressesCount()) {
     // Try next resolved address for current hostname
     std::unique_ptr<Client::FailInfo> info(static_cast<Client::FailInfo *>(e.getData()));
-
     LOG_WARN("failed to connect to server=%s, trying next resolved address", qPrintable(info->m_what));
-    if (!m_suspended) {
-      scheduleClientRestart(retryTime());
-    }
+    scheduleRestart(session, retryTime(session.retryCount));
   } else {
     // All resolved addresses exhausted, try next server in list
-    m_lastServerAddressIndex = 0;
-    tryNextServer();
-
-    if (m_currentServerIndex == 0) {
+    session.lastAddressIndex = 0;
+    tryNextServer(session);
+    if (session.currentServerIndex == 0) {
       // We've cycled through all servers, treat as refused
-      handleClientRefused(e);
+      handleClientRefused(session, e);
     } else {
       std::unique_ptr<Client::FailInfo> info(static_cast<Client::FailInfo *>(e.getData()));
       LOG_WARN("failed to connect to server=%s, trying next server in list", qPrintable(info->m_what));
-      if (!m_suspended) {
-        scheduleClientRestart(retryTime());
-      }
+      scheduleRestart(session, retryTime(session.retryCount));
     }
   }
 }
 
-void ClientApp::handleClientRefused(const Event &e)
+void ClientApp::handleClientRefused(Session &session, const Event &e)
 {
   std::unique_ptr<Client::FailInfo> info(static_cast<Client::FailInfo *>(e.getData()));
-
-  if (!info->m_retry) {
-    LOG_ERR("failed to connect to server: %s", qPrintable(info->m_what));
-    getEvents()->addEvent(Event(EventTypes::Quit));
-  } else {
+  setState(session, deskflow::core::ConnectionState::Disconnected);
+  if (info->m_retry) {
     LOG_WARN("failed to connect to server: %s", qPrintable(info->m_what));
-    if (!m_suspended) {
-      scheduleClientRestart(retryTime());
-      m_retryCount++;
-    }
+    scheduleRestart(session, retryTime(session.retryCount));
+    session.retryCount++;
+    return;
   }
+
+  LOG_ERR("failed to connect to server \"%s\": %s", qPrintable(session.label), qPrintable(info->m_what));
+  session.stopped = true;
+
+  // one server turning us down for good mustn't cut the others off
+  for (const auto &other : m_sessions) {
+    if (!other->stopped)
+      return;
+  }
+  getEvents()->addEvent(Event(EventTypes::Quit));
 }
 
-void ClientApp::handleClientDisconnected()
+void ClientApp::handleClientDisconnected(Session &session)
 {
-  m_retryCount = 0;
-  LOG_DEBUG("disconnected from server");
-  ipcSendConnectionState(deskflow::core::ConnectionState::Disconnected);
-  if (!m_suspended) {
-    scheduleClientRestart(retryTime());
-  }
+  session.retryCount = 0;
+  LOG_DEBUG("disconnected from server \"%s\"", qPrintable(session.label));
+  setState(session, deskflow::core::ConnectionState::Disconnected);
+  scheduleRestart(session, retryTime(session.retryCount));
 }
 
-Client *ClientApp::openClient(const std::string &name, const NetworkAddress &address, deskflow::Computer *computer)
+Client *ClientApp::openClient(Session &session)
 {
-  auto *client = new Client(getEvents(), name, address, getSocketFactory(), computer);
-
-  try {
-    getEvents()->addHandler(EventTypes::ClientConnected, client->getEventTarget(), [this](const auto &) {
-      handleClientConnected();
-    });
-    getEvents()->addHandler(EventTypes::ClientConnectionFailed, client->getEventTarget(), [this](const auto &e) {
-      handleClientFailed(e);
-    });
-    getEvents()->addHandler(EventTypes::ClientConnectionRefused, client->getEventTarget(), [this](const auto &e) {
-      handleClientRefused(e);
-    });
-    getEvents()->addHandler(EventTypes::ClientDisconnected, client->getEventTarget(), [this](const auto &) {
-      handleClientDisconnected();
-    });
-
-  } catch (std::bad_alloc &ba) {
-    delete client;
-    throw ba;
-  }
-
+  auto *client = new Client(
+      getEvents(), Settings::value(Settings::Core::ComputerName).toString().toStdString(),
+      session.addresses[session.currentServerIndex], getSocketFactory(), m_hub.get()
+  );
+  using enum EventTypes;
+  auto *target = client->getEventTarget();
+  auto *events = getEvents();
+  events->addHandler(ClientConnected, target, [this, &session](const auto &) { handleClientConnected(session); });
+  events->addHandler(ClientConnectionFailed, target, [this, &session](const auto &e) {
+    handleClientFailed(session, e);
+  });
+  events->addHandler(ClientConnectionRefused, target, [this, &session](const auto &e) {
+    handleClientRefused(session, e);
+  });
+  events->addHandler(ClientDisconnected, target, [this, &session](const auto &) { handleClientDisconnected(session); });
   return client;
 }
 
-void ClientApp::closeClient(Client *client)
+void ClientApp::closeClient(Session &session)
 {
-  if (client == nullptr) {
+  cancelRestart(session);
+  if (session.client == nullptr) {
     return;
   }
   using enum EventTypes;
-  auto *target = client->getEventTarget();
+  auto *target = session.client->getEventTarget();
   getEvents()->removeHandler(ClientConnected, target);
   getEvents()->removeHandler(ClientConnectionFailed, target);
   getEvents()->removeHandler(ClientConnectionRefused, target);
   getEvents()->removeHandler(ClientDisconnected, target);
-  delete client;
+  delete session.client;
+  session.client = nullptr;
+}
+
+void ClientApp::connectSession(Session &session)
+{
+  if (session.client == nullptr || session.stopped) {
+    return;
+  }
+  session.client->setServerAddress(session.addresses[session.currentServerIndex]);
+  if (!session.client->isConnected()) {
+    setState(session, deskflow::core::ConnectionState::Connecting);
+  }
+  session.client->connect(session.lastAddressIndex);
 }
 
 bool ClientApp::startClient()
 {
-  deskflow::Computer *clientComputer = nullptr;
-  try {
-    if (m_clientComputer == nullptr) {
-      clientComputer = openClientComputer();
-      m_client = openClient(
-          Settings::value(Settings::Core::ComputerName).toString().toStdString(), getCurrentServerAddress(),
-          clientComputer
-      );
-      m_clientComputer = clientComputer;
-      LOG_INFO("started client");
-    }
-
-    m_client->setServerAddress(getCurrentServerAddress());
-    m_client->connect(m_lastServerAddressIndex);
-
-    return true;
-  } catch (X11DisplayUnavailableException &e) {
-    LOG_WARN("secondary computer unavailable: %s", e.what());
-    closeClientComputer(clientComputer);
-  } catch (DisplayOpenFailureException &e) {
-    LOG_CRIT("failed to start client: %s", e.what());
-    closeClientComputer(clientComputer);
-    m_retryCount = 0;
-    return false;
-  } catch (BaseException &e) {
-    LOG_CRIT("failed to start client: %s", e.what());
-    closeClientComputer(clientComputer);
-    m_retryCount = 0;
+  if (m_sessions.empty()) {
+    LOG_CRIT("failed to start client: no server address configured");
     return false;
   }
 
-  scheduleClientRestart(retryTime());
+  if (m_clientComputer == nullptr) {
+    deskflow::Computer *clientComputer = nullptr;
+    try {
+      clientComputer = openClientComputer();
+      m_hub = std::make_unique<deskflow::client::ClientHub>(
+          getEvents(), clientComputer, Settings::value(Settings::Core::ComputerName).toString().toStdString()
+      );
+      m_hub->setControlChangedHandler([this] { publishStates(); });
+      m_clientComputer = clientComputer;
+      for (const auto &session : m_sessions) {
+        session->client = openClient(*session);
+      }
+      LOG_INFO("started client");
+    } catch (X11DisplayUnavailableException &e) {
+      LOG_WARN("secondary computer unavailable: %s", e.what());
+      m_hub.reset();
+      closeClientComputer(clientComputer);
+      m_clientComputer = nullptr;
+      scheduleComputerRestart();
+      return true;
+    } catch (DisplayOpenFailureException &e) {
+      LOG_CRIT("failed to start client: %s", e.what());
+      m_hub.reset();
+      closeClientComputer(clientComputer);
+      m_clientComputer = nullptr;
+      return false;
+    } catch (BaseException &e) {
+      LOG_CRIT("failed to start client: %s", e.what());
+      m_hub.reset();
+      closeClientComputer(clientComputer);
+      m_clientComputer = nullptr;
+      return false;
+    }
+  }
+
+  for (const auto &session : m_sessions) {
+    connectSession(*session);
+  }
   return true;
 }
 
 void ClientApp::stopClient()
 {
-  closeClient(m_client);
+  // clients first: they hand the computer back to the hub, which must outlive them
+  for (const auto &session : m_sessions) {
+    closeClient(*session);
+    session->retryCount = 0;
+  }
+  m_hub.reset();
   closeClientComputer(m_clientComputer);
-  m_client = nullptr;
   m_clientComputer = nullptr;
-  m_retryCount = 0;
+}
+
+void ClientApp::setState(Session &session, deskflow::core::ConnectionState state)
+{
+  session.state = state;
+  publishStates();
+}
+
+void ClientApp::publishStates()
+{
+  using deskflow::core::ConnectionState;
+
+  // overall: connected if any server is, else connecting if any is trying
+  auto overall = ConnectionState::Disconnected;
+  QJsonArray servers;
+  const Client *controller = m_hub != nullptr ? m_hub->controller() : nullptr;
+  for (const auto &session : m_sessions) {
+    if (session->state == ConnectionState::Connected) {
+      overall = ConnectionState::Connected;
+    } else if (session->state == ConnectionState::Connecting && overall != ConnectionState::Connected) {
+      overall = ConnectionState::Connecting;
+    }
+    QJsonObject server;
+    server["host"] = session->label;
+    server["state"] = static_cast<int>(session->state);
+    server["control"] = controller != nullptr && controller == session->client;
+    servers.append(server);
+  }
+
+  if (!m_publishedOnce || overall != m_publishedState) {
+    m_publishedOnce = true;
+    m_publishedState = overall;
+    ipcSendConnectionState(overall);
+  }
+
+  QJsonObject payload;
+  payload["servers"] = servers;
+  ipcSendToClient(deskflow::ipc::kServers, deskflow::ipc::encodePayload(payload));
 }
 
 int ClientApp::mainLoop()
@@ -357,19 +472,14 @@ int ClientApp::runInner(StartupFunc startup)
   return result;
 }
 
-NetworkAddress &ClientApp::getCurrentServerAddress()
+void ClientApp::tryNextServer(Session &session)
 {
-  if (m_serverAddresses.isEmpty()) {
-    throw std::runtime_error("No server addresses configured");
-  }
-  return m_serverAddresses[m_currentServerIndex];
-}
-
-void ClientApp::tryNextServer()
-{
-  if (m_serverAddresses.size() > 1) {
-    m_currentServerIndex = (m_currentServerIndex + 1) % m_serverAddresses.size();
-    LOG_DEBUG("switching to server %zu of %zu", m_currentServerIndex + 1, m_serverAddresses.size());
+  if (session.addresses.size() > 1) {
+    session.currentServerIndex = (session.currentServerIndex + 1) % session.addresses.size();
+    LOG_DEBUG(
+        "switching to server %zu of %zu", static_cast<size_t>(session.currentServerIndex + 1),
+        static_cast<size_t>(session.addresses.size())
+    );
   }
 }
 
@@ -388,19 +498,19 @@ ISocketFactory *ClientApp::getSocketFactory() const
   return new TCPSocketFactory(getEvents(), getSocketMultiplexer());
 }
 
-double ClientApp::retryTime() const
+double ClientApp::retryTime(uint retryCount)
 {
-  if (!Settings::value(Settings::Client::DynamicConnectionRetry).toBool() || m_retryCount < 300) // 5 minutes
+  if (!Settings::value(Settings::Client::DynamicConnectionRetry).toBool() || retryCount < 300) // 5 minutes
     return 1;
-  if (m_retryCount < 360) // 5 minutes
+  if (retryCount < 360) // 5 minutes
     return 5;
-  if (m_retryCount < 390) // 5 minutes
+  if (retryCount < 390) // 5 minutes
     return 10;
-  if (m_retryCount < 410) // 10 minutes
+  if (retryCount < 410) // 10 minutes
     return 30;
-  if (m_retryCount < 420) // 10 minutes
+  if (retryCount < 420) // 10 minutes
     return 60;
-  if (m_retryCount < 430) // 20 minutes
+  if (retryCount < 430) // 20 minutes
     return 120;
   return 300;
 }

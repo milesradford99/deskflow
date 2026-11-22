@@ -9,9 +9,12 @@
 
 #include "deskflow/IClient.h"
 
+#include <QStringList>
+
 namespace deskflow {
 class IStream;
-}
+struct FileTransferMessage;
+} // namespace deskflow
 
 //! Generic proxy for client or primary
 class BaseClientProxy : public IClient
@@ -78,6 +81,16 @@ public:
   void setOptions(const OptionsList &options) override = 0;
   virtual void sendDragInfo(uint32_t fileCount, const char *info, size_t size) = 0;
   virtual void fileChunkSending(uint8_t mark, char *data, size_t dataSize) = 0;
+  //! Queue a file transfer message for this client; false if it can't take one (protocol < 1.9).
+  virtual bool sendFileTransferMessage(const deskflow::FileTransferMessage &)
+  {
+    return false;
+  }
+  //! Tell the client which computers it can send files to.
+  virtual void sendFilePeers(const QStringList &)
+  {
+    // only clients speaking protocol 1.9 or later care
+  }
   virtual std::string getSecureInputApp() const = 0;
   virtual void secureInputNotification(const std::string &app) const = 0;
   std::string getName() const override;

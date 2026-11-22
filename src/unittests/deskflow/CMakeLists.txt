@@ -14,6 +14,22 @@ create_test(
 )
 
 create_test(
+  NAME ClipboardImageTests
+  DEPENDS app
+  LIBS arch base io Qt6::Gui ${extra_libs}
+  SOURCE ClipboardImageTests.cpp
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/deskflow"
+)
+
+create_test(
+  NAME FileTransferTests
+  DEPENDS app
+  LIBS arch base io ${extra_libs}
+  SOURCE FileTransferTests.cpp
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/deskflow"
+)
+
+create_test(
   NAME ClipboardChunksTests
   DEPENDS app
   LIBS arch base io ${extra_libs}
@@ -26,6 +42,14 @@ create_test(
   DEPENDS app
   LIBS arch base ${extra_libs}
   SOURCE IKeyStateTests.cpp
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/deskflow"
+)
+
+create_test(
+  NAME KeyDisplayTests
+  DEPENDS app
+  LIBS arch base ${extra_libs}
+  SOURCE KeyDisplayTests.cpp
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lib/deskflow"
 )
 
