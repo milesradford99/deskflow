@@ -9,6 +9,7 @@
 #include "deskflow/KeyDisplay.h"
 
 using deskflow::formatKeyForDisplay;
+using deskflow::isModifierKey;
 
 void KeyDisplayTests::plainCharacter_isText()
 {
@@ -87,6 +88,17 @@ void KeyDisplayTests::deadKey_isHidden()
 {
   QVERIFY(formatKeyForDisplay(kKeyDeadAcute, 0).label.isEmpty());
   QVERIFY(formatKeyForDisplay(kKeyNone, 0).label.isEmpty());
+}
+
+void KeyDisplayTests::modifierKeys_areDetected()
+{
+  QVERIFY(isModifierKey(kKeyMeta_L));
+  QVERIFY(isModifierKey(kKeyShift_R));
+  QVERIFY(isModifierKey(kKeyControl_L));
+  QVERIFY(isModifierKey(kKeyAltGr));
+  QVERIFY(!isModifierKey('c'));
+  QVERIFY(!isModifierKey(kKeyReturn));
+  QVERIFY(!isModifierKey(kKeyNone));
 }
 
 QTEST_MAIN(KeyDisplayTests)

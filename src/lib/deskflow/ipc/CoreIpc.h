@@ -33,6 +33,14 @@ void ipcSendActivity(const QString &type, const QStringList &fields = {});
  */
 void ipcSendKeyPress(KeyID id, KeyModifierMask mask);
 
+/**
+ * @brief Report a key release to the overlay.
+ *
+ * A modifier pressed on its own is only shown once it is released with no other key
+ * pressed in between, so a shortcut like Cmd+C shows a single `Cmd+C` and not `Cmd` first.
+ */
+void ipcSendKeyRelease(KeyID id);
+
 //! Whether a connected GUI currently wants key presses (toggled by the `overlayKeys` ipc command).
 bool ipcKeyOverlayEnabled();
 void ipcSetKeyOverlayEnabled(bool enabled);

@@ -22,4 +22,5 @@ private Q_SLOTS:
   void specialKeys_haveFriendlyNames();
   void lockModifiers_areIgnored();
   void deadKey_isHidden();
+  void modifierKeys_areDetected();
 };

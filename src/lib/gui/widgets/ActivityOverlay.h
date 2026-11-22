@@ -18,8 +18,9 @@ class QTimer;
 /**
  * @brief Translucent always-on-top overlay showing key presses and deskflow activity.
  *
- * Similar to screencast key viewers: dark rounded bubbles near the bottom of the screen
- * that fade out after a moment. Mouse input passes through and it never takes focus.
+ * Similar to screencast key viewers: dark rounded bubbles in the top-right corner of the
+ * screen that fade out after a moment. Each key press is its own small bubble in one row,
+ * activity events stack underneath. Mouse input passes through and it never takes focus.
  * Nothing shown here is written to the log.
  */
 class ActivityOverlay : public QWidget
@@ -54,7 +55,7 @@ public:
   /**
    * @brief Show a key press.
    * @param label Text from the core, e.g. `a`, `Ctrl+C`, `↵`.
-   * @param isText Plain typing, joined with the previous presses into one bubble.
+   * @param isText Plain typing. Never merged; only repeated shortcuts collapse into `×N`.
    */
   void addKey(const QString &label, bool isText);
 
@@ -92,13 +93,14 @@ private:
     qint64 lastUpdate = 0;
     qint64 lifetime = 0;
     int repeat = 1;
-    bool joinable = false;
+    bool isText = false;
   };
 
   void push(Entry entry);
   void tick();
   void reposition();
   qint64 now() const;
+  static qreal opacityFor(const Entry &entry, qint64 t);
   static QColor accentFor(Kind kind);
   static QString glyphFor(Kind kind);
 

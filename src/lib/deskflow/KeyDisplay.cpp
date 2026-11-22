@@ -151,6 +151,11 @@ bool isPrintable(KeyID id)
 
 } // namespace
 
+bool isModifierKey(KeyID id)
+{
+  return modifierForKey(id) != 0;
+}
+
 KeyDisplay formatKeyForDisplay(KeyID id, KeyModifierMask mask)
 {
   // Locks are state, not part of a chord.

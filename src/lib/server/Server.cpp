@@ -1687,6 +1687,9 @@ void Server::onKeyUp(KeyID id, KeyModifierMask mask, KeyButton button, const cha
   LOG_VERBOSE("onKeyUp id=%d mask=0x%04x button=0x%04x", id, mask, button);
   assert(m_active != nullptr);
 
+  // only shows a lone modifier that ipcSendKeyPress held back, so no forwarding check is needed
+  ipcSendKeyRelease(id);
+
   // relay
   if (!m_keyboardBroadcasting && IKeyState::KeyInfo::isDefault(computers)) {
     m_active->keyUp(id, mask, button);

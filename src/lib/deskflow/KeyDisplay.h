@@ -33,4 +33,7 @@ struct KeyDisplay
  */
 KeyDisplay formatKeyForDisplay(KeyID id, KeyModifierMask mask);
 
+//! True for Shift, Ctrl, Alt, Meta/Cmd, Super and AltGr key ids.
+bool isModifierKey(KeyID id);
+
 } // namespace deskflow

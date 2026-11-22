@@ -15,19 +15,21 @@
 #include <QTimer>
 
 namespace {
-constexpr auto kMaxEntries = 6;
-constexpr auto kMaxTextLength = 40;
-constexpr qint64 kKeyLifetime = 1800;
+// Keys are a single row of small bubbles, one per press, newest on the right.
+// Activity events stack underneath it. Everything is anchored to the top-right corner.
+constexpr auto kMaxKeyEntries = 8;
+constexpr auto kMaxActivityEntries = 4;
+constexpr qint64 kKeyLifetime = 1100;
 constexpr qint64 kActivityLifetime = 3500;
-constexpr qint64 kJoinWindow = 1500;
-constexpr qint64 kRepeatWindow = 1000;
-constexpr qint64 kFadeIn = 120;
-constexpr qint64 kFadeOut = 400;
-constexpr auto kKeyPixelSize = 28;
-constexpr auto kActivityPixelSize = 18;
-constexpr auto kPadding = 14;
-constexpr auto kSpacing = 8;
-constexpr auto kRadius = 12;
+constexpr qint64 kRepeatWindow = 800;
+constexpr qint64 kFadeIn = 80;
+constexpr qint64 kFadeOut = 300;
+constexpr auto kKeyPixelSize = 22;
+constexpr auto kActivityPixelSize = 16;
+constexpr auto kPadding = 12;
+constexpr auto kSpacing = 6;
+constexpr auto kRadius = 10;
+constexpr auto kScreenMargin = 24;
 constexpr auto kBackgroundAlpha = 190;
 } // namespace
 
@@ -76,33 +78,25 @@ void ActivityOverlay::addKey(const QString &label, bool isText)
     return;
 
   const auto t = now();
-  // Short glyph keys (↵, ⌫, arrows) read naturally inline with typed text.
-  const bool joinable = isText || label.size() == 1;
 
-  if (!m_entries.isEmpty()) {
-    auto &last = m_entries.last();
-    if (last.kind == Kind::Keys && t - last.lastUpdate < kJoinWindow) {
-      if (joinable && last.joinable) {
-        last.text += label;
-        if (last.text.size() > kMaxTextLength)
-          last.text = QStringLiteral("…") + last.text.right(kMaxTextLength - 1);
-        last.lastUpdate = t;
-        update();
-        return;
-      }
-      if (!joinable && !last.joinable && last.text == label && t - last.lastUpdate < kRepeatWindow) {
-        ++last.repeat;
-        last.lastUpdate = t;
-        update();
-        return;
-      }
+  // The same shortcut pressed again quickly (Cmd+Z, Cmd+Z...) counts up instead of
+  // filling the row. Typed characters are never merged: each one is its own bubble.
+  for (auto it = m_entries.rbegin(); it != m_entries.rend(); ++it) {
+    if (it->kind != Kind::Keys)
+      continue;
+    if (!isText && !it->isText && it->text == label && t - it->lastUpdate < kRepeatWindow) {
+      ++it->repeat;
+      it->lastUpdate = t;
+      update();
+      return;
     }
+    break;
   }
 
   Entry entry;
   entry.kind = Kind::Keys;
   entry.text = label;
-  entry.joinable = joinable;
+  entry.isText = isText;
   entry.lifetime = kKeyLifetime;
   push(entry);
 }
@@ -211,9 +205,24 @@ void ActivityOverlay::push(Entry entry)
   const auto t = now();
   entry.created = t;
   entry.lastUpdate = t;
+  const bool isKeys = entry.kind == Kind::Keys;
   m_entries.append(entry);
-  while (m_entries.size() > kMaxEntries)
-    m_entries.removeFirst();
+
+  // Drop the oldest entries of the same group (keys or activity) beyond its limit.
+  const int limit = isKeys ? kMaxKeyEntries : kMaxActivityEntries;
+  int count = 0;
+  for (const auto &e : std::as_const(m_entries)) {
+    if ((e.kind == Kind::Keys) == isKeys)
+      ++count;
+  }
+  for (auto it = m_entries.begin(); count > limit && it != m_entries.end();) {
+    if ((it->kind == Kind::Keys) == isKeys) {
+      it = m_entries.erase(it);
+      --count;
+    } else {
+      ++it;
+    }
+  }
 
   if (!isVisible()) {
     reposition();
@@ -247,10 +256,10 @@ void ActivityOverlay::reposition()
     return;
 
   const auto area = screen->availableGeometry();
-  const int width = qMin(900, area.width() * 4 / 5);
-  const int height = kMaxEntries * (kKeyPixelSize * 2 + kSpacing);
-  const int x = area.x() + (area.width() - width) / 2;
-  const int y = area.y() + area.height() - height - area.height() / 10;
+  const int width = qMin(720, area.width() * 3 / 5);
+  const int height = (kKeyPixelSize * 2 + kSpacing) + kMaxActivityEntries * (kActivityPixelSize * 2 + kSpacing);
+  const int x = area.x() + area.width() - width - kScreenMargin;
+  const int y = area.y() + kScreenMargin;
   setGeometry(x, y, width, height);
 }
 
@@ -297,6 +306,18 @@ QString ActivityOverlay::glyphFor(Kind kind)
   }
 }
 
+qreal ActivityOverlay::opacityFor(const Entry &entry, qint64 t)
+{
+  qreal opacity = 1.0;
+  const auto age = t - entry.created;
+  const auto remaining = entry.lifetime - (t - entry.lastUpdate);
+  if (age < kFadeIn)
+    opacity = qreal(age) / kFadeIn;
+  if (remaining < kFadeOut)
+    opacity = qMin(opacity, qMax<qreal>(0, qreal(remaining) / kFadeOut));
+  return opacity;
+}
+
 void ActivityOverlay::paintEvent(QPaintEvent *)
 {
   QPainter painter(this);
@@ -310,60 +331,80 @@ void ActivityOverlay::paintEvent(QPaintEvent *)
   activityFont.setPixelSize(kActivityPixelSize);
 
   const auto t = now();
-  int bottom = height();
 
-  // newest at the bottom, older ones stacked above
-  for (auto it = m_entries.crbegin(); it != m_entries.crend(); ++it) {
-    const auto &entry = *it;
-    const bool isKeys = entry.kind == Kind::Keys;
-
-    qreal opacity = 1.0;
-    const auto age = t - entry.created;
-    const auto remaining = entry.lifetime - (t - entry.lastUpdate);
-    if (age < kFadeIn)
-      opacity = qreal(age) / kFadeIn;
-    if (remaining < kFadeOut)
-      opacity = qMin(opacity, qMax<qreal>(0, qreal(remaining) / kFadeOut));
-
-    QString text = entry.text;
-    if (entry.repeat > 1 && !entry.joinable)
-      text += QStringLiteral("  ×%1").arg(entry.repeat);
-
-    const QFont &textFont = isKeys ? keyFont : activityFont;
-    const QFontMetrics fm(textFont);
-    const QString glyph = glyphFor(entry.kind);
-    const int glyphWidth = glyph.isEmpty() ? 0 : fm.horizontalAdvance(glyph) + kPadding / 2;
-    const int maxTextWidth = width() - 2 * kPadding - glyphWidth;
-    text = fm.elidedText(text, Qt::ElideLeft, maxTextWidth);
-
-    const int bubbleWidth = fm.horizontalAdvance(text) + glyphWidth + 2 * kPadding;
-    const int bubbleHeight = fm.height() + kPadding;
-    const QRect bubble((width() - bubbleWidth) / 2, bottom - bubbleHeight, bubbleWidth, bubbleHeight);
-    if (bubble.top() < 0)
-      break;
-
+  const auto drawBubble = [&painter](const QRect &bubble, qreal opacity) {
     painter.setOpacity(opacity);
     QPainterPath path;
     path.addRoundedRect(bubble, kRadius, kRadius);
     painter.fillPath(path, QColor(0, 0, 0, kBackgroundAlpha));
+  };
+
+  // Row of key bubbles along the top edge, newest at the right.
+  const QFontMetrics keyMetrics(keyFont);
+  const int keyHeight = keyMetrics.height() + kPadding;
+  int right = width();
+  bool hasKeys = false;
+  painter.setFont(keyFont);
+  for (auto it = m_entries.crbegin(); it != m_entries.crend(); ++it) {
+    if (it->kind != Kind::Keys)
+      continue;
+    hasKeys = true;
+
+    QString text = it->text;
+    if (it->repeat > 1)
+      text += QStringLiteral(" ×%1").arg(it->repeat);
+    text = keyMetrics.elidedText(text, Qt::ElideLeft, width() - 2 * kPadding);
+
+    const int bubbleWidth = qMax(keyHeight, keyMetrics.horizontalAdvance(text) + 2 * kPadding);
+    const QRect bubble(right - bubbleWidth, 0, bubbleWidth, keyHeight);
+    if (bubble.left() < 0)
+      break;
+
+    drawBubble(bubble, opacityFor(*it, t));
+    painter.setPen(Qt::white);
+    painter.drawText(bubble, Qt::AlignCenter, text);
+    right = bubble.left() - kSpacing;
+  }
+
+  // Activity events underneath, newest first, right-aligned.
+  const QFontMetrics activityMetrics(activityFont);
+  int top = hasKeys ? keyHeight + kSpacing : 0;
+  painter.setFont(activityFont);
+  for (auto it = m_entries.crbegin(); it != m_entries.crend(); ++it) {
+    if (it->kind == Kind::Keys)
+      continue;
+
+    QString text = it->text;
+    if (it->repeat > 1)
+      text += QStringLiteral("  ×%1").arg(it->repeat);
+
+    const QString glyph = glyphFor(it->kind);
+    const int glyphWidth = glyph.isEmpty() ? 0 : activityMetrics.horizontalAdvance(glyph) + kPadding / 2;
+    text = activityMetrics.elidedText(text, Qt::ElideRight, width() - 2 * kPadding - glyphWidth);
+
+    const int bubbleWidth = activityMetrics.horizontalAdvance(text) + glyphWidth + 2 * kPadding;
+    const int bubbleHeight = activityMetrics.height() + kPadding;
+    const QRect bubble(width() - bubbleWidth, top, bubbleWidth, bubbleHeight);
+    if (bubble.bottom() > height())
+      break;
+
+    drawBubble(bubble, opacityFor(*it, t));
 
     int textX = bubble.left() + kPadding;
     if (!glyph.isEmpty()) {
-      painter.setFont(textFont);
-      painter.setPen(accentFor(entry.kind));
+      painter.setPen(accentFor(it->kind));
       painter.drawText(
           QRect(textX, bubble.top(), glyphWidth, bubble.height()), Qt::AlignLeft | Qt::AlignVCenter, glyph
       );
       textX += glyphWidth;
     }
 
-    painter.setFont(textFont);
     painter.setPen(Qt::white);
     painter.drawText(
         QRect(textX, bubble.top(), bubble.right() - textX - kPadding + 1, bubble.height()),
         Qt::AlignLeft | Qt::AlignVCenter, text
     );
 
-    bottom = bubble.top() - kSpacing;
+    top = bubble.bottom() + 1 + kSpacing;
   }
 }
