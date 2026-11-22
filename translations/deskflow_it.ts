@@ -136,6 +136,65 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ActivityOverlay</name>
+    <message>
+        <source>Control: %1 → %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control moved to this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control left this computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard from %1 shared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor locked to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor unlocked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected to server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ClientConfigDialog</name>
     <message>
         <source>Client Configuration</source>
@@ -1376,6 +1435,22 @@ L&apos;abilitazione di questa impostazione disabiliterà l&apos;interfaccia graf
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">Rimuovi tutte le impostazioni</translation>
+    </message>
+    <message>
+        <source>Activity overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys typed through Deskflow appear in a translucent bubble on screen. They are never logged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show key presses sent through Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show events: switching computers, clipboard sharing, connections</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
