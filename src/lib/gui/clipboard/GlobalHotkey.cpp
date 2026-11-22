@@ -49,7 +49,7 @@ quint32 nativeKeycode(Qt::Key key)
     return *it;
 
   if (key < 0x100) {
-    const SHORT scan = VkKeyScanW(wchar_t(QChar(key).toLower().unicode()));
+    const SHORT scan = VkKeyScanW(wchar_t(QChar(char16_t(key)).toLower().unicode()));
     if (scan != -1)
       return LOBYTE(scan);
   }
@@ -211,7 +211,7 @@ Display *x11Display()
 KeySym keysymFor(Qt::Key key)
 {
   if (key >= 0x20 && key <= 0xff)
-    return KeySym(QChar(key).toLower().unicode());
+    return KeySym(QChar(char16_t(key)).toLower().unicode());
   if (key >= Qt::Key_F1 && key <= Qt::Key_F35)
     return XK_F1 + (key - Qt::Key_F1);
 
