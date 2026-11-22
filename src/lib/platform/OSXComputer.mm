@@ -74,6 +74,7 @@ std::string getProcessName(int pid);
 void setZeroSuppressionInterval();
 void avoidSupression();
 void logCursorVisibility();
+bool isCursorVisible();
 void avoidHesitatingCursor();
 
 //
@@ -641,19 +642,44 @@ void OSXComputer::fakeMouseWheel(ScrollDelta delta) const
   }
 }
 
+namespace {
+// While off this computer, check this often that the cursor is still hidden.
+constexpr double kCursorCheckInterval = 0.25;
+// Upper bound on re-hides, in case the system keeps reporting a visible cursor.
+constexpr int kMaxCursorHideCount = 8;
+
+void setsCursorInBackground()
+{
+  CFStringRef propertyString = CFStringCreateWithCString(nullptr, "SetsCursorInBackground", kCFStringEncodingMacRoman);
+  CGSSetConnectionProperty(_CGSDefaultConnection(), _CGSDefaultConnection(), propertyString, kCFBooleanTrue);
+  CFRelease(propertyString);
+}
+} // namespace
+
 void OSXComputer::showCursor()
 {
   LOG_DEBUG("showing cursor");
 
-  CFStringRef propertyString = CFStringCreateWithCString(nullptr, "SetsCursorInBackground", kCFStringEncodingMacRoman);
+  if (m_cursorTimer != nullptr) {
+    m_events->removeHandler(EventTypes::Timer, m_cursorTimer);
+    m_events->deleteTimer(m_cursorTimer);
+    m_cursorTimer = nullptr;
+  }
 
-  CGSSetConnectionProperty(_CGSDefaultConnection(), _CGSDefaultConnection(), propertyString, kCFBooleanTrue);
+  setsCursorInBackground();
 
-  CFRelease(propertyString);
-
-  CGError error = CGDisplayShowCursor(m_displayID);
-  if (error != kCGErrorSuccess) {
-    LOG_ERR("failed to show cursor, error=%d", error);
+  // Hide and show are counted by the system: undo exactly the hides we did. An extra
+  // hide (e.g. leaving twice) used to leave the cursor stuck, and an extra show let a
+  // later hide do nothing, so the cursor stayed visible on two computers at once.
+  if (m_cursorHideCount == 0 && !isCursorVisible()) {
+    // hidden by something else; one show is what this always did
+    m_cursorHideCount = 1;
+  }
+  while (m_cursorHideCount > 0) {
+    if (const CGError error = CGDisplayShowCursor(m_displayID); error != kCGErrorSuccess) {
+      LOG_ERR("failed to show cursor, error=%d", error);
+    }
+    --m_cursorHideCount;
   }
 
   // appears to fix "mouse randomly not showing" bug
@@ -668,23 +694,38 @@ void OSXComputer::hideCursor()
 {
   LOG_DEBUG("hiding cursor");
 
-  CFStringRef propertyString = CFStringCreateWithCString(nullptr, "SetsCursorInBackground", kCFStringEncodingMacRoman);
+  setsCursorInBackground();
 
-  CGSSetConnectionProperty(_CGSDefaultConnection(), _CGSDefaultConnection(), propertyString, kCFBooleanTrue);
-
-  CFRelease(propertyString);
-
-  CGError error = CGDisplayHideCursor(m_displayID);
-  if (error != kCGErrorSuccess) {
-    LOG_ERR("failed to hide cursor, error=%d", error);
+  if (m_cursorHideCount == 0) {
+    if (const CGError error = CGDisplayHideCursor(m_displayID); error != kCGErrorSuccess) {
+      LOG_ERR("failed to hide cursor, error=%d", error);
+    } else {
+      ++m_cursorHideCount;
+    }
   }
 
   // appears to fix "mouse randomly not hiding" bug
   CGAssociateMouseAndMouseCursorPosition(true);
 
-  logCursorVisibility();
-
   m_cursorHidden = true;
+
+  // macOS shows the cursor again on some occasions (another app setting the cursor,
+  // display changes, Mission Control...), so keep checking while we are away.
+  if (m_cursorTimer == nullptr) {
+    m_cursorTimer = m_events->newTimer(kCursorCheckInterval, nullptr);
+    m_events->addHandler(EventTypes::Timer, m_cursorTimer, [this](const auto &) { reassertHiddenCursor(); });
+  }
+}
+
+void OSXComputer::reassertHiddenCursor()
+{
+  if (!m_cursorHidden || m_cursorHideCount >= kMaxCursorHideCount || !isCursorVisible())
+    return;
+
+  LOG_DEBUG("cursor became visible while away, hiding it again");
+  setsCursorInBackground();
+  if (CGDisplayHideCursor(m_displayID) == kCGErrorSuccess)
+    ++m_cursorHideCount;
 }
 
 void OSXComputer::enable()
@@ -1916,6 +1957,11 @@ void avoidSupression()
       (kCGEventFilterMaskPermitLocalKeyboardEvents | kCGEventFilterMaskPermitSystemDefinedEvents),
       kCGEventSupressionStateRemoteMouseDrag
   );
+}
+
+bool isCursorVisible()
+{
+  return CGCursorIsVisible();
 }
 
 void logCursorVisibility()

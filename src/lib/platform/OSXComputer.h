@@ -131,6 +131,8 @@ private:
   // Added here to allow the carbon cursor hack to be called.
   void showCursor();
   void hideCursor();
+  //! macOS can show a hidden cursor again behind our back; hide it again if so.
+  void reassertHiddenCursor();
 
   // map deskflow mouse button to mac buttons
   ButtonID mapDeskflowButtonToMac(uint16_t) const;
@@ -251,6 +253,9 @@ private:
   std::vector<MouseButtonEventMapType> MouseButtonEventMap;
 
   bool m_cursorHidden;
+  //! CGDisplayHideCursor calls not yet undone; the system keeps a count, so they must balance.
+  int m_cursorHideCount = 0;
+  EventQueueTimer *m_cursorTimer = nullptr;
 
   // keyboard stuff
   OSXKeyState *m_keyState;

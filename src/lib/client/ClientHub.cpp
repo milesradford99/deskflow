@@ -341,7 +341,10 @@ void ClientHub::enterComputer(InputArbiter::SessionId id, int32_t x, int32_t y, 
   const bool changed = m_entered != id;
   m_entered = id;
   m_computer->mouseMove(x, y);
-  m_computer->enter(mask);
+  // the same server entering again (e.g. after wrapping around) only moves the cursor:
+  // entering twice would show the cursor twice, and one leave would no longer hide it
+  if (changed)
+    m_computer->enter(mask);
   if (changed && m_controlChanged)
     m_controlChanged();
 }
