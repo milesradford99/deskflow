@@ -14,6 +14,7 @@
 #include "deskflow/Computer.h"
 #include "deskflow/FileTransfer.h"
 #include "deskflow/FileTransferIpc.h"
+#include "deskflow/ipc/CoreIpc.h"
 
 namespace deskflow::client {
 
@@ -173,8 +174,11 @@ void ClientHub::leave(Client *client)
 
 void ClientHub::keyDown(Client *client, KeyID id, KeyModifierMask mask, KeyButton button, const std::string &lang)
 {
-  if (m_arbiter.input(idOf(client)))
+  if (m_arbiter.input(idOf(client))) {
+    // only keys that actually reach this computer, not those of a server that isn't in control
+    ipcSendKeyPress(id, mask);
     m_computer->keyDown(id, mask, button, lang);
+  }
 }
 
 void ClientHub::keyRepeat(
@@ -187,8 +191,10 @@ void ClientHub::keyRepeat(
 
 void ClientHub::keyUp(Client *client, KeyID id, KeyModifierMask mask, KeyButton button)
 {
-  if (m_arbiter.input(idOf(client), false))
+  if (m_arbiter.input(idOf(client), false)) {
+    ipcSendKeyRelease(id);
     m_computer->keyUp(id, mask, button);
+  }
 }
 
 void ClientHub::mouseDown(Client *client, ButtonID id)

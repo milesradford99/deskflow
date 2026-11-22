@@ -175,8 +175,11 @@ public:
   bool requestOffer(const Offer &offer);
   //@}
 
-  static constexpr int kChunkSize = 64 * 1024; //!< bytes of stream per Data message
-  static constexpr uint32_t kWindow = 16;      //!< most Data messages in flight
+  // File data shares the connection with keyboard and mouse events, so at most
+  // kChunkSize * kWindow (128 KiB) is queued ahead of them: about 10 ms on a 100 Mbit/s
+  // link. Larger windows transfer faster on slow links but make the cursor lag meanwhile.
+  static constexpr int kChunkSize = 16 * 1024; //!< bytes of stream per Data message
+  static constexpr uint32_t kWindow = 8;       //!< most Data messages in flight
   static constexpr uint32_t kAckEvery = 4;     //!< receiver acknowledges every N Data messages
   static constexpr quint32 kMaxRecordHeader = 64 * 1024;
   //! Offers stop measuring a folder after this many entries and report an unknown (huge) size.

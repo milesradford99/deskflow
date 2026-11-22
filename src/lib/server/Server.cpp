@@ -1659,8 +1659,10 @@ void Server::onKeyDown(KeyID id, KeyModifierMask mask, KeyButton button, const s
   LOG_VERBOSE("onKeyDown id=%d mask=0x%04x button=0x%04x lang=%s", id, mask, button, lang.c_str());
   assert(m_active != nullptr);
 
-  // only keys that deskflow sends to another computer (local typing never reaches the server)
-  if (m_active != m_primaryClient || m_keyboardBroadcasting) {
+  // The overlay shows keys on the computer they are typed into: here only while this
+  // computer is in control. Keys sent to a client are shown by that client instead.
+  // (The primary only reports local typing where the platform hook sees it, e.g. macOS.)
+  if (m_active == m_primaryClient) {
     ipcSendKeyPress(id, mask);
   }
 

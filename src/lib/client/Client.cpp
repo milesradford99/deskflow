@@ -277,7 +277,6 @@ void Client::setClipboardDirty(ClipboardID, bool)
 
 void Client::keyDown(KeyID id, KeyModifierMask mask, KeyButton button, const std::string &lang)
 {
-  ipcSendKeyPress(id, mask);
   m_hub->keyDown(this, id, mask, button, lang);
 }
 
@@ -288,7 +287,6 @@ void Client::keyRepeat(KeyID id, KeyModifierMask mask, int32_t count, KeyButton 
 
 void Client::keyUp(KeyID id, KeyModifierMask mask, KeyButton button)
 {
-  ipcSendKeyRelease(id);
   m_hub->keyUp(this, id, mask, button);
 }
 
