@@ -13,6 +13,7 @@
 #include "Diagnostic.h"
 #include "StyleUtils.h"
 
+#include "clipboard/ClipboardHistory.h"
 #include "dialogs/AboutDialog.h"
 #include "dialogs/ClientConfigDialog.h"
 #include "dialogs/FingerprintDialog.h"
@@ -156,6 +157,8 @@ MainWindow::MainWindow()
   // In case of a previous crash remove first
   QLocalServer::removeServer(m_guiSocketName);
   m_guiDupeChecker->listen(m_guiSocketName);
+
+  m_clipboardHistory = new deskflow::gui::clipboard::ClipboardHistory(this, this);
 
   createMenuBar();
   setupControls();
@@ -352,7 +355,7 @@ void MainWindow::connectSlots()
   connect(m_statusBar, &StatusBar::requestUpdateVersion, this, &MainWindow::openGetNewVersionUrl);
   connect(&m_versionChecker, &VersionChecker::updateFound, m_statusBar, &StatusBar::updateFound);
 
-  connect(m_guiDupeChecker, &QLocalServer::newConnection, this, &MainWindow::showAndActivate);
+  connect(m_guiDupeChecker, &QLocalServer::newConnection, this, &MainWindow::handleInstanceConnection);
 
   connect(ui->btnEditName, &QPushButton::clicked, this, &MainWindow::showHostNameEditor);
 
@@ -407,6 +410,10 @@ void MainWindow::settingsChanged(const QString &key)
 
   if (key == Settings::Core::ComputerName)
     updateComputerName();
+
+  if (key == Settings::Core::ComputerName || key == Settings::Client::RemoteHost ||
+      key == Settings::ClipboardHistory::Enabled)
+    m_clipboardHistory->reloadSettings();
 
   if ((key == Settings::Security::Certificate) || (key == Settings::Security::KeySize) ||
       (key == Settings::Security::TlsEnabled) || (key == Settings::Security::CheckPeers)) {
@@ -773,6 +780,7 @@ void MainWindow::createMenuBar()
   m_menuEdit->addAction(m_actionSettings);
 
   m_menuView->addAction(m_logDock->toggleViewAction());
+  m_menuView->addAction(m_clipboardHistory->showAction());
 
   m_menuHelp->addAction(m_actionAbout);
   m_menuHelp->addAction(m_actionShowHelp);
@@ -794,6 +802,8 @@ void MainWindow::setupTrayIcon()
   );
   trayMenu->insertSeparator(m_actionMinimize);
   trayMenu->insertSeparator(m_actionTrayQuit);
+  trayMenu->insertAction(m_actionStartCore, m_clipboardHistory->showAction());
+  trayMenu->insertSeparator(m_actionStartCore);
   m_trayIcon->setContextMenu(trayMenu);
 
   setTrayIcon();
@@ -873,6 +883,48 @@ void MainWindow::setTrayIcon()
 void MainWindow::handleLogLine(const QString &line)
 {
   m_logDock->appendLine(line);
+  m_clipboardHistory->handleCoreLogLine(line);
+}
+
+void MainWindow::showClipboardHistory()
+{
+  m_clipboardHistory->showPopup();
+}
+
+void MainWindow::handleInstanceConnection()
+{
+  using deskflow::gui::clipboard::ClipboardHistory;
+  while (auto *socket = m_guiDupeChecker->nextPendingConnection()) {
+    // Older instances connect without sending anything, which means "show the window".
+    auto handled = std::make_shared<bool>(false);
+    auto process = [this, socket, handled](bool closing) {
+      if (*handled)
+        return;
+      if (socket->canReadLine()) {
+        *handled = true;
+        const auto command = QString::fromUtf8(socket->readLine()).trimmed();
+        if (command == ClipboardHistory::kShowCommand)
+          m_clipboardHistory->togglePopup();
+        else
+          showAndActivate();
+      } else if (closing) {
+        *handled = true;
+        showAndActivate();
+      }
+    };
+    connect(socket, &QLocalSocket::readyRead, this, [process] { process(false); });
+    connect(socket, &QLocalSocket::disconnected, this, [process, socket] {
+      process(true);
+      socket->deleteLater();
+    });
+    // The other instance may already have written and gone.
+    if (socket->state() == QLocalSocket::UnconnectedState) {
+      process(true);
+      socket->deleteLater();
+    } else if (socket->bytesAvailable() > 0) {
+      process(false);
+    }
+  }
 }
 
 void MainWindow::handleUnrecognisedClient(const QString &clientName)

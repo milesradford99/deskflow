@@ -17,6 +17,7 @@
 #include "gui/Messages.h"
 #include "gui/StyleUtils.h"
 #include "gui/Theme.h"
+#include "gui/clipboard/ClipboardHistory.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -77,12 +78,17 @@ int main(int argc, char *argv[])
   auto helpOption = QCommandLineOption({"h", "help"}, "Display Help on the command line");
   auto versionOption = QCommandLineOption({"v", "version"}, "Display version information");
   auto resetOption = QCommandLineOption("reset", "Reset all settings");
+  auto clipboardOption = QCommandLineOption(
+      deskflow::gui::clipboard::ClipboardHistory::kShowCommand,
+      "Open clipboard history (bind this to a keyboard shortcut where apps cannot register global shortcuts)"
+  );
 
   QCommandLineParser parser;
   parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
   parser.addOption(helpOption);
   parser.addOption(versionOption);
   parser.addOption(resetOption);
+  parser.addOption(clipboardOption);
   parser.parse(QCoreApplication::arguments());
 
   if (!parser.errorText().isEmpty()) {
@@ -113,13 +119,16 @@ int main(int argc, char *argv[])
 
   // If we can create 1 byte of SHM we are the only instance
   if (!sharedMemory.create(1)) {
-    // Ping the running instance to have it show itself
+    // Ping the running instance to have it show itself, or run a command
     QLocalSocket socket;
-    socket.connectToServer(shmId, QLocalSocket::ReadOnly);
+    socket.connectToServer(shmId, QLocalSocket::ReadWrite);
     if (!socket.waitForConnected()) {
       // If we can't connect to the other instance tell the user its running.
       // This should never happen but just incase we should show something
       QMessageBox::information(nullptr, kAppName, QObject::tr("%1 is already running").arg(kAppName));
+    } else if (parser.isSet(clipboardOption)) {
+      socket.write(deskflow::gui::clipboard::ClipboardHistory::kShowCommand.toUtf8() + '\n');
+      socket.waitForBytesWritten(1000);
     }
     socket.disconnectFromServer();
     return s_exitDuplicate;
@@ -154,6 +163,9 @@ int main(int argc, char *argv[])
 
   MainWindow mainWindow;
   mainWindow.open();
+
+  if (parser.isSet(clipboardOption))
+    QMetaObject::invokeMethod(&mainWindow, &MainWindow::showClipboardHistory, Qt::QueuedConnection);
 
   return QApplication::exec();
 }

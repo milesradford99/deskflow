@@ -17,3 +17,8 @@ bool isOSXInterfaceStyleDark();
 void forceAppActive();
 void macOSNativeHide();
 void installQuitHandler(std::function<bool()> shouldQuit);
+
+/// NSPasteboard change count, increments every time the general pasteboard changes.
+long macPasteboardChangeCount();
+/// True when the general pasteboard carries a concealed/transient marker (password managers).
+bool macPasteboardIsConcealed();

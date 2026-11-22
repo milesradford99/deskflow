@@ -44,6 +44,10 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace deskflow::gui::clipboard {
+class ClipboardHistory;
+}
+
 namespace deskflow::gui::ipc {
 class DaemonIpcClient;
 }
@@ -74,6 +78,7 @@ public:
     return m_coreProcess.mode();
   }
   void open();
+  void showClipboardHistory();
   ServerConfig &serverConfig()
   {
     return m_serverConfig;
@@ -172,6 +177,12 @@ private:
   void setupActivityOverlay();
   void applyActivityOverlaySettings();
 
+  /**
+   * @brief handleInstanceConnection a second instance connected, either to ask us to show
+   * ourselves or to run a command such as opening clipboard history
+   */
+  void handleInstanceConnection();
+
   inline static const auto m_guiSocketName = QStringLiteral("deskflow-gui");
   inline static const auto m_nameRegEx = QRegularExpression(QStringLiteral("^[\\w\\-_\\.]{0,255}$"));
 
@@ -226,4 +237,6 @@ private:
   QStringList m_serverStartIPs;
   QString m_serverStartSuggestedIP;
   QUrl m_helpPath;
+
+  deskflow::gui::clipboard::ClipboardHistory *m_clipboardHistory = nullptr;
 };

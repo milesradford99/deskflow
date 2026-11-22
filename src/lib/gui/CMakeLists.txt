@@ -35,6 +35,22 @@ add_library(${target} STATIC
   TlsUtility.h
   VersionChecker.cpp
   VersionChecker.h
+  clipboard/ClipboardHistory.cpp
+  clipboard/ClipboardHistory.h
+  clipboard/ClipboardHistoryDelegate.cpp
+  clipboard/ClipboardHistoryDelegate.h
+  clipboard/ClipboardHistoryFilterModel.cpp
+  clipboard/ClipboardHistoryFilterModel.h
+  clipboard/ClipboardHistoryItem.cpp
+  clipboard/ClipboardHistoryItem.h
+  clipboard/ClipboardHistoryModel.cpp
+  clipboard/ClipboardHistoryModel.h
+  clipboard/ClipboardHistoryPopup.cpp
+  clipboard/ClipboardHistoryPopup.h
+  clipboard/ClipboardMonitor.cpp
+  clipboard/ClipboardMonitor.h
+  clipboard/GlobalHotkey.cpp
+  clipboard/GlobalHotkey.h
   config/ComputerConfig.h
   config/Computer.cpp
   config/Computer.h

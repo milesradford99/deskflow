@@ -54,6 +54,15 @@ public:
     inline static const auto XdpClipboardRetried = QStringLiteral("client/xdpClipboardRetried");
     inline static const auto XdpRestoreToken = QStringLiteral("client/xdpRestoreToken");
   };
+  struct ClipboardHistory
+  {
+    inline static const auto Enabled = QStringLiteral("clipboardHistory/enabled");
+    inline static const auto IgnoreSensitive = QStringLiteral("clipboardHistory/ignoreSensitive");
+    inline static const auto MaxItems = QStringLiteral("clipboardHistory/maxItems");
+    inline static const auto Paused = QStringLiteral("clipboardHistory/paused");
+    inline static const auto Shortcut = QStringLiteral("clipboardHistory/shortcut");
+    inline static const auto SortMode = QStringLiteral("clipboardHistory/sortMode");
+  };
   struct Core
   {
     inline static const auto CoreMode = QStringLiteral("core/coreMode");
@@ -275,6 +284,7 @@ private:
   // clang-format off
   inline static const QStringList m_validGroup = {
       QStringLiteral("client")
+    , QStringLiteral("clipboardHistory")
     , QStringLiteral("core")
     , QStringLiteral("daemon")
     , QStringLiteral("gui")
@@ -296,6 +306,12 @@ private:
     , Client::RecentRemoteHosts
     , Client::YScrollScale
     , Client::XScrollScale
+    , ClipboardHistory::Enabled
+    , ClipboardHistory::IgnoreSensitive
+    , ClipboardHistory::MaxItems
+    , ClipboardHistory::Paused
+    , ClipboardHistory::Shortcut
+    , ClipboardHistory::SortMode
     , Core::CoreMode
     , Core::Interface
     , Core::LastVersion
@@ -376,6 +392,7 @@ private:
     , Client::LanguageSync
     , Client::ShareClipboardBetweenServers
     , Client::XdpClipboardRetried
+    , ClipboardHistory::Paused
     , Log::ToFile
     , Log::GuiDebug
     , Server::DefaultLockToComputerState
@@ -390,7 +407,9 @@ private:
 
   // When checking the default values this list contains the ones that default to true.
   inline static const QStringList m_defaultTrueValues = {
-      Core::UseHooks
+      ClipboardHistory::Enabled
+    , ClipboardHistory::IgnoreSensitive
+    , Core::UseHooks
     , Gui::CloseToTray
     , Gui::CloseReminder
     , Gui::LogExpanded
