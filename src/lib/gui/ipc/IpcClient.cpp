@@ -127,8 +127,11 @@ void IpcClient::handleReadyRead()
     const auto message = QString::fromUtf8(data.left(index));
     data.remove(0, index + 1);
 
-    qDebug().noquote() << QStringLiteral("%1 ipc client message: %2").arg(m_typeName, message);
     const auto parts = message.split('=');
+    // Key presses for the activity overlay are private and frequent: never log them.
+    if (parts.at(0) != QStringLiteral("key")) {
+      qDebug().noquote() << QStringLiteral("%1 ipc client message: %2").arg(m_typeName, message);
+    }
     if (parts.isEmpty()) {
       qWarning().noquote() << QStringLiteral("%1 ipc client got invalid message: %2").arg(m_typeName, message);
       continue;

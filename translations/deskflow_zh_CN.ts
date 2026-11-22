@@ -136,6 +136,65 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ActivityOverlay</name>
+    <message>
+        <source>Control: %1 → %2</source>
+        <translation>控制权：%1 → %2</translation>
+    </message>
+    <message>
+        <source>Control moved to this computer</source>
+        <translation>控制权已切换到本机</translation>
+    </message>
+    <message>
+        <source>Control left this computer</source>
+        <translation>控制权已离开本机</translation>
+    </message>
+    <message>
+        <source>Clipboard from %1 shared</source>
+        <translation>已同步来自 %1 的剪贴板</translation>
+    </message>
+    <message>
+        <source>Clipboard received</source>
+        <translation>已收到剪贴板</translation>
+    </message>
+    <message>
+        <source>Clipboard sent</source>
+        <translation>已发送剪贴板</translation>
+    </message>
+    <message>
+        <source>Cursor locked to %1</source>
+        <translation>光标已锁定到 %1</translation>
+    </message>
+    <message>
+        <source>Cursor unlocked</source>
+        <translation>光标已解锁</translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast on</source>
+        <translation>键盘广播已开启</translation>
+    </message>
+    <message>
+        <source>Keyboard broadcast off</source>
+        <translation>键盘广播已关闭</translation>
+    </message>
+    <message>
+        <source>%1 connected</source>
+        <translation>%1 已连接</translation>
+    </message>
+    <message>
+        <source>%1 disconnected</source>
+        <translation>%1 已断开</translation>
+    </message>
+    <message>
+        <source>Connected to server</source>
+        <translation>已连接到服务器</translation>
+    </message>
+    <message>
+        <source>Disconnected from server</source>
+        <translation>已与服务器断开</translation>
+    </message>
+</context>
+<context>
     <name>ClientConfigDialog</name>
     <message>
         <source>Client Configuration</source>
@@ -1296,6 +1355,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">移除所有设置</translation>
+    </message>
+    <message>
+        <source>Activity overlay</source>
+        <translation>活动浮窗</translation>
+    </message>
+    <message>
+        <source>Keys typed through Deskflow appear in a translucent bubble on screen. They are never logged.</source>
+        <translation>通过 Deskflow 输入的按键会以半透明气泡显示在屏幕上，不会写入日志。</translation>
+    </message>
+    <message>
+        <source>Show key presses sent through Deskflow</source>
+        <translation>显示通过 Deskflow 发送的按键</translation>
+    </message>
+    <message>
+        <source>Show events: switching computers, clipboard sharing, connections</source>
+        <translation>显示事件：切换电脑、剪贴板同步、连接状态</translation>
     </message>
 </context>
 <context>

@@ -23,7 +23,20 @@ public:
   ~IpcServer() override;
 
   void listen();
-  void broadcastCommand(const QString &command, const QString &args = "");
+  /**
+   * @brief Send a command to every connected client.
+   * @param queueIfNoClients When true, the message is replayed to the next client that connects.
+   *        Live activity (e.g. overlay events) should not be queued, it is only meaningful now.
+   * @param logContent When false, the message text is never written to the log (e.g. key presses).
+   */
+  void broadcastCommand(
+      const QString &command, const QString &args = "", bool queueIfNoClients = true, bool logContent = true
+  );
+
+  int clientCount() const
+  {
+    return static_cast<int>(m_clients.size());
+  }
 
 Q_SIGNALS:
   void logLevelChanged(const QString &logLevel);
@@ -31,6 +44,7 @@ Q_SIGNALS:
   void startProcessRequested();
   void stopProcessRequested();
   void clearSettingsRequested();
+  void clientCountChanged(int count);
 
 protected:
   /**!
@@ -38,8 +52,9 @@ protected:
    *
    * \param clientSocket The client socket to write to.
    * \param message The message to write (without trailing newline).
+   * \param logContent When false, the message text is not logged.
    */
-  void writeToClientSocket(QLocalSocket *&clientSocket, const QString &message) const;
+  void writeToClientSocket(QLocalSocket *&clientSocket, const QString &message, bool logContent = true) const;
 
 private:
   void processMessage(QLocalSocket *clientSocket, const QString &message);

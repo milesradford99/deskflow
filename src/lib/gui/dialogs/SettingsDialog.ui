@@ -237,6 +237,32 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupOverlay">
+         <property name="title">
+          <string>Activity overlay</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayoutOverlay">
+          <item>
+           <widget class="QCheckBox" name="cbOverlayKeys">
+            <property name="toolTip">
+             <string>Keys typed through Deskflow appear in a translucent bubble on screen. They are never logged.</string>
+            </property>
+            <property name="text">
+             <string>Show key presses sent through Deskflow</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbOverlayActivity">
+            <property name="text">
+             <string>Show events: switching computers, clipboard sharing, connections</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_11">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>

@@ -226,6 +226,7 @@ void Client::enter(int32_t xAbs, int32_t yAbs, uint32_t, KeyModifierMask mask, b
   }
   m_computer->mouseMove(xAbs, yAbs);
   m_computer->enter(mask);
+  ipcSendActivity(QStringLiteral("entered"));
 }
 
 bool Client::leave()
@@ -236,6 +237,7 @@ bool Client::leave()
   m_active = false;
 
   m_computer->leave();
+  ipcSendActivity(QStringLiteral("left"));
 
   if (m_enableClipboard) {
     // send clipboards that we own and that have changed
@@ -254,6 +256,9 @@ void Client::setClipboard(ClipboardID id, const IClipboard *clipboard)
   m_computer->setClipboard(id, clipboard);
   m_ownClipboard[id] = false;
   m_sentClipboard[id] = false;
+  if (id == kClipboardClipboard) {
+    ipcSendActivity(QStringLiteral("clipboardReceived"));
+  }
 }
 
 void Client::grabClipboard(ClipboardID id)
@@ -270,6 +275,7 @@ void Client::setClipboardDirty(ClipboardID, bool)
 
 void Client::keyDown(KeyID id, KeyModifierMask mask, KeyButton button, const std::string &lang)
 {
+  ipcSendKeyPress(id, mask);
   m_computer->keyDown(id, mask, button, lang);
 }
 
@@ -405,6 +411,9 @@ void Client::sendClipboard(ClipboardID id)
       m_sentClipboard[id] = true;
       m_dataClipboard[id] = data;
       m_server->onClipboardChanged(id, &clipboard);
+      if (id == kClipboardClipboard) {
+        ipcSendActivity(QStringLiteral("clipboardSent"));
+      }
     }
   }
 }

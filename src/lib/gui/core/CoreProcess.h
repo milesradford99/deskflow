@@ -48,6 +48,12 @@ public:
   void clearSettings();
   void retryDaemon();
 
+  /**
+   * @brief Whether the core should send key presses for the activity overlay.
+   * Applied now if the core ipc is connected, and again every time it connects.
+   */
+  void setKeyOverlayEnabled(bool enabled);
+
   // getters
   Settings::CoreMode mode() const
   {
@@ -94,6 +100,8 @@ Q_SIGNALS:
   void retryIn(int seconds);
   void peerFingerprint(const QString &fingerprint);
   void missingKeyboardLayouts(const QString &layouts);
+  void activity(const QString &type, const QStringList &fields);
+  void keyPressed(const QString &label, bool isText);
 
 private Q_SLOTS:
   void onProcessFinished(int exitCode, QProcess::ExitStatus);
@@ -130,6 +138,7 @@ private:
   std::optional<ProcessMode> m_lastProcessMode = std::nullopt;
   QTimer m_retryTimer;
   deskflow::gui::ipc::CoreIpcClient *m_coreIpcClient = nullptr;
+  bool m_keyOverlayEnabled = false;
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
   FileTail *m_daemonFileTail = nullptr;
   QProcess *m_process = nullptr;
