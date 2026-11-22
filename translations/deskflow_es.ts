@@ -282,6 +282,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1657,91 +1700,6 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     </message>
 </context>
 <context>
-    <name>i18n</name>
-    <message>
-        <source>LocalizedName</source>
-        <extracomment>Replace with your Language name This is a required string</extracomment>
-        <translation>Español</translation>
-    </message>
-</context>
-<context>
-    <name>validators::AliasValidator</name>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation type="unfinished">El nombre de la computadora no puede contener espacios</translation>
-    </message>
-    <message>
-        <source>Aliases may not be ip addresses</source>
-        <translation type="unfinished">Los alias no pueden ser direcciones IP</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation type="unfinished">Contiene caracteres no válidos o es demasiado largo</translation>
-    </message>
-</context>
-<context>
-    <name>validators::ComputerLineNameValidator</name>
-    <message>
-        <source>Computer name cannot be empty</source>
-        <translation type="unfinished">El nombre de la computadora no puede estar vacío</translation>
-    </message>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation type="unfinished">El nombre de la computadora no puede contener espacios</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation type="unfinished">Contiene caracteres no válidos o es demasiado largo</translation>
-    </message>
-    <message>
-        <source>A computer with this name already exists</source>
-        <translation type="unfinished">Ya existe un ordenador con este nombre</translation>
-    </message>
-</context>
-<context>
-    <name>ClipboardHistory</name>
-    <message>
-        <source>just now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 min ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 h ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yesterday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>from %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>copied %1×</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image %1 × %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 and %2 more</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>deskflow::gui::clipboard::ClipboardHistory</name>
     <message>
         <source>Clipboard History</source>
@@ -2016,6 +1974,48 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>server</source>
         <translation type="unfinished">servidor</translation>
+    </message>
+</context>
+<context>
+    <name>i18n</name>
+    <message>
+        <source>LocalizedName</source>
+        <extracomment>Replace with your Language name This is a required string</extracomment>
+        <translation>Español</translation>
+    </message>
+</context>
+<context>
+    <name>validators::AliasValidator</name>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation type="unfinished">El nombre de la computadora no puede contener espacios</translation>
+    </message>
+    <message>
+        <source>Aliases may not be ip addresses</source>
+        <translation type="unfinished">Los alias no pueden ser direcciones IP</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation type="unfinished">Contiene caracteres no válidos o es demasiado largo</translation>
+    </message>
+</context>
+<context>
+    <name>validators::ComputerLineNameValidator</name>
+    <message>
+        <source>Computer name cannot be empty</source>
+        <translation type="unfinished">El nombre de la computadora no puede estar vacío</translation>
+    </message>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation type="unfinished">El nombre de la computadora no puede contener espacios</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation type="unfinished">Contiene caracteres no válidos o es demasiado largo</translation>
+    </message>
+    <message>
+        <source>A computer with this name already exists</source>
+        <translation type="unfinished">Ya existe un ordenador con este nombre</translation>
     </message>
 </context>
 </TS>

@@ -282,6 +282,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1658,91 +1701,6 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
 </context>
 <context>
-    <name>i18n</name>
-    <message>
-        <source>LocalizedName</source>
-        <extracomment>Replace with your Language name This is a required string</extracomment>
-        <translation>日本語</translation>
-    </message>
-</context>
-<context>
-    <name>validators::AliasValidator</name>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation>コンピューター名に空白を含めることはできません</translation>
-    </message>
-    <message>
-        <source>Aliases may not be ip addresses</source>
-        <translation>別名に IP アドレスは設定できません</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation>無効な文字が含まれているか長すぎます</translation>
-    </message>
-</context>
-<context>
-    <name>validators::ComputerLineNameValidator</name>
-    <message>
-        <source>Computer name cannot be empty</source>
-        <translation type="unfinished">コンピュータ名を空にすることはできません</translation>
-    </message>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation type="unfinished">コンピューター名に空白を含めることはできません</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation type="unfinished">無効な文字が含まれているか長すぎます</translation>
-    </message>
-    <message>
-        <source>A computer with this name already exists</source>
-        <translation type="unfinished">この名前のコンピューターはすでに存在します</translation>
-    </message>
-</context>
-<context>
-    <name>ClipboardHistory</name>
-    <message>
-        <source>just now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 min ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 h ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yesterday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>from %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>copied %1×</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image %1 × %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 and %2 more</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>deskflow::gui::clipboard::ClipboardHistory</name>
     <message>
         <source>Clipboard History</source>
@@ -2017,6 +1975,48 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>server</source>
         <translation type="unfinished">サーバー</translation>
+    </message>
+</context>
+<context>
+    <name>i18n</name>
+    <message>
+        <source>LocalizedName</source>
+        <extracomment>Replace with your Language name This is a required string</extracomment>
+        <translation>日本語</translation>
+    </message>
+</context>
+<context>
+    <name>validators::AliasValidator</name>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation>コンピューター名に空白を含めることはできません</translation>
+    </message>
+    <message>
+        <source>Aliases may not be ip addresses</source>
+        <translation>別名に IP アドレスは設定できません</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation>無効な文字が含まれているか長すぎます</translation>
+    </message>
+</context>
+<context>
+    <name>validators::ComputerLineNameValidator</name>
+    <message>
+        <source>Computer name cannot be empty</source>
+        <translation type="unfinished">コンピュータ名を空にすることはできません</translation>
+    </message>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation type="unfinished">コンピューター名に空白を含めることはできません</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation type="unfinished">無効な文字が含まれているか長すぎます</translation>
+    </message>
+    <message>
+        <source>A computer with this name already exists</source>
+        <translation type="unfinished">この名前のコンピューターはすでに存在します</translation>
     </message>
 </context>
 </TS>

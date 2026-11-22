@@ -282,6 +282,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1656,91 +1699,6 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
 </context>
 <context>
-    <name>i18n</name>
-    <message>
-        <source>LocalizedName</source>
-        <extracomment>Replace with your Language name This is a required string</extracomment>
-        <translation>한국어</translation>
-    </message>
-</context>
-<context>
-    <name>validators::AliasValidator</name>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation>컴퓨터 이름에는 공백을 포함할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Aliases may not be ip addresses</source>
-        <translation>별칭에는 IP 주소를 사용할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation>유효하지 않은 문자가 포함되어 있거나 너무 깁니다</translation>
-    </message>
-</context>
-<context>
-    <name>validators::ComputerLineNameValidator</name>
-    <message>
-        <source>Computer name cannot be empty</source>
-        <translation type="unfinished">컴퓨터 이름은 비워 둘 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation type="unfinished">컴퓨터 이름에는 공백을 포함할 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation type="unfinished">유효하지 않은 문자가 포함되어 있거나 너무 깁니다</translation>
-    </message>
-    <message>
-        <source>A computer with this name already exists</source>
-        <translation type="unfinished">동명의 컴퓨터가 이미 존재합니다</translation>
-    </message>
-</context>
-<context>
-    <name>ClipboardHistory</name>
-    <message>
-        <source>just now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 min ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 h ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yesterday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>from %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>copied %1×</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image %1 × %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 and %2 more</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>deskflow::gui::clipboard::ClipboardHistory</name>
     <message>
         <source>Clipboard History</source>
@@ -2015,6 +1973,48 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>server</source>
         <translation type="unfinished">서버</translation>
+    </message>
+</context>
+<context>
+    <name>i18n</name>
+    <message>
+        <source>LocalizedName</source>
+        <extracomment>Replace with your Language name This is a required string</extracomment>
+        <translation>한국어</translation>
+    </message>
+</context>
+<context>
+    <name>validators::AliasValidator</name>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation>컴퓨터 이름에는 공백을 포함할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Aliases may not be ip addresses</source>
+        <translation>별칭에는 IP 주소를 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation>유효하지 않은 문자가 포함되어 있거나 너무 깁니다</translation>
+    </message>
+</context>
+<context>
+    <name>validators::ComputerLineNameValidator</name>
+    <message>
+        <source>Computer name cannot be empty</source>
+        <translation type="unfinished">컴퓨터 이름은 비워 둘 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation type="unfinished">컴퓨터 이름에는 공백을 포함할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation type="unfinished">유효하지 않은 문자가 포함되어 있거나 너무 깁니다</translation>
+    </message>
+    <message>
+        <source>A computer with this name already exists</source>
+        <translation type="unfinished">동명의 컴퓨터가 이미 존재합니다</translation>
     </message>
 </context>
 </TS>

@@ -282,6 +282,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation>刚刚</translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation>%1 分钟前</translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation>%1 小时前</translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation>昨天</translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation>来自 %1</translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation>复制 %1 次</translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation>图片 %1 × %2</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation>图片</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation>%1 等 %2 个</translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1660,91 +1703,6 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
 </context>
 <context>
-    <name>i18n</name>
-    <message>
-        <source>LocalizedName</source>
-        <extracomment>Replace with your Language name This is a required string</extracomment>
-        <translation>简体中文</translation>
-    </message>
-</context>
-<context>
-    <name>validators::AliasValidator</name>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation>计算机名称不能包含空格</translation>
-    </message>
-    <message>
-        <source>Aliases may not be ip addresses</source>
-        <translation>不能用 IP 地址作为别名</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation>包含无效字符或过长</translation>
-    </message>
-</context>
-<context>
-    <name>validators::ComputerLineNameValidator</name>
-    <message>
-        <source>Computer name cannot be empty</source>
-        <translation type="unfinished">计算机名称不能为空</translation>
-    </message>
-    <message>
-        <source>Computer name cannot contain spaces</source>
-        <translation type="unfinished">计算机名称不能包含空格</translation>
-    </message>
-    <message>
-        <source>Contains invalid characters or is too long</source>
-        <translation type="unfinished">包含无效字符或过长</translation>
-    </message>
-    <message>
-        <source>A computer with this name already exists</source>
-        <translation type="unfinished">一台同名的计算机已经存在</translation>
-    </message>
-</context>
-<context>
-    <name>ClipboardHistory</name>
-    <message>
-        <source>just now</source>
-        <translation>刚刚</translation>
-    </message>
-    <message>
-        <source>%1 min ago</source>
-        <translation>%1 分钟前</translation>
-    </message>
-    <message>
-        <source>%1 h ago</source>
-        <translation>%1 小时前</translation>
-    </message>
-    <message>
-        <source>yesterday</source>
-        <translation>昨天</translation>
-    </message>
-    <message>
-        <source>from %1</source>
-        <translation>来自 %1</translation>
-    </message>
-    <message>
-        <source>copied %1×</source>
-        <translation>复制 %1 次</translation>
-    </message>
-    <message>
-        <source>Image %1 × %2</source>
-        <translation>图片 %1 × %2</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>图片</translation>
-    </message>
-    <message>
-        <source>Files</source>
-        <translation>文件</translation>
-    </message>
-    <message>
-        <source>%1 and %2 more</source>
-        <translation>%1 等 %2 个</translation>
-    </message>
-</context>
-<context>
     <name>deskflow::gui::clipboard::ClipboardHistory</name>
     <message>
         <source>Clipboard History</source>
@@ -2023,6 +1981,48 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>server</source>
         <translation type="unfinished">服务器</translation>
+    </message>
+</context>
+<context>
+    <name>i18n</name>
+    <message>
+        <source>LocalizedName</source>
+        <extracomment>Replace with your Language name This is a required string</extracomment>
+        <translation>简体中文</translation>
+    </message>
+</context>
+<context>
+    <name>validators::AliasValidator</name>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation>计算机名称不能包含空格</translation>
+    </message>
+    <message>
+        <source>Aliases may not be ip addresses</source>
+        <translation>不能用 IP 地址作为别名</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation>包含无效字符或过长</translation>
+    </message>
+</context>
+<context>
+    <name>validators::ComputerLineNameValidator</name>
+    <message>
+        <source>Computer name cannot be empty</source>
+        <translation type="unfinished">计算机名称不能为空</translation>
+    </message>
+    <message>
+        <source>Computer name cannot contain spaces</source>
+        <translation type="unfinished">计算机名称不能包含空格</translation>
+    </message>
+    <message>
+        <source>Contains invalid characters or is too long</source>
+        <translation type="unfinished">包含无效字符或过长</translation>
+    </message>
+    <message>
+        <source>A computer with this name already exists</source>
+        <translation type="unfinished">一台同名的计算机已经存在</translation>
     </message>
 </context>
 </TS>
