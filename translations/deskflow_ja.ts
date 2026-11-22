@@ -179,6 +179,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1395,6 +1438,283 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Encryption Disabled</source>
         <translation>暗号化無効</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistory</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore next copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Handy before copying a password or other one-off secret</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip passwords and concealed content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep history of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change shortcut…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear history (keep pinned)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear everything…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard History Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press the keys you want to use to open clipboard history from anywhere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your desktop does not let apps register global shortcuts (for example on Wayland). Add a custom shortcut in your system keyboard settings that runs:
+
+    %1 --%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is already used by another application. Your previous shortcut has been restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete every item in your clipboard history, including pinned items? This cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set shortcut…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change shortcut (%1)%2…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistoryPopup</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search clipboard history…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recently copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clipboard history settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignoring next copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 × %2 pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>rich text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is paused.
+Resume it from the ⋯ menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing here yet.
+Copy something on any of your computers and it will show up here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No matches for “%1”</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing in this category yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy as plain text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardMonitor</name>
+    <message>
+        <source>server</source>
+        <translation type="unfinished">サーバー</translation>
     </message>
 </context>
 <context>

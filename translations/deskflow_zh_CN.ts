@@ -179,6 +179,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ClipboardHistory</name>
+    <message>
+        <source>just now</source>
+        <translation>刚刚</translation>
+    </message>
+    <message>
+        <source>%1 min ago</source>
+        <translation>%1 分钟前</translation>
+    </message>
+    <message>
+        <source>%1 h ago</source>
+        <translation>%1 小时前</translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation>昨天</translation>
+    </message>
+    <message>
+        <source>from %1</source>
+        <translation>来自 %1</translation>
+    </message>
+    <message>
+        <source>copied %1×</source>
+        <translation>复制 %1 次</translation>
+    </message>
+    <message>
+        <source>Image %1 × %2</source>
+        <translation>图片 %1 × %2</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation>图片</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>%1 and %2 more</source>
+        <translation>%1 等 %2 个</translation>
+    </message>
+</context>
+<context>
     <name>ComputerSettingsDialog</name>
     <message>
         <source>Computer settings</source>
@@ -1395,6 +1438,287 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Encryption Disabled</source>
         <translation>加密已禁用</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistory</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation type="unfinished">剪贴板历史</translation>
+    </message>
+    <message>
+        <source>Pause recording</source>
+        <translation>暂停记录</translation>
+    </message>
+    <message>
+        <source>Ignore next copy</source>
+        <translation>忽略下一次复制</translation>
+    </message>
+    <message>
+        <source>Handy before copying a password or other one-off secret</source>
+        <translation>适合在复制密码或其他一次性机密信息前使用</translation>
+    </message>
+    <message>
+        <source>Skip passwords and concealed content</source>
+        <translation>跳过密码和隐藏内容</translation>
+    </message>
+    <message>
+        <source>Keep history of</source>
+        <translation>保留历史条数</translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation>%1 条</translation>
+    </message>
+    <message>
+        <source>Change shortcut…</source>
+        <translation>更改快捷键…</translation>
+    </message>
+    <message>
+        <source>Clear history (keep pinned)</source>
+        <translation>清空历史（保留收藏）</translation>
+    </message>
+    <message>
+        <source>Clear everything…</source>
+        <translation>全部清空…</translation>
+    </message>
+    <message>
+        <source>Clipboard History Shortcut</source>
+        <translation>剪贴板历史快捷键</translation>
+    </message>
+    <message>
+        <source>Press the keys you want to use to open clipboard history from anywhere.</source>
+        <translation>按下想用来在任何地方打开剪贴板历史的按键。</translation>
+    </message>
+    <message>
+        <source>Your desktop does not let apps register global shortcuts (for example on Wayland). Add a custom shortcut in your system keyboard settings that runs:
+
+    %1 --%2</source>
+        <translation>你的桌面环境不允许应用注册全局快捷键（例如 Wayland）。请在系统键盘设置中添加一个自定义快捷键，运行：
+
+    %1 --%2</translation>
+    </message>
+    <message>
+        <source>Use default</source>
+        <translation>恢复默认</translation>
+    </message>
+    <message>
+        <source>Shortcut unavailable</source>
+        <translation>快捷键不可用</translation>
+    </message>
+    <message>
+        <source>%1 is already used by another application. Your previous shortcut has been restored.</source>
+        <translation>%1 已被其他应用占用，已恢复为之前的快捷键。</translation>
+    </message>
+    <message>
+        <source>Clear clipboard history</source>
+        <translation>清空剪贴板历史</translation>
+    </message>
+    <message>
+        <source>Delete every item in your clipboard history, including pinned items? This cannot be undone.</source>
+        <translation>删除剪贴板历史中的所有条目（包括收藏）吗？此操作无法撤销。</translation>
+    </message>
+    <message>
+        <source>Set shortcut…</source>
+        <translation>设置快捷键…</translation>
+    </message>
+    <message>
+        <source>Change shortcut (%1)%2…</source>
+        <translation>更改快捷键（%1）%2…</translation>
+    </message>
+    <message>
+        <source>, unavailable</source>
+        <translation>，不可用</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardHistoryPopup</name>
+    <message>
+        <source>Clipboard History</source>
+        <translation>剪贴板历史</translation>
+    </message>
+    <message>
+        <source>Search clipboard history…</source>
+        <translation>搜索剪贴板历史…</translation>
+    </message>
+    <message>
+        <source>Recently copied</source>
+        <translation>最近复制</translation>
+    </message>
+    <message>
+        <source>Most copied</source>
+        <translation>最常复制</translation>
+    </message>
+    <message>
+        <source>First copied</source>
+        <translation>最早复制</translation>
+    </message>
+    <message>
+        <source>Sort order</source>
+        <translation>排序方式</translation>
+    </message>
+    <message>
+        <source>Clipboard history settings</source>
+        <translation>剪贴板历史设置</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>全部</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>收藏</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>文本</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation>链接</translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation>图片</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>Open link</source>
+        <translation>打开链接</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <source>Plain text</source>
+        <translation>纯文本</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>收藏</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation>筛选</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">关闭</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>已暂停</translation>
+    </message>
+    <message>
+        <source>Ignoring next copy</source>
+        <translation>将忽略下一次复制</translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation>记录中</translation>
+    </message>
+    <message>
+        <source>%1 × %2 pixels</source>
+        <translation>%1 × %2 像素</translation>
+    </message>
+    <message>
+        <source>1 file</source>
+        <translation>1 个文件</translation>
+    </message>
+    <message>
+        <source>%1 files</source>
+        <translation>%1 个文件</translation>
+    </message>
+    <message>
+        <source>1 character</source>
+        <translation>1 个字符</translation>
+    </message>
+    <message>
+        <source>%1 characters</source>
+        <translation>%1 个字符</translation>
+    </message>
+    <message>
+        <source>%1 lines</source>
+        <translation>%1 行</translation>
+    </message>
+    <message>
+        <source>rich text</source>
+        <translation>富文本</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>来源</translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation>本机</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>内容</translation>
+    </message>
+    <message>
+        <source>Last copied</source>
+        <translation>最近复制</translation>
+    </message>
+    <message>
+        <source>Times copied</source>
+        <translation>复制次数</translation>
+    </message>
+    <message>
+        <source>1 item</source>
+        <translation>1 条</translation>
+    </message>
+    <message>
+        <source>%1 items</source>
+        <translation>%1 条</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 / %2</translation>
+    </message>
+    <message>
+        <source>Recording is paused.
+Resume it from the ⋯ menu.</source>
+        <translation>记录已暂停。
+可在 ⋯ 菜单中恢复。</translation>
+    </message>
+    <message>
+        <source>Nothing here yet.
+Copy something on any of your computers and it will show up here.</source>
+        <translation>这里还没有内容。
+在任意一台电脑上复制内容，就会出现在这里。</translation>
+    </message>
+    <message>
+        <source>No matches for “%1”</source>
+        <translation>没有与“%1”匹配的内容</translation>
+    </message>
+    <message>
+        <source>Nothing in this category yet.</source>
+        <translation>这个分类还没有内容。</translation>
+    </message>
+    <message>
+        <source>Copy as plain text</source>
+        <translation>按纯文本复制</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>取消收藏</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::clipboard::ClipboardMonitor</name>
+    <message>
+        <source>server</source>
+        <translation type="unfinished">服务器</translation>
     </message>
 </context>
 <context>
