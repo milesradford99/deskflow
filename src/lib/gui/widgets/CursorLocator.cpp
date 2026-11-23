@@ -6,6 +6,10 @@
 
 #include "CursorLocator.h"
 
+#ifdef Q_OS_MACOS
+#include "gui/OSXHelpers.h"
+#endif
+
 #include <QCursor>
 #include <QEasingCurve>
 #include <QPainter>
@@ -96,7 +100,12 @@ void CursorLocator::locate()
   m_progress = 0;
   followCursor();
   show();
+#ifdef Q_OS_MACOS
+  // never raise(): on macOS that activates the app and brings the main window forward
+  macOSOrderFrontWithoutActivating(this);
+#else
   raise();
+#endif
   m_animation->start();
 }
 

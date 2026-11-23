@@ -5,6 +5,7 @@
  */
 
 #import "OSXHelpers.h"
+#include <QWidget>
 
 #import <Cocoa/Cocoa.h>
 #import <CoreData/CoreData.h>
@@ -107,6 +108,15 @@ void forceAppActive()
 {
   [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
   [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
+}
+
+void macOSOrderFrontWithoutActivating(QWidget *window)
+{
+  if (!window)
+    return;
+  auto *view = (__bridge NSView *)reinterpret_cast<void *>(window->winId());
+  if (NSWindow *nsWindow = view.window)
+    [nsWindow orderFrontRegardless];
 }
 
 void macOSNativeHide()
