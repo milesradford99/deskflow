@@ -10,7 +10,7 @@
 
 namespace deskflow::gui::pages {
 
-//! On-screen hints: key presses, Deskflow events and the cursor ripple, each with a preview.
+//! On-screen hints: key presses, Deskflow events and the cursor highlight, each with a preview.
 class OverlayPage : public RebuildablePage
 {
   Q_OBJECT
