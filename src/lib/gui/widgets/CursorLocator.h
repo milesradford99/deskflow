@@ -14,10 +14,10 @@ class QVariantAnimation;
 /**
  * @brief Brief animation around the cursor when it arrives on this computer.
  *
- * A soft glow blooms under the cursor while two thin rings ripple outwards and fade,
- * all within about 0.7 s. The window is click-through, never takes focus, follows the
- * cursor while it plays and is hidden (with its animation stopped) as soon as it ends,
- * so it costs nothing in between.
+ * A white "focus lens" with a soft shadow appears around the cursor, closes in on it with
+ * a small spring, rests for a beat and fades, all within about 0.8 s. The window is click-through, never takes focus,
+ * follows the cursor while it plays and is hidden (with its animation stopped) as soon as it ends, so it costs nothing
+ * in between.
  */
 class CursorLocator : public QWidget
 {
@@ -32,8 +32,8 @@ public:
   //! Draws one frame centred on \c center; \c progress runs from 0 to 1.
   static void paintFrame(QPainter &painter, const QPointF &center, qreal progress);
 
-  static constexpr int kDurationMs = 720;
-  static constexpr int kSize = 220;
+  static constexpr int kDurationMs = 820;
+  static constexpr int kSize = 180;
 
 protected:
   void paintEvent(QPaintEvent *event) override;

@@ -2353,7 +2353,7 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>A short ripple around the cursor when it comes to this computer, so it is easy to find.</source>
-        <translation>光标移到这台电脑时，周围会泛起一圈波纹，方便你一眼找到。</translation>
+        <translation>光标移到这台电脑时，会有一圈光环收拢到光标上，方便你一眼找到。</translation>
     </message>
 </context>
 <context>

@@ -16,6 +16,10 @@ bool showOSXNotification(const QString &title, const QString &body);
 bool isOSXInterfaceStyleDark();
 void forceAppActive();
 void macOSNativeHide();
+class QWidget;
+/// Bring an overlay window to the front without activating the app (QWidget::raise() activates
+/// the whole app on macOS, which also brings the main window forward).
+void macOSOrderFrontWithoutActivating(QWidget *window);
 void installQuitHandler(std::function<bool()> shouldQuit);
 
 /// NSPasteboard change count, increments every time the general pasteboard changes.

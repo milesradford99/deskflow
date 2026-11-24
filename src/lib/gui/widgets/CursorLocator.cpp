@@ -6,6 +6,10 @@
 
 #include "CursorLocator.h"
 
+#ifdef Q_OS_MACOS
+#include "gui/OSXHelpers.h"
+#endif
+
 #include <QCursor>
 #include <QEasingCurve>
 #include <QPainter>
@@ -17,8 +21,14 @@
 
 namespace {
 
-// A calm blue that reads on both light and dark backgrounds, with white highlights.
-const QColor kAccent(0x4d, 0xa3, 0xff);
+// Look: a neutral "focus lens" in the spirit of macOS pointer feedback (shake to locate,
+// the camera focus square, Find My's target lock). A white ring with a soft shadow reads
+// on any wallpaper, light or dark, and a faint iris tint ties it to the app.
+const QColor kTint(0x5a, 0x55, 0xd6);
+
+constexpr qreal kStartRadius = 64; // where the lens appears
+constexpr qreal kRestRadius = 24;  // where it settles around the pointer
+constexpr qreal kShadow = 9;       // reach of the soft shadow beyond the ring
 
 qreal clamp01(qreal v)
 {
@@ -31,9 +41,22 @@ qreal phase(qreal t, qreal start, qreal end)
   return clamp01((t - start) / (end - start));
 }
 
-qreal easeOut(qreal t)
+qreal easeOutCubic(qreal t)
 {
   return 1 - std::pow(1 - t, 3);
+}
+
+qreal easeInCubic(qreal t)
+{
+  return t * t * t;
+}
+
+//! Ease-out with a small overshoot, so the lens "snaps" onto the pointer like a spring.
+qreal easeOutBack(qreal t)
+{
+  constexpr qreal s = 1.35;
+  const qreal u = t - 1;
+  return 1 + (s + 1) * u * u * u + s * u * u;
 }
 
 QColor withAlpha(QColor color, qreal alpha)
@@ -42,24 +65,55 @@ QColor withAlpha(QColor color, qreal alpha)
   return color;
 }
 
-void paintRing(QPainter &painter, const QPointF &center, qreal t)
+//! Soft, slightly lowered shadow hugging a ring of \c radius, like a macOS window shadow.
+void paintShadow(QPainter &painter, const QPointF &center, qreal radius, qreal alpha)
+{
+  const qreal outer = radius + kShadow;
+  QRadialGradient shadow(center + QPointF(0, 1.5), outer);
+  const auto at = [outer](qreal r) { return clamp01(r / outer); };
+  shadow.setColorAt(0, withAlpha(Qt::black, 0));
+  shadow.setColorAt(at(radius - kShadow * 0.6), withAlpha(Qt::black, 0));
+  shadow.setColorAt(at(radius), withAlpha(Qt::black, 0.26 * alpha));
+  shadow.setColorAt(1, withAlpha(Qt::black, 0));
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(shadow);
+  painter.drawEllipse(center + QPointF(0, 1.5), outer, outer);
+}
+
+void paintLens(QPainter &painter, const QPointF &center, qreal radius, qreal alpha)
+{
+  if (alpha <= 0)
+    return;
+
+  paintShadow(painter, center, radius, alpha);
+
+  // barely-there glass: lifts dark backgrounds a touch, tinted with the app's iris
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(withAlpha(Qt::white, 0.06 * alpha));
+  painter.drawEllipse(center, radius, radius);
+  painter.setBrush(withAlpha(kTint, 0.06 * alpha));
+  painter.drawEllipse(center, radius, radius);
+
+  // the ring itself, with a hairline inside so it still has an edge on white
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(QPen(withAlpha(Qt::black, 0.12 * alpha), 1));
+  painter.drawEllipse(center, radius - 2, radius - 2);
+  painter.setPen(QPen(withAlpha(Qt::white, 0.97 * alpha), 2.5));
+  painter.drawEllipse(center, radius, radius);
+}
+
+//! One quiet ring that leaves the lens as it lands, confirming the arrival.
+void paintEcho(QPainter &painter, const QPointF &center, qreal t)
 {
   if (t <= 0 || t >= 1)
     return;
-
-  const qreal radius = 12 + 86 * easeOut(t);
-  // fades in over the first few frames, then out as it travels
-  const qreal alpha = std::min(t * 6, 1.0) * std::pow(1 - t, 1.6);
-
+  const qreal radius = kRestRadius + 20 * easeOutCubic(t);
+  const qreal alpha = 0.55 * std::pow(1 - t, 2);
   painter.setBrush(Qt::NoBrush);
-  // soft coloured halo, then a crisp line on top
-  painter.setPen(QPen(withAlpha(kAccent, 0.28 * alpha), 7));
+  painter.setPen(QPen(withAlpha(Qt::black, 0.18 * alpha), 3));
+  painter.drawEllipse(center + QPointF(0, 1), radius, radius);
+  painter.setPen(QPen(withAlpha(Qt::white, alpha), 1.25));
   painter.drawEllipse(center, radius, radius);
-  painter.setPen(QPen(withAlpha(kAccent.lighter(125), 0.95 * alpha), 2.2));
-  painter.drawEllipse(center, radius, radius);
-  // thin dark edge so it still shows on white
-  painter.setPen(QPen(withAlpha(Qt::black, 0.12 * alpha), 1));
-  painter.drawEllipse(center, radius + 2.2, radius + 2.2);
 }
 
 } // namespace
@@ -96,7 +150,12 @@ void CursorLocator::locate()
   m_progress = 0;
   followCursor();
   show();
+#ifdef Q_OS_MACOS
+  // never raise(): on macOS that activates the app and brings the main window forward
+  macOSOrderFrontWithoutActivating(this);
+#else
   raise();
+#endif
   m_animation->start();
 }
 
@@ -118,22 +177,16 @@ void CursorLocator::paintFrame(QPainter &painter, const QPointF &center, qreal t
 {
   painter.setRenderHint(QPainter::Antialiasing);
 
-  // glow: blooms quickly, lingers a moment, fades
-  const qreal bloom = easeOut(phase(t, 0, 0.3));
-  const qreal fade = 1 - phase(t, 0.45, 1);
-  const qreal glowAlpha = bloom * fade * fade;
-  if (glowAlpha > 0) {
-    const qreal radius = 16 + 22 * bloom;
-    QRadialGradient glow(center, radius);
-    glow.setColorAt(0.0, withAlpha(Qt::white, 0.85 * glowAlpha));
-    glow.setColorAt(0.35, withAlpha(kAccent.lighter(130), 0.55 * glowAlpha));
-    glow.setColorAt(1.0, withAlpha(kAccent, 0));
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(glow);
-    painter.drawEllipse(center, radius, radius);
-  }
+  // 1. the lens appears wide and closes in on the pointer, snapping into place
+  const qreal approach = phase(t, 0, 0.42);
+  qreal radius = kStartRadius + (kRestRadius - kStartRadius) * easeOutBack(approach);
+  qreal alpha = easeOutCubic(clamp01(approach * 3));
 
-  // two rings, the second a little behind the first
-  paintRing(painter, center, phase(t, 0.0, 0.8));
-  paintRing(painter, center, phase(t, 0.18, 1.0));
+  // 2. it rests around the pointer for a beat, then 3. shrinks a little as it fades
+  const qreal exit = easeInCubic(phase(t, 0.66, 1));
+  radius *= 1 - 0.18 * exit;
+  alpha *= 1 - exit;
+
+  paintEcho(painter, center, phase(t, 0.34, 0.84));
+  paintLens(painter, center, radius, alpha);
 }
