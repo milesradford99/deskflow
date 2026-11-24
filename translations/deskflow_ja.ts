@@ -684,6 +684,10 @@ Do you want to connect to the server?
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Screen Hints</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2033,6 +2037,14 @@ Enabling this setting will disable the server config GUI.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Edit…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop and mark up (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2315,6 +2327,131 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::pages::ScreenshotPage</name>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture part of the screen straight to the clipboard, ready to paste on any linked computer. Click the thumbnail that appears to crop it or mark it up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Take Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to select an area, or press Space to pick a window. The first time, macOS asks to allow screen recording for %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to select an area, or click for the whole screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps register shortcuts. Add one in your system settings that runs: %1 --%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>After a capture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to the clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always. It also lands in clipboard history, where you can open it in the editor again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show floating thumbnail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slides in at the bottom right. Click it to crop and mark up, or drag it into another app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n seconds</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Thumbnail stays for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Longer while the pointer is over it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also save as a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A PNG in the folder below, named by date and time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Screenshots To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop, rectangle, ellipse, arrow, line, pen, highlighter, text, numbered steps and pixelate. Press Enter to copy the result, or save it as a file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit from clipboard history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select any image in clipboard history and choose Edit (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">なし</translation>
+    </message>
+    <message>
+        <source>Another app is using this shortcut; choose a different one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>deskflow::gui::pages::SettingsPage</name>
     <message>
         <source>Settings</source>
@@ -2591,6 +2728,202 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
         <translation type="unfinished">&lt;p&gt;すべての設定を消去して %1 を再起動してもよろしいですか？&lt;/p&gt; &lt;p&gt;この操作は元に戻せません。&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::RegionSelector</name>
+    <message>
+        <source>Drag to capture an area  ·  Click for the whole screen  ·  Esc to cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotEditor</name>
+    <message>
+        <source>Select and move</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ellipse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Numbered step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixelate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Purple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redo (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to the clipboard and close (↵)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>↵ Copy    %1 Save    Esc Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 × %2 px</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PNG image (*.png);;JPEG image (*.jpg *.jpeg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t save to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discard changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close the editor without copying or saving your changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotThumbnail</name>
+    <message>
+        <source>Click to edit · Drag to drop into another app</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotTool</name>
+    <message>
+        <source>Take Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot Shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press the keys you want to use to take a screenshot from anywhere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is already used by another application. Your previous shortcut has been restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps read the screen (for example on Wayland). Use your desktop&apos;s own screenshot tool; whatever it copies still shows up in clipboard history.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

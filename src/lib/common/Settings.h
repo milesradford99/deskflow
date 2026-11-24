@@ -63,6 +63,15 @@ public:
     inline static const auto Shortcut = QStringLiteral("clipboardHistory/shortcut");
     inline static const auto SortMode = QStringLiteral("clipboardHistory/sortMode");
   };
+  struct Screenshot
+  {
+    inline static const auto Enabled = QStringLiteral("screenshot/enabled");
+    inline static const auto Shortcut = QStringLiteral("screenshot/shortcut");
+    inline static const auto ShowThumbnail = QStringLiteral("screenshot/showThumbnail");
+    inline static const auto ThumbnailSeconds = QStringLiteral("screenshot/thumbnailSeconds");
+    inline static const auto SaveToFolder = QStringLiteral("screenshot/saveToFolder");
+    inline static const auto Folder = QStringLiteral("screenshot/folder");
+  };
   struct Core
   {
     inline static const auto CoreMode = QStringLiteral("core/coreMode");
@@ -292,6 +301,7 @@ private:
     , QStringLiteral("gui")
     , QStringLiteral("log")
     , QStringLiteral("security")
+    , QStringLiteral("screenshot")
     , QStringLiteral("server")
     , QStringLiteral("internalConfig")
   };
@@ -314,6 +324,12 @@ private:
     , ClipboardHistory::Paused
     , ClipboardHistory::Shortcut
     , ClipboardHistory::SortMode
+    , Screenshot::Enabled
+    , Screenshot::Shortcut
+    , Screenshot::ShowThumbnail
+    , Screenshot::ThumbnailSeconds
+    , Screenshot::SaveToFolder
+    , Screenshot::Folder
     , Core::CoreMode
     , Core::Interface
     , Core::LastVersion
@@ -396,6 +412,7 @@ private:
     , Client::ShareClipboardBetweenServers
     , Client::XdpClipboardRetried
     , ClipboardHistory::Paused
+    , Screenshot::SaveToFolder
     , Log::ToFile
     , Log::GuiDebug
     , Server::DefaultLockToComputerState
@@ -412,6 +429,8 @@ private:
   inline static const QStringList m_defaultTrueValues = {
       ClipboardHistory::Enabled
     , ClipboardHistory::IgnoreSensitive
+    , Screenshot::Enabled
+    , Screenshot::ShowThumbnail
     , Gui::CursorHighlight
     , Core::UseHooks
     , Gui::CloseToTray

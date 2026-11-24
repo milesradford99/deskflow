@@ -32,4 +32,14 @@
         </translation>
     </message>
 </context>
+<context>
+    <name>deskflow::gui::pages::ScreenshotPage</name>
+    <message numerus="yes">
+        <source>%n seconds</source>
+        <translation>
+            <numerusform>%n second</numerusform>
+            <numerusform>%n seconds</numerusform>
+        </translation>
+    </message>
+</context>
 </TS>

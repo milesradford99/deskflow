@@ -174,3 +174,13 @@ bool macPasteboardIsConcealed()
   }
   return false;
 }
+
+bool macScreenCaptureAllowed()
+{
+  return CGPreflightScreenCaptureAccess();
+}
+
+void macRequestScreenCaptureAccess()
+{
+  CGRequestScreenCaptureAccess();
+}

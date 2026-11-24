@@ -416,6 +416,23 @@ QVariant Settings::defaultValue(const QString &key)
 #endif
   }
 
+  if (key == Screenshot::Shortcut) {
+    // Cmd+Shift+A on macOS; Ctrl+Alt+A elsewhere, the shortcut common screenshot tools use there.
+#ifdef Q_OS_MACOS
+    return QStringLiteral("Ctrl+Shift+A");
+#else
+    return QStringLiteral("Ctrl+Alt+A");
+#endif
+  }
+
+  if (key == Screenshot::ThumbnailSeconds)
+    return 5;
+
+  if (key == Screenshot::Folder) {
+    const auto desktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    return desktop.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) : desktop;
+  }
+
   return QVariant();
 }
 

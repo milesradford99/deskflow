@@ -182,6 +182,9 @@ QToolButton[dropTarget="true"] { background: %4; border: 1px solid %5; border-ra
 QToolButton[dropTarget="true"]:hover { border-color: %10; }
 QToolButton[dropTarget="true"][dropActive="true"] { background: %10; color: %13; border-color: %10; }
 QToolButton[dropTarget="true"]::menu-button { border: none; width: 18px; }
+QToolButton[editorTool="true"] { padding: 4px; border-radius: 7px; }
+QToolButton[editorTool="true"]:checked { background: %3; border-color: %5; }
+QFrame[editorBar="true"] { background: %1; border: none; border-bottom: 1px solid %5; }
 
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QKeySequenceEdit, QPlainTextEdit, QTextEdit {
   background: %4; color: %7; border: 1px solid %5; border-radius: 8px; padding: 4px 8px;

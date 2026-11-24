@@ -80,9 +80,10 @@ void MainWindow::setupUi(QMainWindow *window)
 
   navHome = navButton(sidebar);
   navClipboard = navButton(sidebar);
+  navScreenshot = navButton(sidebar);
   navOverlay = navButton(sidebar);
   navLog = navButton(sidebar);
-  for (auto *button : {navHome, navClipboard, navOverlay, navLog})
+  for (auto *button : {navHome, navClipboard, navScreenshot, navOverlay, navLog})
     side->addWidget(button);
   side->addStretch(1);
 
@@ -234,6 +235,7 @@ void MainWindow::updateIcons()
 
   navHome->setIcon(symbol(Symbol::Computers, secondary, white));
   navClipboard->setIcon(symbol(Symbol::Clipboard, secondary, white));
+  navScreenshot->setIcon(symbol(Symbol::Screenshot, secondary, white));
   navOverlay->setIcon(symbol(Symbol::Sparkle, secondary, white));
   navLog->setIcon(symbol(Symbol::Log, secondary, white));
   navSettings->setIcon(symbol(Symbol::Settings, secondary, white));
@@ -253,6 +255,7 @@ void MainWindow::retranslateUi(QMainWindow *window)
 
   navHome->setText(tr("This Computer"));
   navClipboard->setText(tr("Clipboard"));
+  navScreenshot->setText(tr("Screenshot"));
   navOverlay->setText(tr("Screen Hints"));
   navLog->setText(tr("Log"));
   const auto settingsShortcut = deskflow::platform::isMac() ? QStringLiteral("  ⌘,") : QString();

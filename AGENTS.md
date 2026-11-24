@@ -148,8 +148,8 @@ in `Theme.h`. Don't give widgets their own style sheets; add a role instead. Cus
 painted controls take colours from `theme::accent()` etc. or the palette.
 
 **GUI layout**: `MainWindowUi` builds the main window in code (no `.ui` file): a sidebar
-and a `QStackedWidget` of pages (This Computer, Clipboard, Screen Hints, Log, Settings;
-Ctrl/Cmd+1..5). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
+and a `QStackedWidget` of pages (This Computer, Clipboard, Screenshot, Screen Hints, Log, Settings;
+Ctrl/Cmd+1..6). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
 `SegmentedControl`, `FormCard` rows, `ChoiceCard`, `Page`, line `symbol()`s drawn with
 QPainter, since the GUI doesn't link QtSvg). Pages under `pages/` derive from
 `RebuildablePage`: they read Settings each time they are shown or the language changes,

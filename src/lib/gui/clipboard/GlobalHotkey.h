@@ -38,6 +38,11 @@ public:
   {
     return m_registered;
   }
+  /// Distinguishes this shortcut from the app's other global shortcuts.
+  quint32 id() const
+  {
+    return m_id;
+  }
 
   bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
@@ -53,6 +58,7 @@ private:
 
   QKeySequence m_sequence;
   bool m_registered = false;
+  quint32 m_id = 0;
   bool m_filterInstalled = false;
 
   // Platform specific state.

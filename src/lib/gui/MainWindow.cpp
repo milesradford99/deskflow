@@ -36,7 +36,9 @@
 #include "net/FingerprintDatabase.h"
 #include "pages/ClipboardPage.h"
 #include "pages/OverlayPage.h"
+#include "pages/ScreenshotPage.h"
 #include "pages/SettingsPage.h"
+#include "screenshot/ScreenshotTool.h"
 #include "widgets/FileTransferWidget.h"
 #include "widgets/StatusBar.h"
 
@@ -145,6 +147,11 @@ MainWindow::MainWindow()
   m_guiDupeChecker->listen(m_guiSocketName);
 
   m_clipboardHistory = new deskflow::gui::clipboard::ClipboardHistory(this, this);
+  m_screenshotTool = new deskflow::gui::screenshot::ScreenshotTool(this, this);
+  connect(
+      m_clipboardHistory, &deskflow::gui::clipboard::ClipboardHistory::editImageRequested, m_screenshotTool,
+      &deskflow::gui::screenshot::ScreenshotTool::edit
+  );
   setupPages();
 
   createMenuBar();
@@ -391,6 +398,9 @@ void MainWindow::setupPages()
   auto *clipboardPage = new ClipboardPage(m_clipboardHistory, ui->pages);
   ui->pages->insertWidget(UiPage::ClipboardPage, clipboardPage);
 
+  auto *screenshotPage = new ScreenshotPage(m_screenshotTool, ui->pages);
+  ui->pages->insertWidget(UiPage::ScreenshotPage, screenshotPage);
+
   auto *overlayPage = new OverlayPage(ui->pages);
   ui->pages->insertWidget(UiPage::OverlayPage, overlayPage);
   connect(overlayPage, &OverlayPage::previewKeys, this, [this] {
@@ -417,7 +427,8 @@ void MainWindow::setupPages()
   connect(m_settingsPage, &SettingsPage::requestRemoveAllSettings, this, &MainWindow::clearSettings);
   connect(m_settingsPage, &SettingsPage::requestShowFingerprint, this, &MainWindow::showMyFingerprint);
 
-  const QList<QPushButton *> nav{ui->navHome, ui->navClipboard, ui->navOverlay, ui->navLog, ui->navSettings};
+  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot,
+                                 ui->navOverlay, ui->navLog,       ui->navSettings};
   for (int i = 0; i < nav.size(); ++i) {
     connect(nav.at(i), &QPushButton::clicked, this, [this, i] { showPage(i); });
     // Settings also has the platform's own shortcut (Cmd+, on macOS) through the Preferences action
@@ -433,7 +444,8 @@ void MainWindow::setupPages()
 
 void MainWindow::showPage(int index)
 {
-  const QList<QPushButton *> nav{ui->navHome, ui->navClipboard, ui->navOverlay, ui->navLog, ui->navSettings};
+  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot,
+                                 ui->navOverlay, ui->navLog,       ui->navSettings};
   if (index < 0 || index >= nav.size())
     return;
   if (!isVisible())
@@ -802,6 +814,7 @@ void MainWindow::createMenuBar()
     m_menuView->addAction(action);
   m_menuView->addSeparator();
   m_menuView->addAction(m_clipboardHistory->showAction());
+  m_menuView->addAction(m_screenshotTool->captureAction());
 
   m_menuHelp->addAction(m_actionAbout);
   m_menuHelp->addAction(m_actionShowHelp);
@@ -824,6 +837,7 @@ void MainWindow::setupTrayIcon()
   trayMenu->insertSeparator(m_actionMinimize);
   trayMenu->insertSeparator(m_actionTrayQuit);
   trayMenu->insertAction(m_actionStartCore, m_clipboardHistory->showAction());
+  trayMenu->insertAction(m_actionStartCore, m_screenshotTool->captureAction());
   trayMenu->insertAction(m_actionStartCore, m_actionSettings);
   trayMenu->insertSeparator(m_actionStartCore);
   m_trayIcon->setContextMenu(trayMenu);
@@ -927,6 +941,8 @@ void MainWindow::handleInstanceConnection()
         const auto command = QString::fromUtf8(socket->readLine()).trimmed();
         if (command == ClipboardHistory::kShowCommand)
           m_clipboardHistory->togglePopup();
+        else if (command == deskflow::gui::screenshot::ScreenshotTool::kCommand)
+          m_screenshotTool->capture();
         else
           showAndActivate();
       } else if (closing) {

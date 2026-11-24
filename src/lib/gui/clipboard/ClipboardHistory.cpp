@@ -10,20 +10,14 @@
 #include "ClipboardHistoryPopup.h"
 #include "ClipboardMonitor.h"
 #include "GlobalHotkey.h"
+#include "ShortcutDialog.h"
 
-#include "common/Constants.h"
 #include "common/Settings.h"
 
 #include <QAction>
 #include <QActionGroup>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QKeySequenceEdit>
-#include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
 
 namespace deskflow::gui::clipboard {
 
@@ -50,6 +44,11 @@ ClipboardHistory::ClipboardHistory(QWidget *dialogParent, QObject *parent)
       m_model->setPinned(id, !item->pinned);
   });
   connect(m_popup, &ClipboardHistoryPopup::removeRequested, m_model, &ClipboardHistoryModel::remove);
+  connect(m_popup, &ClipboardHistoryPopup::editRequested, this, [this](const QString &id) {
+    const auto image = m_model->image(id);
+    if (!image.isNull())
+      Q_EMIT editImageRequested(image);
+  });
   connect(m_popup, &ClipboardHistoryPopup::sortModeChanged, this, [](ClipboardHistoryFilterModel::SortMode mode) {
     Settings::setValue(Settings::ClipboardHistory::SortMode, int(mode));
   });
@@ -178,50 +177,17 @@ void ClipboardHistory::applyShortcut()
 
 void ClipboardHistory::editShortcut()
 {
-  QDialog dialog(m_dialogParent);
-  dialog.setWindowTitle(tr("Clipboard History Shortcut"));
-  auto *layout = new QVBoxLayout(&dialog);
-
-  auto *label = new QLabel(&dialog);
-  label->setWordWrap(true);
-  if (GlobalHotkey::isSupported()) {
-    label->setText(tr("Press the keys you want to use to open clipboard history from anywhere."));
-  } else {
-    label->setText(tr("Your desktop does not let apps register global shortcuts (for example on Wayland). "
-                      "Add a custom shortcut in your system keyboard settings that runs:\n\n    %1 --%2")
-                       .arg(kAppId, kShowCommand));
-    label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-  }
-  layout->addWidget(label);
-
-  auto *edit = new QKeySequenceEdit(
+  const auto chosenSequence = askForGlobalShortcut(
+      m_dialogParent, tr("Clipboard History Shortcut"),
+      tr("Press the keys you want to use to open clipboard history from anywhere."), kShowCommand,
       QKeySequence(Settings::value(Settings::ClipboardHistory::Shortcut).toString(), QKeySequence::PortableText),
-      &dialog
+      QKeySequence(Settings::defaultValue(Settings::ClipboardHistory::Shortcut).toString(), QKeySequence::PortableText)
   );
-  edit->setEnabled(GlobalHotkey::isSupported());
-  // Only single chord shortcuts make sense globally.
-  connect(edit, &QKeySequenceEdit::keySequenceChanged, edit, [edit](const QKeySequence &sequence) {
-    if (sequence.count() > 1)
-      edit->setKeySequence(QKeySequence(sequence[0]));
-  });
-  layout->addWidget(edit);
-
-  auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
-  auto *reset = buttons->addButton(tr("Use default"), QDialogButtonBox::ResetRole);
-  connect(reset, &QPushButton::clicked, edit, [edit] {
-    edit->setKeySequence(QKeySequence(
-        Settings::defaultValue(Settings::ClipboardHistory::Shortcut).toString(), QKeySequence::PortableText
-    ));
-  });
-  connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-  connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-  layout->addWidget(buttons);
-
-  if (dialog.exec() != QDialog::Accepted)
+  if (!chosenSequence)
     return;
 
   const auto previous = Settings::value(Settings::ClipboardHistory::Shortcut).toString();
-  const auto chosen = edit->keySequence().toString(QKeySequence::PortableText);
+  const auto chosen = chosenSequence->toString(QKeySequence::PortableText);
   Settings::setValue(Settings::ClipboardHistory::Shortcut, chosen);
   applyShortcut();
 
@@ -229,7 +195,7 @@ void ClipboardHistory::editShortcut()
     QMessageBox::warning(
         m_dialogParent, tr("Shortcut unavailable"),
         tr("%1 is already used by another application. Your previous shortcut has been restored.")
-            .arg(edit->keySequence().toString(QKeySequence::NativeText))
+            .arg(chosenSequence->toString(QKeySequence::NativeText))
     );
     Settings::setValue(Settings::ClipboardHistory::Shortcut, previous);
     applyShortcut();

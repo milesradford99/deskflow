@@ -270,6 +270,14 @@ void ClipboardHistoryPopup::buildUi()
   });
   previewLayout->addWidget(m_openLinkButton, 0, Qt::AlignLeft);
 
+  m_editImageButton = new QPushButton(tr("Edit…"), preview);
+  m_editImageButton->setObjectName(QStringLiteral("pillButton"));
+  m_editImageButton->setFocusPolicy(Qt::NoFocus);
+  m_editImageButton->setCursor(Qt::PointingHandCursor);
+  m_editImageButton->setToolTip(tr("Crop and mark up (%1)").arg(shortcutText(QStringLiteral("Ctrl+E"))));
+  connect(m_editImageButton, &QPushButton::clicked, this, &ClipboardHistoryPopup::editCurrent);
+  previewLayout->addWidget(m_editImageButton, 0, Qt::AlignLeft);
+
   m_metaLabel = new QLabel(preview);
   m_metaLabel->setObjectName(QStringLiteral("meta"));
   m_metaLabel->setTextFormat(Qt::RichText);
@@ -528,6 +536,12 @@ bool ClipboardHistoryPopup::eventFilter(QObject *watched, QEvent *event)
       return true;
     }
     break;
+  case Qt::Key_E:
+    if (ctrl) {
+      editCurrent();
+      return true;
+    }
+    break;
   default:
     if (ctrl && key->key() >= Qt::Key_1 && key->key() <= Qt::Key_9) {
       activateRow(key->key() - Qt::Key_1, mods & Qt::ShiftModifier);
@@ -556,6 +570,7 @@ void ClipboardHistoryPopup::updatePreview()
 {
   const auto *item = m_model->item(currentId());
   m_openLinkButton->setVisible(item && item->kind == ItemKind::Link);
+  m_editImageButton->setVisible(item && item->kind == ItemKind::Image);
 
   if (!item) {
     m_previewText->clear();
@@ -724,6 +739,16 @@ void ClipboardHistoryPopup::removeCurrent()
   selectRow(row);
 }
 
+void ClipboardHistoryPopup::editCurrent()
+{
+  const auto id = currentId();
+  const auto *item = m_model->item(id);
+  if (!item || item->kind != ItemKind::Image)
+    return;
+  hide();
+  Q_EMIT editRequested(id);
+}
+
 void ClipboardHistoryPopup::showContextMenu(const QPoint &pos)
 {
   const auto index = m_list->indexAt(pos);
@@ -739,6 +764,8 @@ void ClipboardHistoryPopup::showContextMenu(const QPoint &pos)
   menu.addAction(tr("Copy"), this, [this, row = index.row()] { activateRow(row, false); });
   if (item->kind != ItemKind::Image)
     menu.addAction(tr("Copy as plain text"), this, [this, row = index.row()] { activateRow(row, true); });
+  else
+    menu.addAction(tr("Edit…"), this, [this] { editCurrent(); });
   menu.addAction(item->pinned ? tr("Unpin") : tr("Pin"), this, [this] { togglePinCurrent(); });
   menu.addSeparator();
   menu.addAction(tr("Delete"), this, [this] { removeCurrent(); });

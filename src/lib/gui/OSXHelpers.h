@@ -22,3 +22,7 @@ void installQuitHandler(std::function<bool()> shouldQuit);
 long macPasteboardChangeCount();
 /// True when the general pasteboard carries a concealed/transient marker (password managers).
 bool macPasteboardIsConcealed();
+/// True when this app may record the screen (needed for screenshots that show other apps' windows).
+bool macScreenCaptureAllowed();
+/// Ask for screen recording access; macOS shows its prompt only the first time.
+void macRequestScreenCaptureAccess();

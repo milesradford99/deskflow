@@ -45,6 +45,10 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace deskflow::gui::screenshot {
+class ScreenshotTool;
+}
+
 namespace deskflow::gui::clipboard {
 class ClipboardHistory;
 }
@@ -246,9 +250,10 @@ private:
   QUrl m_helpPath;
 
   deskflow::gui::clipboard::ClipboardHistory *m_clipboardHistory = nullptr;
+  deskflow::gui::screenshot::ScreenshotTool *m_screenshotTool = nullptr;
 
   deskflow::gui::pages::SettingsPage *m_settingsPage = nullptr;
-  //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..5)
+  //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..6)
   QList<QAction *> m_pageActions;
   QStringList m_connectedClients;
 };

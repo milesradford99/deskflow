@@ -684,6 +684,10 @@ Do you want to connect to the server?
         <translation>剪贴板</translation>
     </message>
     <message>
+        <source>Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
         <source>Screen Hints</source>
         <translation>屏幕提示</translation>
     </message>
@@ -2061,6 +2065,14 @@ Enabling this setting will disable the server config GUI.</source>
         <translation>打开链接</translation>
     </message>
     <message>
+        <source>Edit…</source>
+        <translation>编辑…</translation>
+    </message>
+    <message>
+        <source>Crop and mark up (%1)</source>
+        <translation>裁剪和标注（%1）</translation>
+    </message>
+    <message>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
@@ -2345,6 +2357,131 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::pages::ScreenshotPage</name>
+    <message>
+        <source>Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <source>Capture part of the screen straight to the clipboard, ready to paste on any linked computer. Click the thumbnail that appears to crop it or mark it up.</source>
+        <translation>截取屏幕的一部分，直接放进剪贴板，在任何一台已连接的电脑上都能粘贴。点一下随后出现的缩略图，就能裁剪或标注。</translation>
+    </message>
+    <message>
+        <source>Take Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <source>Capture</source>
+        <translation>截取</translation>
+    </message>
+    <message>
+        <source>Screenshot tool</source>
+        <translation>截屏工具</translation>
+    </message>
+    <message>
+        <source>Change…</source>
+        <translation>更改…</translation>
+    </message>
+    <message>
+        <source>Drag to select an area, or press Space to pick a window. The first time, macOS asks to allow screen recording for %1.</source>
+        <translation>拖动选择区域，或按空格键选择窗口。第一次使用时，macOS 会请求允许 %1 录制屏幕。</translation>
+    </message>
+    <message>
+        <source>Drag to select an area, or click for the whole screen.</source>
+        <translation>拖动选择区域，或单击截取整个屏幕。</translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps register shortcuts. Add one in your system settings that runs: %1 --%2</source>
+        <translation>当前桌面不允许应用注册快捷键。请在系统设置中添加一个快捷键，运行：%1 --%2</translation>
+    </message>
+    <message>
+        <source>Shortcut</source>
+        <translation>快捷键</translation>
+    </message>
+    <message>
+        <source>After a capture</source>
+        <translation>截屏之后</translation>
+    </message>
+    <message>
+        <source>Copy to the clipboard</source>
+        <translation>复制到剪贴板</translation>
+    </message>
+    <message>
+        <source>Always. It also lands in clipboard history, where you can open it in the editor again later.</source>
+        <translation>始终会复制。截图也会进入剪贴板历史，之后可以在那里再次打开编辑。</translation>
+    </message>
+    <message>
+        <source>Show floating thumbnail</source>
+        <translation>显示浮动缩略图</translation>
+    </message>
+    <message>
+        <source>Slides in at the bottom right. Click it to crop and mark up, or drag it into another app.</source>
+        <translation>从右下角滑入。点击可裁剪和标注，也可以把它拖进其他应用。</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n seconds</source>
+        <translation>
+            <numerusform>%n 秒</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Thumbnail stays for</source>
+        <translation>缩略图停留</translation>
+    </message>
+    <message>
+        <source>Longer while the pointer is over it.</source>
+        <translation>指针停在上面时会一直保留。</translation>
+    </message>
+    <message>
+        <source>Also save as a file</source>
+        <translation>同时保存为文件</translation>
+    </message>
+    <message>
+        <source>A PNG in the folder below, named by date and time.</source>
+        <translation>以日期和时间命名的 PNG，保存到下面的文件夹。</translation>
+    </message>
+    <message>
+        <source>Choose…</source>
+        <translation>选择…</translation>
+    </message>
+    <message>
+        <source>Save Screenshots To</source>
+        <translation>截图保存位置</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>文件夹</translation>
+    </message>
+    <message>
+        <source>Editor</source>
+        <translation>编辑器</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>工具</translation>
+    </message>
+    <message>
+        <source>Crop, rectangle, ellipse, arrow, line, pen, highlighter, text, numbered steps and pixelate. Press Enter to copy the result, or save it as a file.</source>
+        <translation>裁剪、矩形、椭圆、箭头、直线、画笔、荧光笔、文字、序号和马赛克。按回车复制结果，或保存为文件。</translation>
+    </message>
+    <message>
+        <source>Edit from clipboard history</source>
+        <translation>从剪贴板历史编辑</translation>
+    </message>
+    <message>
+        <source>Select any image in clipboard history and choose Edit (%1).</source>
+        <translation>在剪贴板历史中选中任意图片，选择「编辑」（%1）。</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>Another app is using this shortcut; choose a different one.</source>
+        <translation>另一个应用正在使用此快捷键，请换一个。</translation>
+    </message>
+</context>
+<context>
     <name>deskflow::gui::pages::SettingsPage</name>
     <message>
         <source>Settings</source>
@@ -2621,6 +2758,202 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
         <translation>&lt;p&gt;确定要清除所有设置并重启 %1 吗？&lt;/p&gt; &lt;p&gt;此操作无法撤销。&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::RegionSelector</name>
+    <message>
+        <source>Drag to capture an area  ·  Click for the whole screen  ·  Esc to cancel</source>
+        <translation>拖动截取区域  ·  单击截取整个屏幕  ·  Esc 取消</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotEditor</name>
+    <message>
+        <source>Select and move</source>
+        <translation>选择和移动</translation>
+    </message>
+    <message>
+        <source>Crop</source>
+        <translation>裁剪</translation>
+    </message>
+    <message>
+        <source>Rectangle</source>
+        <translation>矩形</translation>
+    </message>
+    <message>
+        <source>Ellipse</source>
+        <translation>椭圆</translation>
+    </message>
+    <message>
+        <source>Arrow</source>
+        <translation>箭头</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>直线</translation>
+    </message>
+    <message>
+        <source>Pen</source>
+        <translation>画笔</translation>
+    </message>
+    <message>
+        <source>Highlighter</source>
+        <translation>荧光笔</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>文字</translation>
+    </message>
+    <message>
+        <source>Numbered step</source>
+        <translation>序号</translation>
+    </message>
+    <message>
+        <source>Pixelate</source>
+        <translation>马赛克</translation>
+    </message>
+    <message>
+        <source>Edit Screenshot</source>
+        <translation>编辑截图</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>红色</translation>
+    </message>
+    <message>
+        <source>Yellow</source>
+        <translation>黄色</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>绿色</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>蓝色</translation>
+    </message>
+    <message>
+        <source>Purple</source>
+        <translation>紫色</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>黑色</translation>
+    </message>
+    <message>
+        <source>White</source>
+        <translation>白色</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>细</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>Thick</source>
+        <translation>粗</translation>
+    </message>
+    <message>
+        <source>Undo (%1)</source>
+        <translation>撤销（%1）</translation>
+    </message>
+    <message>
+        <source>Redo (%1)</source>
+        <translation>重做（%1）</translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation>保存…</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <source>Copy to the clipboard and close (↵)</source>
+        <translation>复制到剪贴板并关闭（↵）</translation>
+    </message>
+    <message>
+        <source>↵ Copy    %1 Save    Esc Close</source>
+        <translation>↵ 复制    %1 保存    Esc 关闭</translation>
+    </message>
+    <message>
+        <source>%1 × %2 px</source>
+        <translation>%1 × %2 像素</translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <source>Save Screenshot</source>
+        <translation>保存截图</translation>
+    </message>
+    <message>
+        <source>PNG image (*.png);;JPEG image (*.jpg *.jpeg)</source>
+        <translation>PNG 图片 (*.png);;JPEG 图片 (*.jpg *.jpeg)</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t save to %1</source>
+        <translation>无法保存到 %1</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <translation>已保存到 %1</translation>
+    </message>
+    <message>
+        <source>Discard changes?</source>
+        <translation>放弃更改？</translation>
+    </message>
+    <message>
+        <source>Close the editor without copying or saving your changes?</source>
+        <translation>不复制也不保存，直接关闭编辑器吗？</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotThumbnail</name>
+    <message>
+        <source>Click to edit · Drag to drop into another app</source>
+        <translation>点击编辑 · 拖到其他应用中</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::screenshot::ScreenshotTool</name>
+    <message>
+        <source>Take Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <source>Screenshot Shortcut</source>
+        <translation>截屏快捷键</translation>
+    </message>
+    <message>
+        <source>Press the keys you want to use to take a screenshot from anywhere.</source>
+        <translation>按下想用来在任何地方截屏的按键。</translation>
+    </message>
+    <message>
+        <source>Shortcut unavailable</source>
+        <translation>快捷键不可用</translation>
+    </message>
+    <message>
+        <source>%1 is already used by another application. Your previous shortcut has been restored.</source>
+        <translation>%1 已被其他应用占用，已恢复为之前的快捷键。</translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <source>This desktop doesn&apos;t let apps read the screen (for example on Wayland). Use your desktop&apos;s own screenshot tool; whatever it copies still shows up in clipboard history.</source>
+        <translation>当前桌面不允许应用读取屏幕（例如 Wayland）。请使用桌面自带的截图工具，它复制的图片同样会出现在剪贴板历史里。</translation>
     </message>
 </context>
 <context>
