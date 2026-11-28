@@ -53,6 +53,10 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   FileTransfer.h
   FileTransferIpc.cpp
   FileTransferIpc.h
+  RemoteViewInput.cpp
+  RemoteViewInput.h
+  RemoteViewIpc.cpp
+  RemoteViewIpc.h
   FileTransferProtocol.cpp
   FileTransferProtocol.h
   IApp.h

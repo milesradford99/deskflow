@@ -10,6 +10,11 @@ if(APPLE)
   set (platform_sources
     OSXHelpers.h
     OSXHelpers.mm
+    permissions/PermissionsMac.mm
+  )
+else()
+  set (platform_sources
+    permissions/PermissionsStub.cpp
   )
 endif()
 
@@ -35,8 +40,14 @@ add_library(${target} STATIC
   pages/ClipboardPage.h
   pages/OverlayPage.cpp
   pages/OverlayPage.h
+  pages/PermissionsPage.cpp
+  pages/PermissionsPage.h
+  permissions/Permissions.cpp
+  permissions/Permissions.h
   pages/RebuildablePage.cpp
   pages/RebuildablePage.h
+  pages/RemotePage.cpp
+  pages/RemotePage.h
   pages/ScreenshotPage.cpp
   pages/ScreenshotPage.h
   pages/SettingsPage.cpp
@@ -74,6 +85,10 @@ add_library(${target} STATIC
   screenshot/ScreenshotEditor.h
   screenshot/ScreenshotThumbnail.cpp
   screenshot/ScreenshotThumbnail.h
+  remote/RemoteViewManager.cpp
+  remote/RemoteViewManager.h
+  remote/RemoteViewWindow.cpp
+  remote/RemoteViewWindow.h
   screenshot/ScreenshotTool.cpp
   screenshot/ScreenshotTool.h
   config/ComputerConfig.h
@@ -170,5 +185,10 @@ target_link_libraries(${target}
     common
     platform
     net
+    remoteview
     Qt6::Widgets
 )
+
+if(APPLE)
+  target_link_libraries(${target} PRIVATE "-framework Security" "-framework ApplicationServices" "-framework CoreGraphics")
+endif()

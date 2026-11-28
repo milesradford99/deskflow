@@ -12,8 +12,10 @@
 #include "base/IEventQueue.h"
 #include "base/Log.h"
 #include "client/ClientHub.h"
+#include "client/RemoteViewSender.h"
 #include "client/ServerProxy.h"
 #include "client/ServerProxy1_10.h"
+#include "client/ServerProxy1_11.h"
 #include "client/ServerProxy1_7.h"
 #include "client/ServerProxy1_8.h"
 #include "client/ServerProxy1_9.h"
@@ -435,6 +437,42 @@ bool Client::sendFileTransferMessage(const deskflow::FileTransferMessage &messag
   return m_server != nullptr && m_server->sendFileTransferMessage(message);
 }
 
+void Client::handleRemoteViewSettings(const std::string &json)
+{
+  if (m_server == nullptr)
+    return;
+  if (!Settings::value(Settings::RemoteView::AllowViewing).toBool()) {
+    LOG_INFO("remote view: refused, viewing this computer is turned off");
+    m_server->sendRemoteViewInfo(R"({"state":"disabled"})");
+    return;
+  }
+  if (!m_remoteView) {
+    const auto display = Settings::value(Settings::Core::Display).toString();
+    m_remoteView = std::make_unique<deskflow::client::RemoteViewSender>(
+        m_events, [display] { return deskflow::remote::createScreenCapturer(display); },
+        [this](const std::string &piece) { return m_server != nullptr && m_server->sendRemoteViewFrame(piece); },
+        [this](const std::string &info) {
+          if (m_server != nullptr)
+            m_server->sendRemoteViewInfo(info);
+        }
+    );
+  }
+  const bool wasStreaming = m_remoteView->isStreaming();
+  m_remoteView->applySettings(json);
+  if (wasStreaming != m_remoteView->isStreaming()) {
+    ipcSendActivity(
+        m_remoteView->isStreaming() ? QStringLiteral("remoteViewStarted") : QStringLiteral("remoteViewStopped"),
+        {QString::fromStdString(m_serverAddress.getHostname())}
+    );
+  }
+}
+
+void Client::handleRemoteViewAck(uint32_t sequence)
+{
+  if (m_remoteView)
+    m_remoteView->acknowledge(sequence);
+}
+
 std::string Client::getServerName() const
 {
   return m_serverAddress.getHostname() + ":" + std::to_string(m_serverAddress.getPort());
@@ -541,6 +579,9 @@ bool Client::setupComputer(int16_t protocolMinor)
   case 10:
     m_server = new ServerProxy1_10(this, m_stream, m_events);
     break;
+  case 11:
+    m_server = new ServerProxy1_11(this, m_stream, m_events);
+    break;
   default:
     break;
   }
@@ -589,6 +630,11 @@ void Client::cleanupConnection()
 
 void Client::cleanupComputer()
 {
+  if (m_remoteView) {
+    if (m_remoteView->isStreaming())
+      ipcSendActivity(QStringLiteral("remoteViewStopped"), {QString::fromStdString(m_serverAddress.getHostname())});
+    m_remoteView.reset(); // before the proxy it writes to goes
+  }
   if (m_server != nullptr) {
     if (m_ready) {
       m_ready = false;

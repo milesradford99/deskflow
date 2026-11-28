@@ -11,6 +11,7 @@
 #include "base/Log.h"
 #include "common/Constants.h"
 #include "deskflow/FileTransferIpc.h"
+#include "deskflow/RemoteViewIpc.h"
 
 #include <QLocalSocket>
 
@@ -25,6 +26,8 @@ CoreIpcServer::CoreIpcServer(QObject *parent) : IpcServer(parent, kCoreIpcName, 
 
   // Stop producing key presses as soon as no GUI is listening, even if it never said "off".
   connect(this, &IpcServer::clientCountChanged, this, [](int count) {
+    if (count == 0)
+      deskflow::remoteViewIpc::postStopAll(); // nobody left to show the streams to
     if (count == 0 && ipcKeyOverlayEnabled()) {
       LOG_DEBUG("core ipc server has no clients, key overlay off");
       ipcSetKeyOverlayEnabled(false);
@@ -46,6 +49,8 @@ CoreIpcServer &CoreIpcServer::instance()
 void CoreIpcServer::processCommand(QLocalSocket *clientSocket, const QString &command, const QStringList &parts)
 {
   if (deskflow::fileTransferIpc::postCommand(command, parts.size() >= 2 ? parts.at(1) : QString()))
+    return;
+  if (deskflow::remoteViewIpc::postCommand(command, parts.size() >= 2 ? parts.at(1) : QString()))
     return;
 
   if (command == QStringLiteral("stop")) {

@@ -10,6 +10,8 @@ add_library(client STATIC
   ClientHub.h
   InputArbiter.cpp
   InputArbiter.h
+  RemoteViewSender.cpp
+  RemoteViewSender.h
   ServerProxy.cpp
   ServerProxy.h
   ServerProxy1_7.cpp
@@ -20,6 +22,8 @@ add_library(client STATIC
   ServerProxy1_9.h
   ServerProxy1_10.cpp
   ServerProxy1_10.h
+  ServerProxy1_11.cpp
+  ServerProxy1_11.h
 )
 
-target_link_libraries(client PUBLIC common)
+target_link_libraries(client PUBLIC common remoteview)

@@ -92,6 +92,8 @@ public:
   void sendFiles(const QString &target, const QStringList &paths);
   //! Ask the core to cancel a file transfer.
   void cancelFileTransfer(quint32 id);
+  //! Server: ask the core for a remote view command (deskflow::ipc::kRemoteView / kRemoteAck / kRemoteInput)
+  void sendRemoteView(const QString &command, const QJsonObject &payload);
 
 Q_SIGNALS:
   void error(deskflow::gui::CoreProcess::Error error);
@@ -115,6 +117,10 @@ Q_SIGNALS:
   void missingKeyboardLayouts(const QString &layouts);
   void activity(const QString &type, const QStringList &fields);
   void keyPressed(const QString &label, bool isText);
+  //! Server: a piece of a frame of \c client's screen (see remoteview/RemoteFrame.h)
+  void remoteFrame(const QString &client, const QByteArray &piece);
+  //! Server: a client's remote view state
+  void remoteInfo(const QJsonObject &info);
 
 private Q_SLOTS:
   void onProcessFinished(int exitCode, QProcess::ExitStatus);

@@ -22,7 +22,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq >/dev/null || true
 apt-get install -y -qq cmake ninja-build build-essential pkg-config \
   libx11-dev libxtst-dev libxi-dev libxkbfile-dev libxinerama-dev libxrandr-dev \
-  libxkbcommon-dev libxkbcommon-x11-dev libssl-dev libgl-dev \
+  libxkbcommon-dev libxkbcommon-x11-dev libssl-dev libgl-dev libavcodec-dev libavutil-dev libxext-dev \
   xvfb xdotool xclip xinput imagemagick python3-venv >/dev/null
 
 echo "== micromamba"
