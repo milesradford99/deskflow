@@ -170,6 +170,14 @@ p, li { white-space: pre-wrap; }
         <translation>光标已解锁</translation>
     </message>
     <message>
+        <source>%1 is viewing this screen</source>
+        <translation>%1 正在查看此屏幕</translation>
+    </message>
+    <message>
+        <source>%1 stopped viewing this screen</source>
+        <translation>%1 已停止查看此屏幕</translation>
+    </message>
+    <message>
         <source>Keyboard broadcast on</source>
         <translation>键盘广播已开启</translation>
     </message>
@@ -686,6 +694,10 @@ Do you want to connect to the server?
     <message>
         <source>Screenshot</source>
         <translation>截屏</translation>
+    </message>
+    <message>
+        <source>Remote Control</source>
+        <translation>远程控制</translation>
     </message>
     <message>
         <source>Screen Hints</source>
@@ -2357,6 +2369,117 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::pages::RemotePage</name>
+    <message>
+        <source>Remote Control</source>
+        <translation>远程控制</translation>
+    </message>
+    <message>
+        <source>See a linked computer&apos;s screen in a window on this one and use it with this keyboard and mouse, without looking at its own display. It uses the same connection as sharing the keyboard and mouse.</source>
+        <translation>在这台电脑的窗口里显示另一台已连接电脑的屏幕，并直接用这里的键盘和鼠标操作它，不用再看它自己的显示器。使用的是与键鼠共享相同的连接。</translation>
+    </message>
+    <message>
+        <source>Computers</source>
+        <translation type="unfinished">计算机</translation>
+    </message>
+    <message>
+        <source>No computers connected yet</source>
+        <translation>还没有电脑连接</translation>
+    </message>
+    <message>
+        <source>Only on the server</source>
+        <translation>仅在 server 上可用</translation>
+    </message>
+    <message>
+        <source>Computers appear here once they connect to this one.</source>
+        <translation>电脑连接到这台电脑后会显示在这里。</translation>
+    </message>
+    <message>
+        <source>Use this computer as the server to see and control the computers linked to it.</source>
+        <translation>把这台电脑设为 server，即可查看并控制连接到它的电脑。</translation>
+    </message>
+    <message>
+        <source>View Screen</source>
+        <translation>查看屏幕</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation type="unfinished">已连接</translation>
+    </message>
+    <message>
+        <source>Picture</source>
+        <translation>画面</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>流畅</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <translation>均衡</translation>
+    </message>
+    <message>
+        <source>Sharp</source>
+        <translation>清晰</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation>画质</translation>
+    </message>
+    <message>
+        <source>Smooth sends a smaller picture. Sharp sends full resolution (up to 4K), best for small text.</source>
+        <translation>流畅：画面更小、更省流量。清晰：原始分辨率（最高 4K），适合看小字。</translation>
+    </message>
+    <message>
+        <source>%1 frames per second</source>
+        <translation>每秒 %1 帧</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation>帧率</translation>
+    </message>
+    <message>
+        <source>The most it sends; a still screen sends almost nothing.</source>
+        <translation>这是上限；画面静止时几乎不发送数据。</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>视频编码</translation>
+    </message>
+    <message>
+        <source>H.264 with the graphics hardware where both computers have it, otherwise compressed images.</source>
+        <translation>两台电脑都支持时使用显卡硬件 H.264 编码，否则使用压缩图片。</translation>
+    </message>
+    <message>
+        <source>Compressed images (this build has no H.264 decoder).</source>
+        <translation>压缩图片（此版本没有 H.264 解码器）。</translation>
+    </message>
+    <message>
+        <source>This Computer</source>
+        <translation type="unfinished">本机</translation>
+    </message>
+    <message>
+        <source>When this computer is a client, its server may show its screen and control it. The first time, macOS asks to allow screen recording for %1.</source>
+        <translation>当这台电脑作为 client 时，允许它的 server 查看并控制这台电脑的屏幕。第一次被查看时，macOS 会要求为 %1 打开屏幕录制权限。</translation>
+    </message>
+    <message>
+        <source>When this computer is a client, its server may show its screen and control it.</source>
+        <translation>当这台电脑作为 client 时，允许它的 server 查看并控制这台电脑的屏幕。</translation>
+    </message>
+    <message>
+        <source>Allow remote viewing</source>
+        <translation>允许远程查看</translation>
+    </message>
+    <message>
+        <source>While someone is watching</source>
+        <translation>有人查看时</translation>
+    </message>
+    <message>
+        <source>A notice appears in the corner of this screen when a viewer opens or closes.</source>
+        <translation>对方打开或关闭查看窗口时，屏幕角落会出现提示。</translation>
+    </message>
+</context>
+<context>
     <name>deskflow::gui::pages::ScreenshotPage</name>
     <message>
         <source>Screenshot</source>
@@ -2758,6 +2881,137 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
         <translation>&lt;p&gt;确定要清除所有设置并重启 %1 吗？&lt;/p&gt; &lt;p&gt;此操作无法撤销。&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::remote::RemoteViewWindow</name>
+    <message>
+        <source>Display %1</source>
+        <translation>屏幕 %1</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <translation>未连接</translation>
+    </message>
+    <message>
+        <source>%1 is not connected</source>
+        <translation>%1 未连接</translation>
+    </message>
+    <message>
+        <source>The picture comes back as soon as it connects again.</source>
+        <translation>重新连接后画面会自动恢复。</translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <translation>实时</translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation>%1 帧/秒</translation>
+    </message>
+    <message>
+        <source>Watching only: another computer is in control</source>
+        <translation>仅观看：另一台电脑正在控制</translation>
+    </message>
+    <message>
+        <source>Another computer is controlling %1</source>
+        <translation>另一台电脑正在控制 %1</translation>
+    </message>
+    <message>
+        <source>Click the picture to take over once it has been idle for a moment.</source>
+        <translation>等对方停止操作片刻后，点击画面即可接管。</translation>
+    </message>
+    <message>
+        <source>Waiting for the picture…</source>
+        <translation>正在等待画面…</translation>
+    </message>
+    <message>
+        <source>Screen recording not allowed</source>
+        <translation>未允许屏幕录制</translation>
+    </message>
+    <message>
+        <source>%1 hasn&apos;t allowed screen recording</source>
+        <translation>%1 还没有允许屏幕录制</translation>
+    </message>
+    <message>
+        <source>On %1, open System Settings &gt; Privacy &amp; Security &gt; Screen &amp; System Audio Recording, turn on Deskflow, then restart Deskflow there.</source>
+        <translation>请在 %1 上打开「系统设置 &gt; 隐私与安全性 &gt; 录屏与系统录音」，开启 Deskflow，然后在那台电脑上重新启动 Deskflow。</translation>
+    </message>
+    <message>
+        <source>On %1, allow Deskflow to record the screen (on a Mac: System Settings &gt; Privacy &amp; Security &gt; Screen &amp; System Audio Recording), then restart Deskflow there.</source>
+        <translation>请在 %1 上允许 Deskflow 录制屏幕（Mac 上为「系统设置 &gt; 隐私与安全性 &gt; 录屏与系统录音」），然后在那台电脑上重新启动 Deskflow。</translation>
+    </message>
+    <message>
+        <source>Viewing turned off</source>
+        <translation>已关闭远程查看</translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t allow remote viewing</source>
+        <translation>%1 不允许远程查看</translation>
+    </message>
+    <message>
+        <source>It can be turned on in Deskflow on %1, under Remote Control.</source>
+        <translation>可以在 %1 的 Deskflow「远程控制」页里打开。</translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation>不可用</translation>
+    </message>
+    <message>
+        <source>%1 can&apos;t share its screen</source>
+        <translation>%1 无法共享屏幕</translation>
+    </message>
+    <message>
+        <source>Update Deskflow on %1 to the same version as this computer.</source>
+        <translation>请把 %1 上的 Deskflow 更新到与这台电脑相同的版本。</translation>
+    </message>
+    <message>
+        <source>Remote viewing works on macOS, Windows and Linux with X11; Wayland isn&apos;t supported yet.</source>
+        <translation>远程查看支持 macOS、Windows 和使用 X11 的 Linux，暂不支持 Wayland。</translation>
+    </message>
+    <message>
+        <source>Capture failed</source>
+        <translation>采集失败</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t capture the screen of %1</source>
+        <translation>无法采集 %1 的屏幕</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation type="unfinished">正在连接…</translation>
+    </message>
+    <message>
+        <source>Connecting to %1…</source>
+        <translation>正在连接 %1…</translation>
+    </message>
+    <message>
+        <source>%1 — Remote Control</source>
+        <translation>%1 — 远程控制</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>流畅</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <translation>均衡</translation>
+    </message>
+    <message>
+        <source>Sharp</source>
+        <translation>清晰</translation>
+    </message>
+    <message>
+        <source>Smooth: smaller picture, less data. Sharp: full resolution, best for text.</source>
+        <translation>流畅：画面更小、流量更少。清晰：原始分辨率，适合看文字。</translation>
+    </message>
+    <message>
+        <source>Full Screen</source>
+        <translation>全屏</translation>
+    </message>
+    <message>
+        <source>Exit Full Screen</source>
+        <translation>退出全屏</translation>
     </message>
 </context>
 <context>

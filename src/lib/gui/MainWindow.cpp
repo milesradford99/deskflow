@@ -36,8 +36,10 @@
 #include "net/FingerprintDatabase.h"
 #include "pages/ClipboardPage.h"
 #include "pages/OverlayPage.h"
+#include "pages/RemotePage.h"
 #include "pages/ScreenshotPage.h"
 #include "pages/SettingsPage.h"
+#include "remote/RemoteViewManager.h"
 #include "screenshot/ScreenshotTool.h"
 #include "widgets/FileTransferWidget.h"
 #include "widgets/StatusBar.h"
@@ -401,6 +403,9 @@ void MainWindow::setupPages()
   auto *screenshotPage = new ScreenshotPage(m_screenshotTool, ui->pages);
   ui->pages->insertWidget(UiPage::ScreenshotPage, screenshotPage);
 
+  m_remoteViews = new deskflow::gui::remote::RemoteViewManager(m_coreProcess, this);
+  ui->pages->insertWidget(UiPage::RemotePage, new RemotePage(m_remoteViews, ui->pages));
+
   auto *overlayPage = new OverlayPage(ui->pages);
   ui->pages->insertWidget(UiPage::OverlayPage, overlayPage);
   connect(overlayPage, &OverlayPage::previewKeys, this, [this] {
@@ -427,7 +432,7 @@ void MainWindow::setupPages()
   connect(m_settingsPage, &SettingsPage::requestRemoveAllSettings, this, &MainWindow::clearSettings);
   connect(m_settingsPage, &SettingsPage::requestShowFingerprint, this, &MainWindow::showMyFingerprint);
 
-  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot,
+  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot, ui->navRemote,
                                  ui->navOverlay, ui->navLog,       ui->navSettings};
   for (int i = 0; i < nav.size(); ++i) {
     connect(nav.at(i), &QPushButton::clicked, this, [this, i] { showPage(i); });
@@ -444,7 +449,7 @@ void MainWindow::setupPages()
 
 void MainWindow::showPage(int index)
 {
-  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot,
+  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot, ui->navRemote,
                                  ui->navOverlay, ui->navLog,       ui->navSettings};
   if (index < 0 || index >= nav.size())
     return;

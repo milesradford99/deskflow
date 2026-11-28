@@ -49,6 +49,10 @@ namespace deskflow::gui::screenshot {
 class ScreenshotTool;
 }
 
+namespace deskflow::gui::remote {
+class RemoteViewManager;
+}
+
 namespace deskflow::gui::clipboard {
 class ClipboardHistory;
 }
@@ -251,6 +255,7 @@ private:
 
   deskflow::gui::clipboard::ClipboardHistory *m_clipboardHistory = nullptr;
   deskflow::gui::screenshot::ScreenshotTool *m_screenshotTool = nullptr;
+  deskflow::gui::remote::RemoteViewManager *m_remoteViews = nullptr;
 
   deskflow::gui::pages::SettingsPage *m_settingsPage = nullptr;
   //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..6)

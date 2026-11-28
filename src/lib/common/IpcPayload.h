@@ -33,11 +33,20 @@ inline QJsonObject decodePayload(const QString &text)
 // commands, GUI -> core
 inline const auto kSendFiles = QStringLiteral("sendFiles");           //!< {target, paths[]}
 inline const auto kCancelTransfer = QStringLiteral("cancelTransfer"); //!< {id}
+//! server: {client, on, display, quality, fps, key, codecs[]}, passed on to the client as its settings
+inline const auto kRemoteView = QStringLiteral("remoteView");
+inline const auto kRemoteAck = QStringLiteral("remoteAck");     //!< {client, sequence}: frame shown
+inline const auto kRemoteInput = QStringLiteral("remoteInput"); //!< {client, t, ...}, see RemoteViewIpc
 
 // commands, core -> GUI
 inline const auto kFileTransfer = QStringLiteral("fileTransfer"); //!< progress, see FileTransferIpc
 inline const auto kFilePeers = QStringLiteral("filePeers");       //!< {self, peers[]}
 //! client mode: {servers: [{host, state, control}]}, state as in deskflow::core::ConnectionState
 inline const auto kServers = QStringLiteral("servers");
+//! server: `<base64url client name>.<base64url frame piece>` (not JSON: pieces are binary and many)
+inline const auto kRemoteFrame = QStringLiteral("remoteFrame");
+//! server: {client, state, displays[], codec, detail}; state streaming|unsupported|denied|disabled|failed|
+//! controlled (another server is in control)|stopped
+inline const auto kRemoteInfo = QStringLiteral("remoteInfo");
 
 } // namespace deskflow::ipc

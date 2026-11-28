@@ -17,6 +17,8 @@
 #include "deskflow/MouseTypes.h"
 #include "server/Config.h"
 
+#include <QJsonObject>
+
 #include <climits>
 #include <map>
 #include <memory>
@@ -210,6 +212,14 @@ public:
 
   //! The client is controlled by another server: take the cursor back from it.
   void handleControlDenied(const BaseClientProxy *client);
+
+  //! @name Remote view (ServerRemoteView.cpp)
+  //@{
+  //! A piece of a frame of the client's screen: on to the GUI.
+  void handleRemoteViewFrame(BaseClientProxy *client, const std::string &piece);
+  //! The client's remote view state (JSON): on to the GUI.
+  void handleRemoteViewInfo(BaseClientProxy *client, const std::string &json);
+  //@}
 
   //! The manager that sends, receives and relays files for this server.
   deskflow::FileTransferManager &fileTransfer() const
@@ -435,6 +445,22 @@ private:
   //! Tell every client and the GUI which computers files can be sent to.
   void sendFilePeers() const;
   ClientSet m_clientSet;
+
+  //! A client whose screen the GUI shows, and whether the viewer is driving it
+  struct RemoteView
+  {
+    bool entered = false; //!< we sent it an enter for the viewer (not for our cursor)
+    std::set<KeyButton> keys;
+    std::set<ButtonID> buttons;
+  };
+  std::map<BaseClientProxy *, RemoteView> m_remoteViews;
+  void handleRemoteViewCommand(const Event &event);
+  void remoteViewInput(BaseClientProxy *client, RemoteView &view, const QJsonObject &input);
+  void remoteViewEnter(BaseClientProxy *client, RemoteView &view, int32_t x, int32_t y);
+  void remoteViewLeave(BaseClientProxy *client, RemoteView &view);
+  void stopRemoteView(BaseClientProxy *client, bool tellClient);
+  //! The viewer's control of \c client ended because our cursor or another server took over
+  bool remoteViewControlDenied(const BaseClientProxy *client);
 
   // all old connections that we're waiting to hangup
   using OldClients = std::map<BaseClientProxy *, EventQueueTimer *>;

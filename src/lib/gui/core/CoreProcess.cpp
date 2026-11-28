@@ -651,8 +651,28 @@ void CoreProcess::cancelFileTransfer(quint32 id)
   m_coreIpcClient->sendCommand(deskflow::ipc::kCancelTransfer, deskflow::ipc::encodePayload(payload));
 }
 
+void CoreProcess::sendRemoteView(const QString &command, const QJsonObject &payload)
+{
+  if (!m_coreIpcClient || !m_coreIpcClient->isConnected())
+    return;
+  m_coreIpcClient->sendCommand(command, deskflow::ipc::encodePayload(payload));
+}
+
 void CoreProcess::onCoreIpcMessageReceived(const QString &command, const QString &args)
 {
+  if (command == deskflow::ipc::kRemoteFrame) {
+    const auto dot = args.indexOf(QLatin1Char('.'));
+    if (dot <= 0)
+      return;
+    constexpr auto base64 = QByteArray::Base64UrlEncoding;
+    const auto client = QString::fromUtf8(QByteArray::fromBase64(QStringView(args).left(dot).toLatin1(), base64));
+    Q_EMIT remoteFrame(client, QByteArray::fromBase64(QStringView(args).mid(dot + 1).toLatin1(), base64));
+    return;
+  }
+  if (command == deskflow::ipc::kRemoteInfo) {
+    Q_EMIT remoteInfo(deskflow::ipc::decodePayload(args));
+    return;
+  }
   if (command == "connectionState") {
     const auto metaEnum = QMetaEnum::fromType<ConnectionState>();
     bool ok = false;

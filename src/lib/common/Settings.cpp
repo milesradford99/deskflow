@@ -428,6 +428,12 @@ QVariant Settings::defaultValue(const QString &key)
   if (key == Screenshot::ThumbnailSeconds)
     return 5;
 
+  if (key == RemoteView::Quality)
+    return 1; // balanced
+
+  if (key == RemoteView::FrameRate)
+    return 30;
+
   if (key == Screenshot::Folder) {
     const auto desktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     return desktop.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) : desktop;

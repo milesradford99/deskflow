@@ -72,6 +72,15 @@ public:
     inline static const auto SaveToFolder = QStringLiteral("screenshot/saveToFolder");
     inline static const auto Folder = QStringLiteral("screenshot/folder");
   };
+  struct RemoteView
+  {
+    //! On a client: let servers stream this computer's screen.
+    inline static const auto AllowViewing = QStringLiteral("remoteView/allowViewing");
+    //! On a server: 0 smooth, 1 balanced, 2 sharp (see RemoteViewWindow)
+    inline static const auto Quality = QStringLiteral("remoteView/quality");
+    //! On a server: most frames per second to ask for
+    inline static const auto FrameRate = QStringLiteral("remoteView/frameRate");
+  };
   struct Core
   {
     inline static const auto CoreMode = QStringLiteral("core/coreMode");
@@ -302,6 +311,7 @@ private:
     , QStringLiteral("log")
     , QStringLiteral("security")
     , QStringLiteral("screenshot")
+    , QStringLiteral("remoteView")
     , QStringLiteral("server")
     , QStringLiteral("internalConfig")
   };
@@ -324,6 +334,9 @@ private:
     , ClipboardHistory::Paused
     , ClipboardHistory::Shortcut
     , ClipboardHistory::SortMode
+    , RemoteView::AllowViewing
+    , RemoteView::Quality
+    , RemoteView::FrameRate
     , Screenshot::Enabled
     , Screenshot::Shortcut
     , Screenshot::ShowThumbnail
@@ -431,6 +444,7 @@ private:
     , ClipboardHistory::IgnoreSensitive
     , Screenshot::Enabled
     , Screenshot::ShowThumbnail
+    , RemoteView::AllowViewing
     , Gui::CursorHighlight
     , Core::UseHooks
     , Gui::CloseToTray

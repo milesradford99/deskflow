@@ -44,6 +44,7 @@ public:
     HomePage,
     ClipboardPage,
     ScreenshotPage,
+    RemotePage,
     OverlayPage,
     LogPage,
     SettingsPage
@@ -64,6 +65,7 @@ public:
   QPushButton *navHome = nullptr;
   QPushButton *navClipboard = nullptr;
   QPushButton *navScreenshot = nullptr;
+  QPushButton *navRemote = nullptr;
   QPushButton *navOverlay = nullptr;
   QPushButton *navLog = nullptr;
   QPushButton *navSettings = nullptr;

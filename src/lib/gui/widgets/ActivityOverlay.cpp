@@ -101,9 +101,9 @@ void ActivityOverlay::addKey(const QString &label, bool isText)
   push(entry);
 }
 
-void ActivityOverlay::addActivity(Kind kind, const QString &text)
+void ActivityOverlay::addActivity(Kind kind, const QString &text, bool always)
 {
-  if (!m_showActivity || text.isEmpty())
+  if ((!m_showActivity && !always) || text.isEmpty())
     return;
 
   // The same event twice in a row (e.g. clipboard updates) just refreshes the bubble.
@@ -145,6 +145,11 @@ void ActivityOverlay::handleCoreActivity(const QString &type, const QStringList 
       addActivity(Kind::Info, tr("Cursor locked to %1").arg(field(1)));
     else
       addActivity(Kind::Info, tr("Cursor unlocked"));
+  } else if (type == QStringLiteral("remoteViewStarted")) {
+    // shown even with screen hints off: people should know when their screen is being watched
+    addActivity(Kind::Info, tr("%1 is viewing this screen").arg(field(0)), true);
+  } else if (type == QStringLiteral("remoteViewStopped")) {
+    addActivity(Kind::Info, tr("%1 stopped viewing this screen").arg(field(0)), true);
   } else if (type == QStringLiteral("keyboardBroadcast")) {
     if (field(0) == QStringLiteral("on"))
       addActivity(Kind::Info, tr("Keyboard broadcast on"));

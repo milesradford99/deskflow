@@ -91,6 +91,16 @@ public:
   {
     // only clients speaking protocol 1.9 or later care
   }
+  //! Start, change or stop the client's remote view stream; false if it can't stream (protocol < 1.11).
+  virtual bool sendRemoteViewSettings(const std::string &)
+  {
+    return false;
+  }
+  //! Tell the client a remote view frame was shown, so it may send another.
+  virtual void sendRemoteViewAck(uint32_t)
+  {
+    // only clients speaking protocol 1.11 or later stream
+  }
   virtual std::string getSecureInputApp() const = 0;
   virtual void secureInputNotification(const std::string &app) const = 0;
   std::string getName() const override;

@@ -37,6 +37,8 @@ add_library(${target} STATIC
   pages/OverlayPage.h
   pages/RebuildablePage.cpp
   pages/RebuildablePage.h
+  pages/RemotePage.cpp
+  pages/RemotePage.h
   pages/ScreenshotPage.cpp
   pages/ScreenshotPage.h
   pages/SettingsPage.cpp
@@ -74,6 +76,10 @@ add_library(${target} STATIC
   screenshot/ScreenshotEditor.h
   screenshot/ScreenshotThumbnail.cpp
   screenshot/ScreenshotThumbnail.h
+  remote/RemoteViewManager.cpp
+  remote/RemoteViewManager.h
+  remote/RemoteViewWindow.cpp
+  remote/RemoteViewWindow.h
   screenshot/ScreenshotTool.cpp
   screenshot/ScreenshotTool.h
   config/ComputerConfig.h
@@ -170,5 +176,6 @@ target_link_libraries(${target}
     common
     platform
     net
+    remoteview
     Qt6::Widgets
 )

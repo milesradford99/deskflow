@@ -57,6 +57,20 @@ void drawSymbol(QPainter &p, Symbol name)
     line(9, 13.5, 9, 18);
     roundRect(17.5, 7, 4, 11, 1.2);
     break;
+  case Symbol::Remote: {
+    // a display with a pointer on it
+    roundRect(2.5, 3.5, 19, 13, 2);
+    line(9, 20.5, 15, 20.5);
+    line(12, 16.5, 12, 20.5);
+    QPainterPath arrow;
+    arrow.moveTo(10, 6.5);
+    arrow.lineTo(15.5, 11);
+    arrow.lineTo(12.6, 11.4);
+    arrow.lineTo(11.3, 14);
+    arrow.closeSubpath();
+    p.drawPath(arrow);
+    break;
+  }
   case Symbol::Clipboard:
     roundRect(5, 4.5, 14, 16.5, 2);
     roundRect(9, 2.5, 6, 4, 1);

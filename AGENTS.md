@@ -148,8 +148,8 @@ in `Theme.h`. Don't give widgets their own style sheets; add a role instead. Cus
 painted controls take colours from `theme::accent()` etc. or the palette.
 
 **GUI layout**: `MainWindowUi` builds the main window in code (no `.ui` file): a sidebar
-and a `QStackedWidget` of pages (This Computer, Clipboard, Screenshot, Screen Hints, Log, Settings;
-Ctrl/Cmd+1..6). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
+and a `QStackedWidget` of pages (This Computer, Clipboard, Screenshot, Remote Control, Screen Hints,
+Log, Settings; Ctrl/Cmd+1..7). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
 `SegmentedControl`, `FormCard` rows, `ChoiceCard`, `Page`, line `symbol()`s drawn with
 QPainter, since the GUI doesn't link QtSvg). Pages under `pages/` derive from
 `RebuildablePage`: they read Settings each time they are shown or the language changes,
@@ -158,3 +158,18 @@ only reads at start-up are listed in `SettingsPage::needsCoreRestart()` and rais
 "restart to apply" banner instead of restarting the core silently. The server layout and
 client options are still dialogs (`ServerConfigDialog`, `ClientConfigDialog`).
 `screenshot.sh` accepts `SHOT_CLICKS="x,y ..."` to click into a page before capturing.
+
+**Remote view** (`remoteview/`, protocol 1.11): the server shows a client's screen in a
+window and drives it from there. The server sends `DRVS` (JSON settings: display,
+quality, fps, codecs); the client's `RemoteViewSender` captures (`ScreenCapturer*`:
+ScreenCaptureKit, GDI, X11/XShm; Wayland unsupported), encodes with `StreamEncoder` and
+answers with `DRVF` frame pieces (<= 192 KiB) and `DRVI` state JSON. Frames are one
+H.264 access unit (VideoToolbox, Media Foundation, FFmpeg when `libavcodec` is found at
+build time) or JPEG dirty tiles later sharpened as PNG; `RemoteFrame.h` holds the wire
+format and `RemoteFrameTests` covers it. At most two frames are unacked; the GUI acks
+each one (`remoteAck` IPC -> `DRVA`), so a slow viewer slows the sender. The GUI viewer
+(`gui/remote/`) sends input as `remoteInput` IPC; `server/ServerRemoteView.cpp` turns it
+into enter/key/mouse calls on that client's proxy with its own sequence number, so the
+client's `InputArbiter` treats it like any other server, and `CDNY` shows "controlled".
+Clients opt out with `remoteView/allowViewing`. The IPC frame lines are big: don't log
+them.
