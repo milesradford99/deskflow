@@ -63,6 +63,18 @@ void drawSymbol(QPainter &p, Symbol name)
     line(9, 11, 15, 11);
     line(9, 15, 13, 15);
     break;
+  case Symbol::Screenshot:
+    // a selection's corners around a small camera lens
+    line(3.5, 8, 3.5, 3.5);
+    line(3.5, 3.5, 8, 3.5);
+    line(16, 3.5, 20.5, 3.5);
+    line(20.5, 3.5, 20.5, 8);
+    line(20.5, 16, 20.5, 20.5);
+    line(20.5, 20.5, 16, 20.5);
+    line(8, 20.5, 3.5, 20.5);
+    line(3.5, 20.5, 3.5, 16);
+    p.drawEllipse(QPointF(12, 12), 3.6, 3.6);
+    break;
   case Symbol::Sparkle: {
     QPainterPath star;
     star.moveTo(11, 3);

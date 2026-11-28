@@ -4,6 +4,7 @@
 add_subdirectory(clipboard)
 add_subdirectory(config)
 add_subdirectory(core)
+add_subdirectory(screenshot)
 
 create_test(
   NAME LoggerTests

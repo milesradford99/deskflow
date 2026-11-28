@@ -55,6 +55,8 @@ Q_SIGNALS:
   void copyRequested(const QString &id, bool plainTextOnly);
   void pinToggled(const QString &id);
   void removeRequested(const QString &id);
+  //! Open an image item in the screenshot editor.
+  void editRequested(const QString &id);
   void sortModeChanged(deskflow::gui::clipboard::ClipboardHistoryFilterModel::SortMode mode);
 
 protected:
@@ -73,6 +75,7 @@ private:
   void activateRow(int row, bool plainTextOnly);
   void togglePinCurrent();
   void removeCurrent();
+  void editCurrent();
   void showContextMenu(const QPoint &pos);
   void updateSortButton();
   QString currentId() const;
@@ -95,6 +98,7 @@ private:
   QLabel *m_previewImage = nullptr;
   QLabel *m_previewColor = nullptr;
   QPushButton *m_openLinkButton = nullptr;
+  QPushButton *m_editImageButton = nullptr;
   QLabel *m_metaLabel = nullptr;
 
   QLabel *m_hintsLabel = nullptr;

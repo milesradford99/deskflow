@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <QImage>
 #include <QObject>
 
 class QAction;
@@ -65,6 +66,8 @@ public:
 Q_SIGNALS:
   //! The shortcut, pause state or item count changed.
   void stateChanged();
+  //! The user chose to edit an image item.
+  void editImageRequested(const QImage &image);
 
 private:
   void buildMenu();

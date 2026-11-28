@@ -29,6 +29,7 @@ enum class Symbol
 {
   Computers,
   Clipboard,
+  Screenshot,
   Sparkle,
   Log,
   Settings,

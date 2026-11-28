@@ -37,6 +37,8 @@ add_library(${target} STATIC
   pages/OverlayPage.h
   pages/RebuildablePage.cpp
   pages/RebuildablePage.h
+  pages/ScreenshotPage.cpp
+  pages/ScreenshotPage.h
   pages/SettingsPage.cpp
   pages/SettingsPage.h
   Theme.h
@@ -60,6 +62,20 @@ add_library(${target} STATIC
   clipboard/ClipboardMonitor.h
   clipboard/GlobalHotkey.cpp
   clipboard/GlobalHotkey.h
+  clipboard/ShortcutDialog.cpp
+  clipboard/ShortcutDialog.h
+  screenshot/Annotation.cpp
+  screenshot/Annotation.h
+  screenshot/AnnotationCanvas.cpp
+  screenshot/AnnotationCanvas.h
+  screenshot/RegionSelector.cpp
+  screenshot/RegionSelector.h
+  screenshot/ScreenshotEditor.cpp
+  screenshot/ScreenshotEditor.h
+  screenshot/ScreenshotThumbnail.cpp
+  screenshot/ScreenshotThumbnail.h
+  screenshot/ScreenshotTool.cpp
+  screenshot/ScreenshotTool.h
   config/ComputerConfig.h
   config/Computer.cpp
   config/Computer.h

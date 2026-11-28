@@ -18,6 +18,7 @@
 #include "gui/StyleUtils.h"
 #include "gui/Theme.h"
 #include "gui/clipboard/ClipboardHistory.h"
+#include "gui/screenshot/ScreenshotTool.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -83,12 +84,18 @@ int main(int argc, char *argv[])
       "Open clipboard history (bind this to a keyboard shortcut where apps cannot register global shortcuts)"
   );
 
+  auto screenshotOption = QCommandLineOption(
+      deskflow::gui::screenshot::ScreenshotTool::kCommand,
+      "Take a screenshot (bind this to a keyboard shortcut where apps cannot register global shortcuts)"
+  );
+
   QCommandLineParser parser;
   parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
   parser.addOption(helpOption);
   parser.addOption(versionOption);
   parser.addOption(resetOption);
   parser.addOption(clipboardOption);
+  parser.addOption(screenshotOption);
   parser.parse(QCoreApplication::arguments());
 
   if (!parser.errorText().isEmpty()) {
@@ -128,6 +135,9 @@ int main(int argc, char *argv[])
       QMessageBox::information(nullptr, kAppName, QObject::tr("%1 is already running").arg(kAppName));
     } else if (parser.isSet(clipboardOption)) {
       socket.write(deskflow::gui::clipboard::ClipboardHistory::kShowCommand.toUtf8() + '\n');
+      socket.waitForBytesWritten(1000);
+    } else if (parser.isSet(screenshotOption)) {
+      socket.write(deskflow::gui::screenshot::ScreenshotTool::kCommand.toUtf8() + '\n');
       socket.waitForBytesWritten(1000);
     }
     socket.disconnectFromServer();

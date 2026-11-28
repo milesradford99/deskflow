@@ -43,6 +43,7 @@ public:
   {
     HomePage,
     ClipboardPage,
+    ScreenshotPage,
     OverlayPage,
     LogPage,
     SettingsPage
@@ -62,6 +63,7 @@ public:
   QLabel *brandTagline = nullptr;
   QPushButton *navHome = nullptr;
   QPushButton *navClipboard = nullptr;
+  QPushButton *navScreenshot = nullptr;
   QPushButton *navOverlay = nullptr;
   QPushButton *navLog = nullptr;
   QPushButton *navSettings = nullptr;

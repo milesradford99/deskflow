@@ -5,6 +5,7 @@
  */
 
 #import "OSXHelpers.h"
+#include <QWidget>
 
 #import <Cocoa/Cocoa.h>
 #import <CoreData/CoreData.h>
@@ -109,6 +110,15 @@ void forceAppActive()
   [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
 }
 
+void macOSOrderFrontWithoutActivating(QWidget *window)
+{
+  if (!window)
+    return;
+  auto *view = (__bridge NSView *)reinterpret_cast<void *>(window->winId());
+  if (NSWindow *nsWindow = view.window)
+    [nsWindow orderFrontRegardless];
+}
+
 void macOSNativeHide()
 {
   [NSApp hide:nil];
@@ -173,4 +183,14 @@ bool macPasteboardIsConcealed()
       return true;
   }
   return false;
+}
+
+bool macScreenCaptureAllowed()
+{
+  return CGPreflightScreenCaptureAccess();
+}
+
+void macRequestScreenCaptureAccess()
+{
+  CGRequestScreenCaptureAccess();
 }

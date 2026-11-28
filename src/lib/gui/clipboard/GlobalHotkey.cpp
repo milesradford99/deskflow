@@ -28,7 +28,7 @@ namespace deskflow::gui::clipboard {
 namespace {
 
 #if defined(Q_OS_WIN)
-constexpr int kHotkeyId = 0xDF01;
+constexpr int kHotkeyIdBase = 0xDF00;
 
 quint32 nativeKeycode(Qt::Key key)
 {
@@ -80,9 +80,14 @@ OSStatus hotkeyHandler(EventHandlerCallRef, EventRef event, void *userData)
           event, kEventParamDirectObject, typeEventHotKeyID, nullptr, sizeof(hotkeyId), nullptr, &hotkeyId
       ) == noErr &&
       hotkeyId.signature == kSignature) {
-    static_cast<GlobalHotkey *>(userData)->trigger();
+    auto *hotkey = static_cast<GlobalHotkey *>(userData);
+    // Every GlobalHotkey installs a handler; let the event go on to the one it belongs to.
+    if (hotkeyId.id != hotkey->id())
+      return eventNotHandledErr;
+    hotkey->trigger();
+    return noErr;
   }
-  return noErr;
+  return eventNotHandledErr;
 }
 
 quint32 nativeKeycode(Qt::Key key)
@@ -245,6 +250,8 @@ unsigned int nativeModifiers(Qt::KeyboardModifiers mods)
 
 GlobalHotkey::GlobalHotkey(QObject *parent) : QObject(parent)
 {
+  static quint32 s_nextId = 1;
+  m_id = s_nextId++;
   // Nothing to do until a shortcut is set.
 }
 
@@ -310,7 +317,7 @@ bool GlobalHotkey::nativeEventFilter(const QByteArray &eventType, void *message,
 #if defined(Q_OS_WIN)
   if (eventType == "windows_generic_MSG") {
     const auto *msg = static_cast<MSG *>(message);
-    if (msg->message == WM_HOTKEY && msg->wParam == WPARAM(kHotkeyId)) {
+    if (msg->message == WM_HOTKEY && msg->wParam == WPARAM(kHotkeyIdBase + m_id)) {
       trigger();
       return true;
     }
@@ -340,7 +347,7 @@ bool GlobalHotkey::registerNative(Qt::Key key, Qt::KeyboardModifiers modifiers)
   m_nativeMods = nativeModifiers(modifiers);
   if (m_nativeKey == 0)
     return false;
-  return RegisterHotKey(nullptr, kHotkeyId, m_nativeMods, m_nativeKey);
+  return RegisterHotKey(nullptr, int(kHotkeyIdBase + m_id), m_nativeMods, m_nativeKey);
 
 #elif defined(Q_OS_MACOS)
   m_nativeKey = nativeKeycode(key);
@@ -356,7 +363,7 @@ bool GlobalHotkey::registerNative(Qt::Key key, Qt::KeyboardModifiers modifiers)
     m_platformHandler = handler;
   }
 
-  EventHotKeyID hotkeyId{kSignature, 1};
+  EventHotKeyID hotkeyId{kSignature, UInt32(m_id)};
   EventHotKeyRef ref = nullptr;
   if (RegisterEventHotKey(m_nativeKey, m_nativeMods, hotkeyId, GetApplicationEventTarget(), 0, &ref) != noErr)
     return false;
@@ -409,7 +416,7 @@ void GlobalHotkey::unregisterNative()
   m_registered = false;
 
 #if defined(Q_OS_WIN)
-  UnregisterHotKey(nullptr, kHotkeyId);
+  UnregisterHotKey(nullptr, int(kHotkeyIdBase + m_id));
 #elif defined(Q_OS_MACOS)
   if (m_platformRef) {
     UnregisterEventHotKey(static_cast<EventHotKeyRef>(m_platformRef));
