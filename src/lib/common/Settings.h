@@ -81,6 +81,13 @@ public:
     //! On a server: most frames per second to ask for
     inline static const auto FrameRate = QStringLiteral("remoteView/frameRate");
   };
+  struct Permissions
+  {
+    //! macOS: the code signature that last held each permission (see gui/permissions)
+    inline static const auto AccessibilitySignature = QStringLiteral("permissions/accessibilitySignature");
+    inline static const auto InputMonitoringSignature = QStringLiteral("permissions/inputMonitoringSignature");
+    inline static const auto ScreenRecordingSignature = QStringLiteral("permissions/screenRecordingSignature");
+  };
   struct Core
   {
     inline static const auto CoreMode = QStringLiteral("core/coreMode");
@@ -312,12 +319,16 @@ private:
     , QStringLiteral("security")
     , QStringLiteral("screenshot")
     , QStringLiteral("remoteView")
+    , QStringLiteral("permissions")
     , QStringLiteral("server")
     , QStringLiteral("internalConfig")
   };
 
   inline static const QStringList m_validKeys = {
       Client::DynamicConnectionRetry
+    , Permissions::AccessibilitySignature
+    , Permissions::InputMonitoringSignature
+    , Permissions::ScreenRecordingSignature
     , Client::InvertYScroll
     , Client::InvertXScroll
     , Client::LanguageSync

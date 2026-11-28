@@ -83,9 +83,19 @@ void MainWindow::setupUi(QMainWindow *window)
   navScreenshot = navButton(sidebar);
   navRemote = navButton(sidebar);
   navOverlay = navButton(sidebar);
+  navPermissions = navButton(sidebar);
   navLog = navButton(sidebar);
-  for (auto *button : {navHome, navClipboard, navScreenshot, navRemote, navOverlay, navLog})
+  for (auto *button : {navHome, navClipboard, navScreenshot, navRemote, navOverlay, navPermissions, navLog})
     side->addWidget(button);
+  // the badge sits at the right end of the Permissions row
+  auto *badgeLayout = new QHBoxLayout(navPermissions);
+  badgeLayout->setContentsMargins(0, 0, 10, 0);
+  badgeLayout->addStretch(1);
+  permissionsBadge = label(QString(), "badge", navPermissions);
+  permissionsBadge->setAlignment(Qt::AlignCenter);
+  permissionsBadge->setAttribute(Qt::WA_TransparentForMouseEvents);
+  permissionsBadge->setVisible(false);
+  badgeLayout->addWidget(permissionsBadge, 0, Qt::AlignVCenter);
   side->addStretch(1);
 
   statusCard = new QFrame(sidebar);
@@ -229,6 +239,11 @@ void MainWindow::setupUi(QMainWindow *window)
   updateIcons();
 }
 
+QList<QPushButton *> MainWindow::navButtons() const
+{
+  return {navHome, navClipboard, navScreenshot, navRemote, navOverlay, navPermissions, navLog, navSettings};
+}
+
 void MainWindow::updateIcons()
 {
   const QColor secondary = theme::textSecondary();
@@ -239,6 +254,7 @@ void MainWindow::updateIcons()
   navScreenshot->setIcon(symbol(Symbol::Screenshot, secondary, white));
   navRemote->setIcon(symbol(Symbol::Remote, secondary, white));
   navOverlay->setIcon(symbol(Symbol::Sparkle, secondary, white));
+  navPermissions->setIcon(symbol(Symbol::Shield, secondary, white));
   navLog->setIcon(symbol(Symbol::Log, secondary, white));
   navSettings->setIcon(symbol(Symbol::Settings, secondary, white));
 
@@ -260,6 +276,7 @@ void MainWindow::retranslateUi(QMainWindow *window)
   navScreenshot->setText(tr("Screenshot"));
   navRemote->setText(tr("Remote Control"));
   navOverlay->setText(tr("Screen Hints"));
+  navPermissions->setText(tr("Permissions"));
   navLog->setText(tr("Log"));
   const auto settingsShortcut = deskflow::platform::isMac() ? QStringLiteral("  ⌘,") : QString();
   navSettings->setText(tr("Settings") + settingsShortcut);

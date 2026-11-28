@@ -46,6 +46,7 @@ public:
     ScreenshotPage,
     RemotePage,
     OverlayPage,
+    PermissionsPage,
     LogPage,
     SettingsPage
   };
@@ -55,6 +56,9 @@ public:
 
   //! Re-tint the sidebar and button symbols after a light/dark switch.
   void updateIcons();
+
+  //! Sidebar rows in page order (PageIndex).
+  QList<QPushButton *> navButtons() const;
 
   // shell
   QWidget *central = nullptr;
@@ -67,6 +71,9 @@ public:
   QPushButton *navScreenshot = nullptr;
   QPushButton *navRemote = nullptr;
   QPushButton *navOverlay = nullptr;
+  QPushButton *navPermissions = nullptr;
+  //! Red count on the Permissions row while something needs the user
+  QLabel *permissionsBadge = nullptr;
   QPushButton *navLog = nullptr;
   QPushButton *navSettings = nullptr;
   QFrame *statusCard = nullptr;

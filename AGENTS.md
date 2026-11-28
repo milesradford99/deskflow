@@ -88,19 +88,28 @@ gh api repos/OWNER/REPO/actions/runs/RUN/jobs --jq '.jobs[] | [.id,.name,.conclu
 gh api repos/OWNER/REPO/actions/jobs/JOB/logs | grep -E "error|FAILED" | head
 ```
 
-macOS packages are ad-hoc signed (no Apple developer certificate is configured), so
-each new build has to be allowed again under Privacy & Security > Accessibility.
-Ad-hoc builds must not use the hardened runtime: its library validation makes dyld
+macOS packages are signed with the certificate in the `MACOS_SIGNING_P12` /
+`MACOS_SIGNING_P12_PWD` secrets when they exist (a self-signed one from
+`scripts/dev/make-signing-cert.sh` is enough), otherwise ad-hoc. Only a stable certificate
+keeps the designated requirement, and with it the user's privacy permissions, the same from
+one build to the next; ad-hoc builds lose them on every update. Ad-hoc and self-signed builds must not use the hardened runtime: its library validation makes dyld
 reject the bundled Qt frameworks ("different Team IDs"). Runners have SIP off and never
 show this, so `test-package` checks the signature flags and each binary's minimum macOS
 against `LSMinimumSystemVersion` instead of trusting a successful launch.
 
 ## Feature notes
 
-**macOS permissions**: the GUI must hold Accessibility (the core it launches inherits
-it). `checkMacAssistiveDevices()` clears a stale entry with `tccutil reset` (each ad-hoc
-build has a new signature, so an old switched-on entry silently stops counting), shows
-Apple's prompt, then waits in a dialog until `AXIsProcessTrusted()` turns true.
+**macOS permissions** (`gui/permissions`, `pages/PermissionsPage`): Accessibility (required;
+the core the GUI launches inherits it), Input Monitoring and Screen Recording. `PermissionMonitor`
+polls them every second while the app is active and remembers, per permission, a hash of the
+designated requirement that last held it (`permissions/*Signature`). Missing with a different
+remembered signature means the entry in System Settings is stale (still switched on, no longer
+counting); `allow()` then runs `tccutil reset <service> <bundle id>`, prompts and opens the
+right pane. The main window opens on the Permissions page when Accessibility is missing or
+anything is stale, and `startCore()` waits there until Accessibility arrives. Screen Recording
+only applies to a new process, so the page offers a relaunch (`open -n` after this pid exits).
+`DESKFLOW_FAKE_PERMISSIONS="accessibility=stale,input=denied,screen=restart"` fakes states on
+Linux for `screenshot.sh`.
 
 **macOS pasteboard ownership**: `OSXClipboard::synchronize()` reports a change only when
 another app owns the pasteboard. Treating our own writes as a local copy cancels copied
@@ -148,8 +157,8 @@ in `Theme.h`. Don't give widgets their own style sheets; add a role instead. Cus
 painted controls take colours from `theme::accent()` etc. or the palette.
 
 **GUI layout**: `MainWindowUi` builds the main window in code (no `.ui` file): a sidebar
-and a `QStackedWidget` of pages (This Computer, Clipboard, Screenshot, Remote Control, Screen Hints,
-Log, Settings; Ctrl/Cmd+1..7). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
+and a `QStackedWidget` of pages (This Computer, Clipboard, Screenshot, Remote Control, Screen Hints, Permissions (macOS only),
+Log, Settings; Ctrl/Cmd+1..8). Reusable controls live in `widgets/MacControls.h` (`ToggleSwitch`,
 `SegmentedControl`, `FormCard` rows, `ChoiceCard`, `Page`, line `symbol()`s drawn with
 QPainter, since the GUI doesn't link QtSvg). Pages under `pages/` derive from
 `RebuildablePage`: they read Settings each time they are shown or the language changes,

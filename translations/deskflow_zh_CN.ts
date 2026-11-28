@@ -704,6 +704,10 @@ Do you want to connect to the server?
         <translation>屏幕提示</translation>
     </message>
     <message>
+        <source>Permissions</source>
+        <translation>权限</translation>
+    </message>
+    <message>
         <source>Log</source>
         <translation>日志</translation>
     </message>
@@ -1296,23 +1300,23 @@ Additionally, check you are able to %1 the server config file: %2</source>
     </message>
     <message>
         <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
-        <translation>%1 需要“辅助功能”权限才能共享键盘和鼠标。</translation>
+        <translation type="vanished">%1 需要“辅助功能”权限才能共享键盘和鼠标。</translation>
     </message>
     <message>
         <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
 
 If %1 is already switched on, remove it with the minus button and open %1 again.</source>
-        <translation>请在“系统设置”中打开“隐私与安全性 &gt; 辅助功能”，并开启 %1。获得权限后此窗口会自动关闭。
+        <translation type="vanished">请在“系统设置”中打开“隐私与安全性 &gt; 辅助功能”，并开启 %1。获得权限后此窗口会自动关闭。
 
 如果 %1 已经开启，请用减号按钮将其移除，然后重新打开 %1。</translation>
     </message>
     <message>
         <source>Open System Settings</source>
-        <translation>打开系统设置</translation>
+        <translation type="vanished">打开系统设置</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>退出</translation>
+        <translation type="vanished">退出</translation>
     </message>
 </context>
 <context>
@@ -2369,6 +2373,153 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::pages::PermissionsPage</name>
+    <message>
+        <source>Permissions</source>
+        <translation>权限</translation>
+    </message>
+    <message>
+        <source>macOS asks you once to allow each of these in System Settings. This page checks them live: switch one on and come back, there is nothing to save.</source>
+        <translation>macOS 会让你在“系统设置”里分别允许下面这几项，每项只需一次。本页会实时检查：打开开关后回到这里即可，无需保存。</translation>
+    </message>
+    <message>
+        <source>Nothing to allow</source>
+        <translation>无需授权</translation>
+    </message>
+    <message>
+        <source>This system doesn&apos;t ask for per-app permissions.</source>
+        <translation>此系统不需要为单个应用授权。</translation>
+    </message>
+    <message>
+        <source>All set</source>
+        <translation>全部就绪</translation>
+    </message>
+    <message>
+        <source>Deskflow was updated, so macOS stopped honouring some switches</source>
+        <translation>Deskflow 已更新，macOS 不再认可部分开关</translation>
+    </message>
+    <message>
+        <source>System Settings can still show %1 switched on, but that entry belongs to the previous build. Click Repair: %1 removes its old entry and asks again, then switch it on in the list that opens.</source>
+        <translation>“系统设置”里可能仍显示 %1 已打开，但那一项属于旧版本。点按“修复”：%1 会删除旧条目并重新申请，然后在打开的列表中把它打开即可。</translation>
+    </message>
+    <message>
+        <source>What %1 needs</source>
+        <translation>%1 需要的权限</translation>
+    </message>
+    <message>
+        <source>Accessibility</source>
+        <translation>辅助功能</translation>
+    </message>
+    <message>
+        <source>Required. Lets %1 move the pointer and type on this Mac, and share its keyboard and mouse.</source>
+        <translation>必需。让 %1 能在这台 Mac 上移动指针、输入文字，并共享它的键盘和鼠标。</translation>
+    </message>
+    <message>
+        <source>Input Monitoring</source>
+        <translation>输入监控</translation>
+    </message>
+    <message>
+        <source>Recommended when this Mac shares its keyboard. Some macOS versions want it as well as Accessibility before keys reach other computers.</source>
+        <translation>这台 Mac 共享键盘时建议打开。部分 macOS 版本除了辅助功能，还需要它才能把按键传到其他电脑。</translation>
+    </message>
+    <message>
+        <source>Screen Recording</source>
+        <translation>屏幕录制</translation>
+    </message>
+    <message>
+        <source>For screenshots that show other apps&apos; windows, and for letting the server see this screen (Remote Control).</source>
+        <translation>用于截取其他应用窗口的截图，以及让服务端查看这台电脑的屏幕（远程控制）。</translation>
+    </message>
+    <message>
+        <source>Allowed</source>
+        <translation>已允许</translation>
+    </message>
+    <message>
+        <source>Not allowed</source>
+        <translation>未允许</translation>
+    </message>
+    <message>
+        <source>Allow…</source>
+        <translation>允许…</translation>
+    </message>
+    <message>
+        <source>Already switched on in System Settings? That entry is from an earlier build; Allow replaces it.</source>
+        <translation>“系统设置”里已经是打开的？那是旧版本留下的条目，点“允许”会替换它。</translation>
+    </message>
+    <message>
+        <source>Needs repair</source>
+        <translation>需要修复</translation>
+    </message>
+    <message>
+        <source>Repair…</source>
+        <translation>修复…</translation>
+    </message>
+    <message>
+        <source>The switch in System Settings belongs to an earlier build and no longer counts.</source>
+        <translation>“系统设置”里的开关属于旧版本，已经不再生效。</translation>
+    </message>
+    <message>
+        <source>Restart needed</source>
+        <translation>需要重启</translation>
+    </message>
+    <message>
+        <source>Restart %1</source>
+        <translation>重新启动 %1</translation>
+    </message>
+    <message>
+        <source>Switch it on in System Settings, then restart: macOS applies it on the next start.</source>
+        <translation>在“系统设置”中打开它，然后重新启动：macOS 会在下次启动时生效。</translation>
+    </message>
+    <message>
+        <source>If something still doesn&apos;t work</source>
+        <translation>如果仍然不正常</translation>
+    </message>
+    <message>
+        <source>Updates keep permissions</source>
+        <translation>更新后权限会保留</translation>
+    </message>
+    <message>
+        <source>This build is signed with “%1”, so macOS recognises later versions as the same app.</source>
+        <translation>此版本使用“%1”签名，macOS 会把之后的版本认作同一个应用。</translation>
+    </message>
+    <message>
+        <source>Updates may need repairs</source>
+        <translation>更新后可能需要修复</translation>
+    </message>
+    <message>
+        <source>This build has no stable signature, so macOS treats each new version as a different app. After an update, use Repair above.</source>
+        <translation>此版本没有固定签名，macOS 会把每个新版本当作不同的应用。更新后请使用上面的“修复”。</translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation>重新启动</translation>
+    </message>
+    <message>
+        <source>Some permissions only take effect when the app starts again.</source>
+        <translation>部分权限要在应用重新启动后才生效。</translation>
+    </message>
+    <message>
+        <source>Start Over…</source>
+        <translation>全部重来…</translation>
+    </message>
+    <message>
+        <source>Start over with permissions?</source>
+        <translation>要重新设置所有权限吗？</translation>
+    </message>
+    <message>
+        <source>This removes every %1 entry from Privacy &amp; Security and restarts %1. You then allow each permission again from this page.</source>
+        <translation>这会从“隐私与安全性”中删除 %1 的所有条目并重新启动 %1，之后在本页重新允许各项权限。</translation>
+    </message>
+    <message>
+        <source>Start over</source>
+        <translation>全部重来</translation>
+    </message>
+    <message>
+        <source>Removes all of %1&apos;s entries, including duplicates left by older builds, and asks again from scratch.</source>
+        <translation>删除 %1 的所有条目（包括旧版本留下的重复项），从头重新申请。</translation>
+    </message>
+</context>
+<context>
     <name>deskflow::gui::pages::RemotePage</name>
     <message>
         <source>Remote Control</source>
@@ -2380,7 +2531,7 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>Computers</source>
-        <translation type="unfinished">计算机</translation>
+        <translation>电脑</translation>
     </message>
     <message>
         <source>No computers connected yet</source>
@@ -2404,7 +2555,7 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>Connected</source>
-        <translation type="unfinished">已连接</translation>
+        <translation>已连接</translation>
     </message>
     <message>
         <source>Picture</source>
@@ -2456,7 +2607,7 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>This Computer</source>
-        <translation type="unfinished">本机</translation>
+        <translation>这台电脑</translation>
     </message>
     <message>
         <source>When this computer is a client, its server may show its screen and control it. The first time, macOS asks to allow screen recording for %1.</source>
@@ -2979,7 +3130,7 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>Connecting…</source>
-        <translation type="unfinished">正在连接…</translation>
+        <translation>正在连接…</translation>
     </message>
     <message>
         <source>Connecting to %1…</source>

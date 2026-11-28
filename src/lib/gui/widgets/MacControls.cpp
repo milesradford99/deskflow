@@ -190,6 +190,19 @@ void drawSymbol(QPainter &p, Symbol name)
     p.drawPath(shackle);
     break;
   }
+  case Symbol::Shield: {
+    QPainterPath shield;
+    shield.moveTo(12, 3);
+    shield.lineTo(19.5, 6);
+    shield.lineTo(19.5, 11.5);
+    shield.cubicTo(19.5, 16, 16.5, 19.2, 12, 21);
+    shield.cubicTo(7.5, 19.2, 4.5, 16, 4.5, 11.5);
+    shield.lineTo(4.5, 6);
+    shield.closeSubpath();
+    p.drawPath(shield);
+    p.drawPolyline(QPolygonF({{8.8, 12}, {11.2, 14.4}, {15.4, 9.6}}));
+    break;
+  }
   case Symbol::Files:
     line(12, 15, 12, 4);
     line(7.5, 8.5, 12, 4);

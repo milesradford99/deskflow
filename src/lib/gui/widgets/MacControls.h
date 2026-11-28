@@ -45,7 +45,8 @@ enum class Symbol
   Export,
   Server,
   Client,
-  Remote
+  Remote,
+  Shield
 };
 
 /**

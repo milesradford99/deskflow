@@ -688,6 +688,10 @@ Vuoi connetterti al server?
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Log</source>
         <translation type="unfinished">Log</translation>
     </message>
@@ -1292,24 +1296,6 @@ Inoltre, verifica di poter %1 il file di configurazione del server: %2</translat
     <message>
         <source>Super</source>
         <translation type="unfinished">Super</translation>
-    </message>
-    <message>
-        <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
-
-If %1 is already switched on, remove it with the minus button and open %1 again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open System Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2336,6 +2322,153 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
     <message>
         <source>A short ripple around the cursor when it comes to this computer, so it is easy to find.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::PermissionsPage</name>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>macOS asks you once to allow each of these in System Settings. This page checks them live: switch one on and come back, there is nothing to save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to allow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This system doesn&apos;t ask for per-app permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow was updated, so macOS stopped honouring some switches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Settings can still show %1 switched on, but that entry belongs to the previous build. Click Repair: %1 removes its old entry and asks again, then switch it on in the list that opens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What %1 needs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accessibility</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Required. Lets %1 move the pointer and type on this Mac, and share its keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Monitoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recommended when this Mac shares its keyboard. Some macOS versions want it as well as Accessibility before keys reach other computers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For screenshots that show other apps&apos; windows, and for letting the server see this screen (Remote Control).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already switched on in System Settings? That entry is from an earlier build; Allow replaces it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch it on in System Settings, then restart: macOS applies it on the next start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Needs repair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repair…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The switch in System Settings belongs to an earlier build and no longer counts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If something still doesn&apos;t work</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates keep permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This build is signed with “%1”, so macOS recognises later versions as the same app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates may need repairs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This build has no stable signature, so macOS treats each new version as a different app. After an update, use Repair above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation type="unfinished">Riavvia</translation>
+    </message>
+    <message>
+        <source>Some permissions only take effect when the app starts again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Over…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over with permissions?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This removes every %1 entry from Privacy &amp; Security and restarts %1. You then allow each permission again from this page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes all of %1&apos;s entries, including duplicates left by older builds, and asks again from scratch.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

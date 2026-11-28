@@ -62,13 +62,13 @@ jobs:
             runs-on: macos-15
             timeout: 30
             qt-version: 6.12
-            config-args: '-DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=14.4 ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"}'
+            config-args: '-DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=14.4 ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"} ${APPLE_CODESIGN_STABLE:+-DAPPLE_CODESIGN_STABLE="$APPLE_CODESIGN_STABLE"}'
 
           - name: "macos-x64"
             runs-on: macos-15-intel
             timeout: 40
             qt-version: 6.9.3
-            config-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=12 -DCMAKE_OSX_SYSROOT=/Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"}'
+            config-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=12 -DCMAKE_OSX_SYSROOT=/Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk ${APPLE_CODESIGN_DEV:+-DAPPLE_CODESIGN_DEV="$APPLE_CODESIGN_DEV"} ${APPLE_CODESIGN_STABLE:+-DAPPLE_CODESIGN_STABLE="$APPLE_CODESIGN_STABLE"}'
 
           # One Linux target keeps the portable code honest and runs the unit tests
           # on the platform they are developed on.
@@ -120,6 +120,42 @@ jobs:
 
       - name: Get version
         uses: ./.github/actions/get-version
+
+      # One certificate for every build, so macOS keeps Accessibility, Input Monitoring and
+      # Screen Recording across updates (an ad-hoc signature changes with every build).
+      # Optional: without the MACOS_SIGNING_P12 secret the package is ad-hoc signed as before.
+      # scripts/dev/make-signing-cert.sh makes a suitable self-signed certificate.
+      - name: Import stable signing certificate
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          MACOS_SIGNING_P12: ${{ secrets.MACOS_SIGNING_P12 }}
+          MACOS_SIGNING_P12_PWD: ${{ secrets.MACOS_SIGNING_P12_PWD }}
+        run: |
+          if [ -z "$MACOS_SIGNING_P12" ]; then
+            echo "::notice::No MACOS_SIGNING_P12 secret: the package is ad-hoc signed, so permissions need repairing after each update"
+            exit 0
+          fi
+          keychain=$RUNNER_TEMP/stable-signing.keychain
+          keychain_pwd=$(openssl rand -hex 32)
+          echo "::add-mask::$keychain_pwd"
+          echo -n "$MACOS_SIGNING_P12" | base64 --decode > "$RUNNER_TEMP/stable-signing.p12"
+          security create-keychain -p "$keychain_pwd" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_pwd" "$keychain"
+          security import "$RUNNER_TEMP/stable-signing.p12" -k "$keychain" -P "$MACOS_SIGNING_P12_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_pwd" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          rm -f "$RUNNER_TEMP/stable-signing.p12"
+          # A self-signed certificate is not trusted, so name it by its SHA-1 rather than its common name.
+          identity=$(security find-identity -p codesigning "$keychain" | awk '/[0-9A-F]{40}/ {print $2; exit}')
+          if [ -z "$identity" ]; then
+            security find-identity -p codesigning "$keychain"
+            echo "::error::MACOS_SIGNING_P12 holds no code signing identity"
+            exit 1
+          fi
+          echo "Stable signing identity: $identity"
+          echo "APPLE_CODESIGN_STABLE=$identity" >> "$GITHUB_ENV"
 
       - name: Configure
         env:
@@ -197,6 +233,14 @@ jobs:
         uses: ./.github/actions/codesign-keychain
         with:
           action: cleanup
+
+      - name: Remove stable signing keychain
+        if: always() && runner.os == 'macOS'
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/stable-signing.keychain" ]; then
+            security delete-keychain "$RUNNER_TEMP/stable-signing.keychain" || true
+          fi
 
       - name: Check for unexpected repo changes
         shell: bash

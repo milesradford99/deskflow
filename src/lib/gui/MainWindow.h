@@ -65,6 +65,10 @@ namespace deskflow::gui::pages {
 class SettingsPage;
 }
 
+namespace deskflow::gui::permissions {
+class PermissionMonitor;
+}
+
 class MainWindow : public QMainWindow
 {
   using ConnectionState = deskflow::core::ConnectionState;
@@ -110,6 +114,8 @@ private:
   void updateText();
   void setupPages();
   void showPage(int index);
+  void setupPermissions();
+  void updatePermissionsBadge();
   void updateSidebarStatus();
 
   void settingsChanged(const QString &key = QString());
@@ -258,6 +264,9 @@ private:
   deskflow::gui::remote::RemoteViewManager *m_remoteViews = nullptr;
 
   deskflow::gui::pages::SettingsPage *m_settingsPage = nullptr;
+  deskflow::gui::permissions::PermissionMonitor *m_permissions = nullptr;
+  //! Start was asked for while a required permission was missing: start once it arrives.
+  bool m_startWhenPermitted = false;
   //! One "go to page" action per sidebar section, for the View menu (Ctrl/Cmd+1..6)
   QList<QAction *> m_pageActions;
   QStringList m_connectedClients;

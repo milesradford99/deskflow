@@ -36,9 +36,11 @@
 #include "net/FingerprintDatabase.h"
 #include "pages/ClipboardPage.h"
 #include "pages/OverlayPage.h"
+#include "pages/PermissionsPage.h"
 #include "pages/RemotePage.h"
 #include "pages/ScreenshotPage.h"
 #include "pages/SettingsPage.h"
+#include "permissions/Permissions.h"
 #include "remote/RemoteViewManager.h"
 #include "screenshot/ScreenshotTool.h"
 #include "widgets/FileTransferWidget.h"
@@ -424,6 +426,9 @@ void MainWindow::setupPages()
     m_cursorLocator->locate();
   });
 
+  m_permissions = new deskflow::gui::permissions::PermissionMonitor(this);
+  ui->pages->insertWidget(UiPage::PermissionsPage, new PermissionsPage(m_permissions, ui->pages));
+
   ui->pages->insertWidget(UiPage::LogPage, m_logView);
 
   m_settingsPage = new SettingsPage(ui->pages);
@@ -432,8 +437,7 @@ void MainWindow::setupPages()
   connect(m_settingsPage, &SettingsPage::requestRemoveAllSettings, this, &MainWindow::clearSettings);
   connect(m_settingsPage, &SettingsPage::requestShowFingerprint, this, &MainWindow::showMyFingerprint);
 
-  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot, ui->navRemote,
-                                 ui->navOverlay, ui->navLog,       ui->navSettings};
+  const auto nav = ui->navButtons();
   for (int i = 0; i < nav.size(); ++i) {
     connect(nav.at(i), &QPushButton::clicked, this, [this, i] { showPage(i); });
     // Settings also has the platform's own shortcut (Cmd+, on macOS) through the Preferences action
@@ -445,12 +449,52 @@ void MainWindow::setupPages()
   }
   ui->navHome->setChecked(true);
   ui->pages->setCurrentIndex(UiPage::HomePage);
+
+  setupPermissions();
+}
+
+void MainWindow::setupPermissions()
+{
+  using deskflow::gui::permissions::Kind;
+  using deskflow::gui::permissions::PermissionMonitor;
+
+  ui->navPermissions->setVisible(m_permissions->supported());
+  updatePermissionsBadge();
+  connect(m_permissions, &PermissionMonitor::changed, this, &MainWindow::updatePermissionsBadge);
+  connect(Settings::instance(), &Settings::settingsChanged, this, [this](const QString &key) {
+    if (key == Settings::RemoteView::AllowViewing)
+      updatePermissionsBadge();
+  });
+
+  connect(m_permissions, &PermissionMonitor::granted, this, [this](Kind kind) {
+    if (kind == Kind::Accessibility && m_startWhenPermitted) {
+      m_startWhenPermitted = false;
+      showPage(Ui::MainWindow::HomePage);
+      startCore();
+      return;
+    }
+    // the core's event tap only picks up input monitoring when it is created
+    if (kind == Kind::InputMonitoring && m_coreProcess.isStarted())
+      resetCore();
+  });
+
+  connect(m_permissions, &PermissionMonitor::quitRequested, this, [this] {
+    const bool startAfter = m_startWhenPermitted || m_coreProcess.isStarted();
+    close();
+    Settings::setValue(Settings::Gui::AutoStartCore, startAfter);
+  });
+}
+
+void MainWindow::updatePermissionsBadge()
+{
+  const int count = m_permissions->attentionCount();
+  ui->permissionsBadge->setText(QString::number(count));
+  ui->permissionsBadge->setVisible(count > 0);
 }
 
 void MainWindow::showPage(int index)
 {
-  const QList<QPushButton *> nav{ui->navHome,    ui->navClipboard, ui->navScreenshot, ui->navRemote,
-                                 ui->navOverlay, ui->navLog,       ui->navSettings};
+  const auto nav = ui->navButtons();
   if (index < 0 || index >= nav.size())
     return;
   if (!isVisible())
@@ -553,6 +597,14 @@ void MainWindow::startCore()
   // No Mode Set
   if (m_coreProcess.mode() == CoreMode::None) {
     qDebug().noquote() << "skipping core start, no mode set";
+    return;
+  }
+
+  // Without Accessibility the core can neither read nor send input: fix that first, then start.
+  if (!m_permissions->ready()) {
+    qInfo().noquote() << "core start waits for the accessibility permission";
+    m_startWhenPermitted = true;
+    showPage(Ui::MainWindow::PermissionsPage);
     return;
   }
 
@@ -772,7 +824,14 @@ void MainWindow::serverConnectionConfigureClient(const QString &clientName)
 
 void MainWindow::open()
 {
-  if (!Settings::value(Settings::Gui::Autohide).toBool())
+  using deskflow::gui::permissions::State;
+  bool permissionsNeeded = !m_permissions->ready();
+  for (const auto kind : deskflow::gui::permissions::kAllKinds)
+    permissionsNeeded = permissionsNeeded || m_permissions->state(kind) == State::Stale;
+
+  if (permissionsNeeded)
+    showPage(Ui::MainWindow::PermissionsPage);
+  else if (!Settings::value(Settings::Gui::Autohide).toBool())
     showAndActivate();
   else if (deskflow::platform::isMac())
     // macOS to call hide after this function ends
