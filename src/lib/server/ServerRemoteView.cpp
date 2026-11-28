@@ -124,12 +124,29 @@ void Server::remoteViewEnter(BaseClientProxy *client, RemoteView &view, int32_t 
   ++m_seqNum;
   LOG_DEBUG("remote view takes control of \"%s\" at %d,%d", getName(client).c_str(), x, y);
   client->enter(x, y, m_seqNum, m_primaryClient->getToggleMask(), false);
-  if (m_enableClipboard) {
-    // what was copied here can be pasted there, as when the cursor crosses over
-    for (ClipboardID id = 0; id < kClipboardEnd; ++id) {
-      if (m_clipboards[id].m_clipboard.marshall().size() <= m_maximumClipboardSize * 1024)
-        client->setClipboard(id, &m_clipboards[id].m_clipboard);
-    }
+  // what was copied here can be pasted there, as when the cursor crosses over
+  for (ClipboardID id = 0; id < kClipboardEnd; ++id)
+    remoteViewSendClipboard(client, id);
+}
+
+void Server::remoteViewSendClipboard(BaseClientProxy *client, ClipboardID id)
+{
+  if (!m_enableClipboard || m_maximumClipboardSize == 0)
+    return;
+  const ClipboardInfo &clipboard = m_clipboards[id];
+  // our own clipboard is normally read only when the cursor leaves this computer, which it
+  // doesn't for a remote view: read it now (this also offers copied files)
+  if (clipboard.m_clipboardOwner == getName(m_primaryClient))
+    onClipboardChanged(m_primaryClient, id, clipboard.m_clipboardSeqNum);
+  if (clipboard.m_clipboard.marshall().size() <= m_maximumClipboardSize * 1024)
+    client->setClipboard(id, &clipboard.m_clipboard);
+}
+
+void Server::remoteViewLocalClipboardChanged(ClipboardID id)
+{
+  for (const auto &[client, view] : m_remoteViews) {
+    if (view.entered && client != m_active)
+      remoteViewSendClipboard(client, id);
   }
 }
 
@@ -168,6 +185,33 @@ void Server::remoteViewInput(BaseClientProxy *client, RemoteView &view, const QJ
   const auto type = event.value("t").toString();
   const auto x = static_cast<int32_t>(event.value("x").toInt());
   const auto y = static_cast<int32_t>(event.value("y").toInt());
+
+  if (type == QStringLiteral("release")) {
+    // the clipboards queued with the enter are on their way: replay what came meanwhile
+    view.holding = false;
+    const auto held = std::move(view.held);
+    view.held.clear();
+    for (const auto &input : held)
+      remoteViewInput(client, view, input);
+    return;
+  }
+  if (view.holding) {
+    view.held.push_back(event);
+    return;
+  }
+  const bool press = type == QStringLiteral("down") || (type == QStringLiteral("key") && event.value("down").toBool());
+  if (press && !view.entered && client != m_active && m_enableClipboard) {
+    // clipboards go out through the event queue, so a key sent now would overtake them
+    remoteViewEnter(client, view, x, y);
+    view.holding = true;
+    view.held.push_back(event);
+    auto *release = new Command; // NOSONAR - owned by the event
+    release->action = Command::Action::Input;
+    release->client = getName(client);
+    release->payload = QJsonObject{{"t", "release"}};
+    m_events->addEvent(Event(EventTypes::RemoteViewCommand, deskflow::remoteViewIpc::eventTarget(), release));
+    return;
+  }
 
   if (type == QStringLiteral("leave")) {
     remoteViewLeave(client, view);

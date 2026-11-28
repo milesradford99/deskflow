@@ -452,12 +452,20 @@ private:
     bool entered = false; //!< we sent it an enter for the viewer (not for our cursor)
     std::set<KeyButton> keys;
     std::set<ButtonID> buttons;
+    //! Input held back until the clipboards sent with an enter have gone out, so a paste
+    //! typed as the viewer takes over pastes what was copied here
+    std::vector<QJsonObject> held;
+    bool holding = false;
   };
   std::map<BaseClientProxy *, RemoteView> m_remoteViews;
   void handleRemoteViewCommand(const Event &event);
   void remoteViewInput(BaseClientProxy *client, RemoteView &view, const QJsonObject &input);
   void remoteViewEnter(BaseClientProxy *client, RemoteView &view, int32_t x, int32_t y);
   void remoteViewLeave(BaseClientProxy *client, RemoteView &view);
+  //! Sends our clipboard \p id to \p client, reading it first if it was copied here
+  void remoteViewSendClipboard(BaseClientProxy *client, ClipboardID id);
+  //! Something was copied here: pass it on to every client a remote view is driving
+  void remoteViewLocalClipboardChanged(ClipboardID id);
   void stopRemoteView(BaseClientProxy *client, bool tellClient);
   //! The viewer's control of \c client ended because our cursor or another server took over
   bool remoteViewControlDenied(const BaseClientProxy *client);

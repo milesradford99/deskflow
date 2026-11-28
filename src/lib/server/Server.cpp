@@ -1332,6 +1332,8 @@ void Server::handleClipboardGrabbed(const Event &event, BaseClientProxy *grabber
   if (grabber == m_primaryClient && m_active != m_primaryClient) {
     LOG_DEBUG("clipboard grabbed while active computer was changed, resending clipboard data");
     onClipboardChanged(m_primaryClient, info->m_id, clipboard.m_clipboardSeqNum);
+  } else if (grabber == m_primaryClient) {
+    remoteViewLocalClipboardChanged(info->m_id);
   }
 }
 

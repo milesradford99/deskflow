@@ -280,6 +280,11 @@ void RemoteViewCanvas::keyReleaseEvent(QKeyEvent *event)
 void RemoteViewCanvas::focusInEvent(QFocusEvent *event)
 {
   m_focused = true;
+  // coming back to a viewer already used: take control at once, so our clipboard reaches
+  // the client before a paste shortcut typed straight away (a viewer only watched so far
+  // waits for a click or key, so opening one doesn't take the client from anyone)
+  if (m_interactive && hasPicture() && m_hasLast)
+    Q_EMIT input({{"t", "enter"}, {"x", m_lastRemote.x()}, {"y", m_lastRemote.y()}});
   update();
   QWidget::focusInEvent(event);
 }

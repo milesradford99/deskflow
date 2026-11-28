@@ -180,5 +180,5 @@ each one (`remoteAck` IPC -> `DRVA`), so a slow viewer slows the sender. The GUI
 (`gui/remote/`) sends input as `remoteInput` IPC; `server/ServerRemoteView.cpp` turns it
 into enter/key/mouse calls on that client's proxy with its own sequence number, so the
 client's `InputArbiter` treats it like any other server, and `CDNY` shows "controlled".
-Clients opt out with `remoteView/allowViewing`. The IPC frame lines are big: don't log
+Clients opt out with `remoteView/allowViewing`. Clipboards follow the viewer like the cursor: the viewer's enter reads our own clipboard first (normally read only when the cursor leaves) and sends it, a copy here while the viewer drives is pushed at once, and the client sends its clipboard back on the viewer's leave (focus out). A press that takes over is held until the queued clipboard chunks have gone out (`RemoteView::holding`), so a paste typed first works. The IPC frame lines are big: don't log
 them.
