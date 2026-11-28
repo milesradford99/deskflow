@@ -170,6 +170,14 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>%1 is viewing this screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 stopped viewing this screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Keyboard broadcast on</source>
         <translation type="unfinished"></translation>
     </message>
@@ -672,7 +680,15 @@ Vuoi connetterti al server?
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Remote Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Screen Hints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1280,24 +1296,6 @@ Inoltre, verifica di poter %1 il file di configurazione del server: %2</translat
     <message>
         <source>Super</source>
         <translation type="unfinished">Super</translation>
-    </message>
-    <message>
-        <source>%1 needs Accessibility permission to share your keyboard and mouse.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In System Settings, open Privacy &amp; Security &gt; Accessibility and switch on %1. This window closes by itself once the permission is granted.
-
-If %1 is already switched on, remove it with the minus button and open %1 again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open System Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2328,6 +2326,264 @@ Copy something on any of your computers and it will show up here.</source>
     </message>
 </context>
 <context>
+    <name>deskflow::gui::pages::PermissionsPage</name>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>macOS asks you once to allow each of these in System Settings. This page checks them live: switch one on and come back, there is nothing to save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to allow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This system doesn&apos;t ask for per-app permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deskflow was updated, so macOS stopped honouring some switches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Settings can still show %1 switched on, but that entry belongs to the previous build. Click Repair: %1 removes its old entry and asks again, then switch it on in the list that opens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What %1 needs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accessibility</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Required. Lets %1 move the pointer and type on this Mac, and share its keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Monitoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recommended when this Mac shares its keyboard. Some macOS versions want it as well as Accessibility before keys reach other computers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For screenshots that show other apps&apos; windows, and for letting the server see this screen (Remote Control).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already switched on in System Settings? That entry is from an earlier build; Allow replaces it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch it on in System Settings, then restart: macOS applies it on the next start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Needs repair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repair…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The switch in System Settings belongs to an earlier build and no longer counts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If something still doesn&apos;t work</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates keep permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This build is signed with “%1”, so macOS recognises later versions as the same app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates may need repairs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This build has no stable signature, so macOS treats each new version as a different app. After an update, use Repair above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation type="unfinished">Riavvia</translation>
+    </message>
+    <message>
+        <source>Some permissions only take effect when the app starts again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Over…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over with permissions?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This removes every %1 entry from Privacy &amp; Security and restarts %1. You then allow each permission again from this page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removes all of %1&apos;s entries, including duplicates left by older builds, and asks again from scratch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::pages::RemotePage</name>
+    <message>
+        <source>Remote Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>See a linked computer&apos;s screen in a window on this one and use it with this keyboard and mouse, without looking at its own display. It uses the same connection as sharing the keyboard and mouse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Computers</source>
+        <translation type="unfinished">Computer</translation>
+    </message>
+    <message>
+        <source>No computers connected yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Computers appear here once they connect to this one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use this computer as the server to see and control the computers linked to it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sharp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth sends a smaller picture. Sharp sends full resolution (up to 4K), best for small text.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 frames per second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The most it sends; a still screen sends almost nothing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H.264 with the graphics hardware where both computers have it, otherwise compressed images.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compressed images (this build has no H.264 decoder).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When this computer is a client, its server may show its screen and control it. The first time, macOS asks to allow screen recording for %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When this computer is a client, its server may show its screen and control it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow remote viewing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While someone is watching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A notice appears in the corner of this screen when a viewer opens or closes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>deskflow::gui::pages::ScreenshotPage</name>
     <message>
         <source>Screenshot</source>
@@ -2730,6 +2986,137 @@ Copy something on any of your computers and it will show up here.</source>
     <message>
         <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
         <translation type="unfinished">&lt;p&gt;Sei sicuro di voler cancellare tutte le impostazioni e riavviare %1?&lt;/p&gt; &lt;p&gt;Questa operazione non può essere annullata.&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>deskflow::gui::remote::RemoteViewWindow</name>
+    <message>
+        <source>Display %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The picture comes back as soon as it connects again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching only: another computer is in control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another computer is controlling %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click the picture to take over once it has been idle for a moment.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for the picture…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen recording not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hasn&apos;t allowed screen recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1, open System Settings &gt; Privacy &amp; Security &gt; Screen &amp; System Audio Recording, turn on Deskflow, then restart Deskflow there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1, allow Deskflow to record the screen (on a Mac: System Settings &gt; Privacy &amp; Security &gt; Screen &amp; System Audio Recording), then restart Deskflow there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewing turned off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t allow remote viewing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It can be turned on in Deskflow on %1, under Remote Control.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 can&apos;t share its screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Deskflow on %1 to the same version as this computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote viewing works on macOS, Windows and Linux with X11; Wayland isn&apos;t supported yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t capture the screen of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting to %1…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — Remote Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sharp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth: smaller picture, less data. Sharp: full resolution, best for text.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Full Screen</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

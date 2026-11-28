@@ -33,6 +33,7 @@ struct FileTransferMessage;
 } // namespace deskflow
 namespace deskflow::client {
 class ClientHub;
+class RemoteViewSender;
 } // namespace deskflow::client
 class IDataSocket;
 class ISocketFactory;
@@ -175,6 +176,11 @@ public:
   //! Send a file transfer message to the server. False if not connected.
   bool sendFileTransferMessage(const deskflow::FileTransferMessage &message);
 
+  //! The server started, changed or stopped watching this computer's screen (JSON settings).
+  void handleRemoteViewSettings(const std::string &json);
+  //! The server showed the remote view frame with this sequence number.
+  void handleRemoteViewAck(uint32_t sequence);
+
   //! The host name this client connects to, for logs.
   std::string getServerName() const;
 
@@ -259,6 +265,7 @@ private:
   deskflow::IStream *m_stream = nullptr;
   EventQueueTimer *m_timer = nullptr;
   ServerProxy *m_server = nullptr;
+  std::unique_ptr<deskflow::client::RemoteViewSender> m_remoteView;
   bool m_ready = false;
   bool m_active = false;
   bool m_suspended = false;

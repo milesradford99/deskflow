@@ -241,5 +241,11 @@ enum class EventTypes : uint32_t
 
   /// The GUI asked for a file transfer to start or stop. The data object is a fileTransferIpc::Command.
   FileTransferCommand,
+
+  /// The remote view capture thread has pieces or state to send. Target: the RemoteViewSender.
+  RemoteViewOutput,
+
+  /// The GUI asked for something to do with a remote view. The data object is a remoteViewIpc::Command.
+  RemoteViewCommand,
 };
 } // namespace deskflow

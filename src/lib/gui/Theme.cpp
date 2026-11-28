@@ -125,6 +125,11 @@ QLabel[error="true"] { color: %17; }
 QLabel[status="true"] { border-radius: 11px; padding: 3px 11px; font-weight: 600; background: %4; color: %8; }
 QLabel[status="true"][state="ok"] { color: %18; }
 QLabel[status="true"][state="busy"] { color: %19; }
+QLabel[status="true"][state="warn"] { color: %17; }
+QLabel[badge="true"] {
+  background: %17; color: #ffffff; border-radius: 8px; padding: 0 5px; font-size: 11px; font-weight: 700;
+  min-width: 6px; min-height: 16px; max-height: 16px;
+}
 QLabel[keycap="true"] {
   background: %4; color: %8; border: 1px solid %5; border-radius: 5px; padding: 1px 6px; font-size: 12px;
 }

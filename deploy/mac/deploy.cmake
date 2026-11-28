@@ -19,6 +19,16 @@ if (OSX_BUNDLE)
       \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_PROPER_NAME}.app\"
       -hardened-runtime -timestamp \"-codesign=${APPLE_CODESIGN_DEV}\"
     )")
+  elseif (APPLE_CODESIGN_STABLE)
+    # A stable certificate (e.g. self-signed, see scripts/dev/make-signing-cert.sh): the designated
+    # requirement names the certificate instead of the build's hash, so macOS privacy permissions
+    # survive updates. Self-signed certificates have no Team ID either, so no hardened runtime.
+    install(CODE "execute_process(COMMAND
+      ${DEPLOYQT}
+      \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_PROPER_NAME}.app\"
+      \"-codesign=${APPLE_CODESIGN_STABLE}\"
+      COMMAND_ERROR_IS_FATAL ANY
+    )")
   else()
     install(CODE "execute_process(COMMAND
       ${DEPLOYQT}

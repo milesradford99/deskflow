@@ -45,7 +45,7 @@ static const int16_t kProtocolMajorVersion = 1;
  * @note When incrementing the minor version, the Deskflow application version should also increment
  * @since Protocol version 1.0
  */
-static const int16_t kProtocolMinorVersion = 10;
+static const int16_t kProtocolMinorVersion = 11;
 
 /**
  * @brief Default TCP port for Deskflow connections
@@ -1203,6 +1203,23 @@ extern const char *const kMsgDFileEnd;     ///< @see kMsgDFileStart
 extern const char *const kMsgDFileRequest; ///< @see kMsgDFileStart
 extern const char *const kMsgDFileDecline; ///< @see kMsgDFileStart
 extern const char *const kMsgDFilePeers;   ///< @see kMsgDFileStart
+
+/**
+ * @brief Remote view: the client streams its screen to a server
+ *
+ * - `DRVS%s`: server to client; JSON settings ({on, display, maxWidth, maxHeight, quality, fps, key}).
+ *   `on: false` stops the stream, `key: true` asks for a full frame.
+ * - `DRVF%s`: client to server; one piece of a frame (deskflow::remote::writePiece)
+ * - `DRVA%4i`: server to client; the frame with this sequence number was shown
+ *   (the client keeps at most two frames unacknowledged)
+ * - `DRVI%s`: client to server; JSON state ({state, displays: [{x, y, w, h}], detail})
+ *
+ * @since Protocol version 1.11
+ */
+extern const char *const kMsgDRemoteSettings;
+extern const char *const kMsgDRemoteFrame; ///< @see kMsgDRemoteSettings
+extern const char *const kMsgDRemoteAck;   ///< @see kMsgDRemoteSettings
+extern const char *const kMsgDRemoteInfo;  ///< @see kMsgDRemoteSettings
 
 /** @} */ // end of protocol_system group
 

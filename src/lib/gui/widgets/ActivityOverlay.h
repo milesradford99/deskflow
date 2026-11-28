@@ -60,7 +60,7 @@ public:
   void addKey(const QString &label, bool isText);
 
   //! Show an activity event with a coloured marker.
-  void addActivity(Kind kind, const QString &text);
+  void addActivity(Kind kind, const QString &text, bool always = false);
 
   /**
    * @brief Turn an `activity` message from the core into a bubble.

@@ -47,6 +47,13 @@ runs:
               too_new=1
             fi
           done
+          # macOS keys privacy permissions to the designated requirement: with a stable
+          # certificate it names the certificate, so the grants survive updates.
+          codesign -d -r- "$app" 2>&1 | grep -E "designated" || true
+          if [ -n "${APPLE_CODESIGN_STABLE:-}" ] && codesign -dv "$app" 2>&1 | grep -q "Signature=adhoc"; then
+            echo "::error::a stable signing certificate was configured but the app is ad-hoc signed"
+            too_new=1
+          fi
           hdiutil detach /tmp/deskflow-dmg
           exit $too_new
 

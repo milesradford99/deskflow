@@ -23,7 +23,8 @@ Widgets opt into roles with dynamic properties rather than their own style sheet
 - `nav` (QPushButton): a sidebar row; `segment` (QPushButton) inside a `segmentTrack` (QFrame)
 - `title` / `heading` / `eyebrow` / `secondary` / `tertiary` / `rowTitle` / `rowDetail` /
   `error` / `keycap` (QLabel): text roles
-- `status` (QLabel) with `state` = ok | busy | off: a status pill
+- `status` (QLabel) with `state` = ok | busy | warn | off: a status pill
+- `badge` (QLabel): a small red count, e.g. on a sidebar row that needs attention
 */
 namespace deskflow::gui::theme {
 

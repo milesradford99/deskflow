@@ -119,17 +119,21 @@ void IpcClient::handleErrorOccurred()
 
 void IpcClient::handleReadyRead()
 {
+  // remote view frames are large and arrive in many reads: only look for the end in what is new
+  const qsizetype searchFrom = m_readBuffer.size();
   QByteArray data = m_readBuffer + m_socket->readAll();
   m_readBuffer.clear();
 
-  while (data.contains('\n')) {
-    const auto index = data.indexOf('\n');
-    const auto message = QString::fromUtf8(data.left(index));
-    data.remove(0, index + 1);
+  qsizetype consumed = 0;
+  qsizetype index = data.indexOf('\n', searchFrom);
+  while (index >= 0) {
+    const auto message = QString::fromUtf8(data.constData() + consumed, index - consumed);
+    consumed = index + 1;
+    index = data.indexOf('\n', consumed);
 
     const auto parts = message.split('=');
-    // Key presses for the activity overlay are private and frequent: never log them.
-    if (parts.at(0) != QStringLiteral("key")) {
+    // Key presses for the activity overlay are private and frequent, remote view frames huge: never log them.
+    if (parts.at(0) != QStringLiteral("key") && parts.at(0) != QStringLiteral("remoteFrame")) {
       qDebug().noquote() << QStringLiteral("%1 ipc client message: %2").arg(m_typeName, message);
     }
     if (parts.isEmpty()) {
@@ -152,8 +156,8 @@ void IpcClient::handleReadyRead()
     processCommand(parts.at(0), parts);
   }
 
-  if (!data.isEmpty()) {
-    m_readBuffer = data;
+  if (consumed < data.size()) {
+    m_readBuffer = data.mid(consumed);
   }
 }
 
@@ -218,7 +222,10 @@ void IpcClient::sendMessage(const QString &message)
   }
 
   m_socket->write(message.toUtf8() + "\n");
-  qDebug().noquote() << QStringLiteral("%1 ipc client sent message: %2").arg(m_typeName, message);
+  // remote view input is frequent and may be typed text: not for the log
+  if (!message.startsWith(QStringLiteral("remoteInput=")) && !message.startsWith(QStringLiteral("remoteAck="))) {
+    qDebug().noquote() << QStringLiteral("%1 ipc client sent message: %2").arg(m_typeName, message);
+  }
 }
 
 } // namespace deskflow::gui::ipc

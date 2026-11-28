@@ -114,7 +114,10 @@ void IpcServer::handleErrorOccurred()
 
 void IpcServer::processMessage(QLocalSocket *clientSocket, const QString &message)
 {
-  LOG_VERBOSE("%s ipc server got message: %s", m_typeName.constData(), message.toUtf8().constData());
+  // remote view input may be typed text (passwords): never in the log
+  if (!message.startsWith(QStringLiteral("remoteInput="))) {
+    LOG_VERBOSE("%s ipc server got message: %s", m_typeName.constData(), message.toUtf8().constData());
+  }
   const auto parts = message.split('=');
   if (parts.isEmpty()) {
     LOG_ERR("%s ipc server got invalid message: %s", m_typeName.constData(), message.toUtf8().constData());

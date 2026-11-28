@@ -67,6 +67,18 @@ public:
     // older servers can't be told; their input is dropped until they leave
   }
 
+  //! Send one piece of a remote view frame; false if the server can't take it (protocol < 1.11).
+  virtual bool sendRemoteViewFrame(const std::string &)
+  {
+    return false;
+  }
+
+  //! Tell the server about the remote view (state, displays); ignored below protocol 1.11.
+  virtual void sendRemoteViewInfo(const std::string &)
+  {
+    // older servers don't ask for a remote view
+  }
+
   //@}
 
 protected:
@@ -85,6 +97,11 @@ protected:
   deskflow::IStream *getStream() const
   {
     return m_stream;
+  }
+
+  Client *getClient() const
+  {
+    return m_client;
   }
 
 private:

@@ -20,6 +20,7 @@
 #include "deskflow/OptionTypes.h"
 #include "deskflow/PacketStreamFilter.h"
 #include "deskflow/ProtocolTypes.h"
+#include "deskflow/RemoteViewIpc.h"
 #include "deskflow/StreamChunker.h"
 #include "deskflow/ipc/CoreIpc.h"
 #include "net/TCPSocket.h"
@@ -88,6 +89,10 @@ Server::Server(ServerConfig &config, PrimaryClient *primaryClient, deskflow::Com
       EventTypes::FileTransferCommand, deskflow::fileTransferIpc::eventTarget(),
       [this](const auto &e) { handleFileTransferCommand(e); }
   );
+  deskflow::remoteViewIpc::attach(m_events);
+  m_events->addHandler(EventTypes::RemoteViewCommand, deskflow::remoteViewIpc::eventTarget(), [this](const auto &e) {
+    handleRemoteViewCommand(e);
+  });
 
   // install event handlers
   m_events->addHandler(EventTypes::Timer, this, [this](const auto &) { handleSwitchWaitTimeout(); });
@@ -192,6 +197,8 @@ Server::~Server()
   m_events->removeHandler(Timer, this);
   m_events->removeHandler(FileTransferCommand, deskflow::fileTransferIpc::eventTarget());
   deskflow::fileTransferIpc::attach(nullptr);
+  m_events->removeHandler(RemoteViewCommand, deskflow::remoteViewIpc::eventTarget());
+  deskflow::remoteViewIpc::attach(nullptr);
   m_primaryClient->setClipboardFileSync(nullptr);
   stopSwitch();
 
@@ -354,6 +361,9 @@ void Server::sendConnectedClientsIpc() const
 
 void Server::handleControlDenied(const BaseClientProxy *client)
 {
+  if (remoteViewControlDenied(client))
+    return;
+
   // only matters while our cursor is on that client (and not for the screen saver)
   if (client != m_active || m_activeSaver != nullptr || client == m_primaryClient) {
     return;
@@ -590,6 +600,8 @@ void Server::switchComputer(BaseClientProxy *dst, int32_t x, int32_t y, bool for
 
     // cut over
     m_active = dst;
+    if (auto view = m_remoteViews.find(dst); view != m_remoteViews.end())
+      view->second.entered = false; // our cursor drives it now; the viewer re-enters when used again
 
     // increment enter sequence number
     ++m_seqNum;
@@ -1320,6 +1332,8 @@ void Server::handleClipboardGrabbed(const Event &event, BaseClientProxy *grabber
   if (grabber == m_primaryClient && m_active != m_primaryClient) {
     LOG_DEBUG("clipboard grabbed while active computer was changed, resending clipboard data");
     onClipboardChanged(m_primaryClient, info->m_id, clipboard.m_clipboardSeqNum);
+  } else if (grabber == m_primaryClient) {
+    remoteViewLocalClipboardChanged(info->m_id);
   }
 }
 
@@ -2074,6 +2088,8 @@ bool Server::removeClient(BaseClientProxy *client)
 
   m_fileTransfer->peerDisconnected(name);
   sendFilePeers();
+  if (m_remoteViews.erase(client) > 0)
+    deskflow::remoteViewIpc::sendInfo(name, QJsonObject{{"state", "stopped"}});
   return true;
 }
 
